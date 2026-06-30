@@ -26,12 +26,15 @@ function setGlobalCache(value: CachedConnection) {
 export const connectToDatabase = async() => {
   let cached = getGlobalCache();
 
+  console.log(MONGODB_URI);
+
   if (!cached) {
     cached = { conn: null, promise: null };
     setGlobalCache(cached);
   }
 
   if (cached.conn) {
+    console.log('already connected');
     return cached.conn;
   }
 
