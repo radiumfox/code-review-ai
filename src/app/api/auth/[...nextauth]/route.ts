@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import { connectToDatabase } from "@/lib/mongoose";
-import { type CallbacksOptions, type Profile } from 'next-auth';
+import { type CallbacksOptions } from 'next-auth';
 import { UserModel, UserRole } from "@/models/User";
 
 const GITHUB_ID = process.env.GITHUB_ID;
@@ -55,4 +55,5 @@ export const authOptions = {
     } satisfies Partial<CallbacksOptions>
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions)
+export { handler as GET, handler as POST}
