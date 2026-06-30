@@ -17,7 +17,7 @@ An AI-powered code review application that analyzes source code and provides str
 * TypeScript
 * MongoDB
 * NextAuth
-* OpenAI / Anthropic API
+* Google AI
 * Monaco Editor
 
 ## Project Status
