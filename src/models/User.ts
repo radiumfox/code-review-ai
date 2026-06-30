@@ -1,6 +1,8 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
+
+const USERS_COLLECTION_NAME = 'users';
 
 export enum UserRole {
     Admin = 'admin',
@@ -8,27 +10,30 @@ export enum UserRole {
 }
 
 const UserSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    githubId: {
-        type: String,
-        required: true
-    },
-    githubUsername: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: UserRole,
-        required: true
-    }
-}, { timestamps: true, collection: 'users' });
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  githubId: {
+    type: String,
+    required: true
+  },
+  githubUsername: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    enum: UserRole,
+    required: true
+  }
+}, {
+  timestamps: true,
+  collection: USERS_COLLECTION_NAME
+});
 
 export const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);
