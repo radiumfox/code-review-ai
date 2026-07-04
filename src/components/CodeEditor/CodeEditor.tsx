@@ -6,32 +6,25 @@ import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import SelectBase from '@/components/SelectBase';
 import StarIcon from '@/components/icons/StarIcon';
-
-type LanguageExtension = keyof typeof langs;
-
-const EDITOR_BASIC_SETUP = {
-  lineNumbers: true,
-  foldGutter: true,
-  indentOnInput: true,
-  autocompletion: true,
-};
-
-const THEME_CUSTOM_SETTINGS = {
-  settings: {
-    caret: '#c6c6c6',
-    fontFamily: '\'JetBrains Mono\', \'Fira Code\', \'Consolas\', monospace',
-    fontSize: '14px',
-  }
-};
-
-const allLanguages = Object.keys(langs) as LanguageExtension[];
-
-const DEFAULT_EDITOR_VALUE = 'console.log(\'hello world!\');';
-const DEFAULT_LANGUAGE = 'js';
+import {
+  DEFAULT_EDITOR_VALUE,
+  DEFAULT_LANGUAGE,
+  LANGUAGES_LIST,
+  LANGUAGES_NAMES_MAP,
+  EDITOR_BASIC_SETUP,
+  THEME_CUSTOM_SETTINGS
+} from "@/components/CodeEditor/config";
 
 export default function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
+
+  const languageItems = useMemo(() => {
+    return LANGUAGES_LIST.map((l) => ({
+      value: l,
+      label: LANGUAGES_NAMES_MAP[l] ?? l,
+    }));
+  }, []);
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
@@ -46,25 +39,25 @@ export default function CodeEditor() {
   }, [value]);
 
   return (
-    <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-8 xl:w-[50vw] xl:max-w-300 lg:w-full">
+    <div className="mx-auto px-2 md:px-6 lg:px-8 xl:max-w-250 md:w-[50vw] w-75 md:min-w-130">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
 
         {/* Toolbar */}
         <div className={
-          `flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 
+          `flex flex-col md:flex-row items-stretch md:items-center gap-2 sm:gap-3 
           px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
           <div className="flex items-center gap-2 sm:gap-3 flex-1">
-            <span className="text-xs sm:text-sm font-medium text-[#6c6cff] tracking-wide uppercase sm:inline flex items-center gap-1.5">
-              <StarIcon />
-              Code Editor
-            </span>
+            <div className="flex items-center gap-2">
+              <StarIcon className="text-[#6c6cff] w-5 h-5" />
+              <span className="uppercase text-xs sm:text-sm font-medium text-[#6c6cff]">Code Editor</span>
+            </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
             <SelectBase
-              items={allLanguages}
+              items={languageItems}
               value={lang}
               onChange={onLanguageChange}
               placeholder="Search language..."
@@ -89,7 +82,7 @@ export default function CodeEditor() {
         {/* Footer */}
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 bg-[#151540] border-t border-[#1e1e4a]">
           <span className="text-xs text-gray-500 truncate">
-            {lang}
+            {LANGUAGES_NAMES_MAP[lang] ?? lang}
           </span>
           <span className="text-xs text-gray-500">
             {linesCount}

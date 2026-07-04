@@ -3,12 +3,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ChevronIcon from '@/components/icons/ChevronIcon';
 
+type SelectItem<T extends string> = { value: T; label: string };
+
 type SelectBaseProps<T extends string> = {
-  items: readonly T[];
+  items: readonly SelectItem<T>[];
   value: T;
   onChange: (value: T) => void;
   placeholder?: string;
   notFoundText?: string;
+  className?: string;
 };
 
 export default function SelectBase<T extends string>({
@@ -17,6 +20,7 @@ export default function SelectBase<T extends string>({
   onChange,
   placeholder = 'Search...',
   notFoundText = 'Not found',
+  className = ''
 }: SelectBaseProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -25,7 +29,7 @@ export default function SelectBase<T extends string>({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filteredItems = search
-    ? items.filter((name) => name.toLowerCase().includes(search.toLowerCase()))
+    ? items.filter((item) => item.label.toLowerCase().includes(search.toLowerCase()))
     : items;
 
   useEffect(() => {
@@ -40,8 +44,8 @@ export default function SelectBase<T extends string>({
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleSelect = (name: T) => {
-    onChange(name);
+  const handleSelect = (item: SelectItem<T>) => {
+    onChange(item.value);
     setIsOpen(false);
     setSearch('');
   };
@@ -53,10 +57,11 @@ export default function SelectBase<T extends string>({
     }
   };
 
-  const displayed = isOpen ? search : value;
+  const activeLabel = items.find((item) => item.value === value)?.label ?? value;
+  const displayed = isOpen ? search : activeLabel;
 
   return (
-    <div ref={containerRef} className="relative w-full min-w-35 sm:min-w-45 md:min-w-55">
+    <div ref={containerRef} className={`relative w-full min-w-35 md:min-w-55 ${className}`}>
       <div className="relative">
         <input
           ref={inputRef}
@@ -66,8 +71,8 @@ export default function SelectBase<T extends string>({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={
-            `w-full bg-[#1a1a3e] text-[#dfdfe2] text-sm sm:text-base rounded-lg border border-[#2a2a5a] 
-             px-3 py-2 sm:px-4 sm:py-2.5 pr-10 outline-none 
+            `w-full bg-[#1a1a3e] text-[#dfdfe2] text-sm md:text-base rounded-lg border border-[#2a2a5a] 
+             px-3 py-2 md:px-4 md:py-2.5 pr-10 outline-none 
              placeholder:text-[#5a5a8a] transition-colors
              focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40
              cursor-text`
@@ -91,16 +96,16 @@ export default function SelectBase<T extends string>({
                 {notFoundText}
               </div>
             ) : (
-              filteredItems.map((name) => (
+              filteredItems.map((item) => (
                 <button
-                  key={name}
-                  onClick={() => handleSelect(name)}
+                  key={item.value}
+                  onClick={() => handleSelect(item)}
                   className={
                     `w-full text-left px-3 sm:px-4 py-2 text-sm sm:text-base transition-colors
-                    ${name === value ? 'bg-[#6c6cff]/20 text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}
+                    ${item.value === value ? 'bg-[#6c6cff]/20 text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}
                   `}
                 >
-                  {name}
+                  {item.label}
                 </button>
               ))
             )}
