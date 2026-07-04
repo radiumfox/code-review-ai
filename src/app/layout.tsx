@@ -37,7 +37,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           { session && <HeaderBase /> }
-          <main className="flex-1">{ children }</main>
+          <main className="flex-1 flex justify-center items-center">{ children }</main>
         </Providers>
       </body>
     </html>
