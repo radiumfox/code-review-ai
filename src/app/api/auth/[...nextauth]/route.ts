@@ -1,8 +1,8 @@
-import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github";
-import { connectToDatabase } from "@/lib/mongoose";
+import NextAuth from 'next-auth';
+import GithubProvider from 'next-auth/providers/github';
+import { connectToDatabase } from '@/lib/mongoose';
 import { type CallbacksOptions } from 'next-auth';
-import { UserModel, UserRole } from "@/models/User";
+import { UserModel, UserRole } from '@/models/User';
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
@@ -15,45 +15,45 @@ declare module 'next-auth' {
 }
 
 if(!GITHUB_ID || !GITHUB_SECRET){
-    throw new Error('Missing GitHub ID or GitHub secret environment variable');
+  throw new Error('Missing GitHub ID or GitHub secret environment variable');
 }
 
 if(!NEXTAUTH_SECRET){
-    throw new Error('Missing NEXTAUTH_SECRET environment variable');
+  throw new Error('Missing NEXTAUTH_SECRET environment variable');
 }
 
 export const authOptions = {
-    providers: [
-        GithubProvider({
-            clientId: GITHUB_ID,
-            clientSecret: GITHUB_SECRET,
-        })
-    ],
-    secret: NEXTAUTH_SECRET,
-    callbacks: {
-        async signIn ({ user, profile }) {
-            if(!user.email) return false;
+  providers: [
+    GithubProvider({
+      clientId: GITHUB_ID,
+      clientSecret: GITHUB_SECRET,
+    })
+  ],
+  secret: NEXTAUTH_SECRET,
+  callbacks: {
+    async signIn ({ user, profile }) {
+      if(!user.email) return false;
 
-            try {
-                await connectToDatabase();
-                const currentUser = await UserModel.findOne({ email: user.email });
+      try {
+        await connectToDatabase();
+        const currentUser = await UserModel.findOne({ email: user.email });
 
-                if(!currentUser){
-                    await UserModel.create({
-                        name: user.name,
-                        email: user.email,
-                        role: UserRole.User,
-                        githubUsername: profile?.login,
-                        githubId: profile?.id
-                    });
-                }
-            } catch (error) {
-
-            }
-            return true;
+        if(!currentUser){
+          await UserModel.create({
+            name: user.name,
+            email: user.email,
+            role: UserRole.User,
+            githubUsername: profile?.login,
+            githubId: profile?.id
+          });
         }
-    } satisfies Partial<CallbacksOptions>
+      } catch (error) {
+        console.error(error);
+      }
+      return true;
+    }
+  } satisfies Partial<CallbacksOptions>
 };
 
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST}
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST};

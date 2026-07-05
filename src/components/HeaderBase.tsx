@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { signOut } from "next-auth/react";
-import ButtonSecondary from "./ButtonSecondary";
+import { signOut } from 'next-auth/react';
+import ButtonSecondary from './ButtonSecondary';
 
 export default function HeaderBase() {
   return (
@@ -9,7 +9,10 @@ export default function HeaderBase() {
       <span className="text-sm uppercase tracking-[0.2em] text-[#dfdfe2]">
         Code Review AI
       </span>
-      <ButtonSecondary onClick={() => signOut()} text="Sign Out" />
+      <ButtonSecondary
+        onClick={() => signOut()}
+        text="Sign Out"
+      />
     </header>
   );
 }

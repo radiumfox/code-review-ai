@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI ?? '';
 
@@ -26,15 +26,12 @@ function setGlobalCache(value: CachedConnection) {
 export const connectToDatabase = async() => {
   let cached = getGlobalCache();
 
-  console.log(MONGODB_URI);
-
   if (!cached) {
     cached = { conn: null, promise: null };
     setGlobalCache(cached);
   }
 
   if (cached.conn) {
-    console.log('already connected');
     return cached.conn;
   }
 
@@ -63,5 +60,5 @@ export const connectToDatabase = async() => {
   }
 
   return cached.conn;
-}
+};
 

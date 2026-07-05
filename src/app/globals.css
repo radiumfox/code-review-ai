@@ -17,3 +17,17 @@ body {
   color: var(--foreground);
   font-family: "Courier New", "Consolas", monospace;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #0d0d2b;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #2a2a5a;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3a3a7a;
+}
