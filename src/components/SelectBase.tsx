@@ -61,7 +61,7 @@ export default function SelectBase<T extends string>({
   const displayed = isOpen ? search : activeLabel;
 
   return (
-    <div ref={containerRef} className={`relative w-full min-w-35 md:min-w-55 ${className}`}>
+    <div ref={containerRef} className={`relative w-full min-w-45 ${className}`}>
       <div className="relative">
         <input
           ref={inputRef}
@@ -71,8 +71,8 @@ export default function SelectBase<T extends string>({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={
-            `w-full bg-[#1a1a3e] text-[#dfdfe2] text-sm md:text-base rounded-lg border border-[#2a2a5a] 
-             px-3 py-2 md:px-4 md:py-2.5 pr-10 outline-none 
+            `w-full bg-[#1a1a3e] text-[#dfdfe2] text-sm rounded-lg border border-[#2a2a5a] 
+             px-3 py-2 pr-10 outline-none 
              placeholder:text-[#5a5a8a] transition-colors
              focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40
              cursor-text`
@@ -90,9 +90,9 @@ export default function SelectBase<T extends string>({
             overflow-hidden`
           }
         >
-          <div className="max-h-48 sm:max-h-56 md:max-h-64 overflow-y-auto custom-scrollbar">
+          <div className="max-h-56 overflow-y-auto custom-scrollbar">
             {filteredItems.length === 0 ? (
-              <div className="px-3 sm:px-4 py-3 text-sm text-[#5a5a8a] text-center">
+              <div className="px-3 py-3 text-sm text-[#5a5a8a] text-center">
                 {notFoundText}
               </div>
             ) : (
@@ -101,7 +101,7 @@ export default function SelectBase<T extends string>({
                   key={item.value}
                   onClick={() => handleSelect(item)}
                   className={
-                    `w-full text-left px-3 sm:px-4 py-2 text-sm sm:text-base transition-colors
+                    `w-full text-left px-3 py-2 text-sm transition-colors
                     ${item.value === value ? 'bg-[#6c6cff]/20 text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}
                   `}
                 >

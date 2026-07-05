@@ -13,7 +13,7 @@ import {
   LANGUAGES_NAMES_MAP,
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
-} from "@/components/CodeEditor/config";
+} from '@/components/CodeEditor/config';
 
 export default function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -39,19 +39,19 @@ export default function CodeEditor() {
   }, [value]);
 
   return (
-    <div className="mx-auto px-2 md:px-6 lg:px-8 xl:max-w-250 md:w-[50vw] w-75 md:min-w-130">
+    <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
 
         {/* Toolbar */}
         <div className={
           `flex flex-col md:flex-row items-stretch md:items-center gap-2 sm:gap-3 
-          px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 
+          px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 transition-all duration-300
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
           <div className="flex items-center gap-2 sm:gap-3 flex-1">
             <div className="flex items-center gap-2">
               <StarIcon className="text-[#6c6cff] w-5 h-5" />
-              <span className="uppercase text-xs sm:text-sm font-medium text-[#6c6cff]">Code Editor</span>
+              <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
@@ -80,7 +80,7 @@ export default function CodeEditor() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 bg-[#151540] border-t border-[#1e1e4a]">
+        <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
           <span className="text-xs text-gray-500 truncate">
             {LANGUAGES_NAMES_MAP[lang] ?? lang}
           </span>
