@@ -10,8 +10,6 @@ export default async function Home() {
     redirect('/login');
   }
 
-
-
   return (
     <div className="flex flex-col items-center justify-center space-y-6">
       <h1 className="text-2xl font-bold">Welcome, {session.user?.name}</h1>

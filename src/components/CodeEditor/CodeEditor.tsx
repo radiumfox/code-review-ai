@@ -35,8 +35,17 @@ export default function CodeEditor() {
   }, []);
 
   const linesCount = useMemo(() => {
-    return `${value.split('\n').length} line${value.split('\n').length !== 1 ? 's' : ''}`;
+    const valueLength = value.split('\n').length;
+    return `${valueLength} line${valueLength !== 1 ? 's' : ''}`;
   }, [value]);
+
+  const extensions = useMemo(() => {
+    return [langs[lang]()];
+  }, [lang]);
+
+  const theme = useMemo(() => {
+    return auraInit(THEME_CUSTOM_SETTINGS);
+  }, []);
 
   return (
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
@@ -72,10 +81,10 @@ export default function CodeEditor() {
             value={value}
             height="300px"
             width="100%"
-            extensions={[langs[lang]()]}
+            extensions={extensions}
             onChange={onValueChange}
             basicSetup={EDITOR_BASIC_SETUP}
-            theme={auraInit(THEME_CUSTOM_SETTINGS)}
+            theme={theme}
           />
         </div>
 

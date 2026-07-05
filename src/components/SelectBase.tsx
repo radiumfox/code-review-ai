@@ -33,8 +33,8 @@ export default function SelectBase<T extends string>({
     : items;
 
   useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+    const handleClick = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         setSearch('');
       }
@@ -50,8 +50,8 @@ export default function SelectBase<T extends string>({
     setSearch('');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
       setIsOpen(false);
       setSearch('');
     }
@@ -77,8 +77,9 @@ export default function SelectBase<T extends string>({
              focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40
              cursor-text`
           }
+          autoComplete="off"
         />
-        <ChevronIcon className={isOpen ? 'rotate-180' : ''} />
+        <ChevronIcon className={`${isOpen ? 'rotate-180' : ''} transition-transform duration-150`} />
       </div>
 
       {isOpen && (
