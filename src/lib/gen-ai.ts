@@ -32,10 +32,10 @@ export async function fetchModels(pageToken?: string): Promise<FetchModelReturn>
   });
 
   const models = pager.page
-      .map(model => ({
-        name: model.name ?? '',
-        displayName: model.displayName ?? model.name ?? '' })
-      );
+    .map(model => ({
+      name: model.name ?? '',
+      displayName: model.displayName ?? model.name ?? '' })
+    );
 
   const nextPageToken = pager.hasNextPage() ? pager.params.config?.pageToken ?? null : null;
 

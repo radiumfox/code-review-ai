@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IssueSeverity, IssueCategory } from "@/lib/types";
+import { IssueSeverity, IssueCategory } from '@/lib/types';
 
 const { Schema } = mongoose;
 

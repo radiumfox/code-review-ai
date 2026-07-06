@@ -3,7 +3,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import CodeEditor from '@/components/CodeEditor/CodeEditor';
 
-import { fetchModels } from "@/lib/gen-ai";
+import { fetchModels } from '@/lib/gen-ai';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -13,8 +13,8 @@ export default async function Home() {
   }
 
   const {
-      models: initialModels,
-      nextPageToken: initialNextPageToken
+    models: initialModels,
+    nextPageToken: initialNextPageToken
   } = await fetchModels();
 
   return (

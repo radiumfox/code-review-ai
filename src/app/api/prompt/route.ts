@@ -1,6 +1,6 @@
-import { googleGenAI } from "@/lib/gen-ai";
-import {NextRequest} from "next/server";
+import { googleGenAI } from '@/lib/gen-ai';
+import {NextRequest} from 'next/server';
 
 export async function GET(request: NextRequest) {
-    const body = await request.json();
+  const body = await request.json();
 }

@@ -12,11 +12,11 @@ interface ModelSelectProps {
 }
 
 export default function ModelSelect({
-    initialModels,
-    initialNextPageToken,
-    value,
-    onChange
-  }: ModelSelectProps) {
+  initialModels,
+  initialNextPageToken,
+  value,
+  onChange
+}: ModelSelectProps) {
   const [models, setModels] = useState(initialModels);
   const [nextPageToken, setNextPageToken] = useState(initialNextPageToken);
   const [isLoading, setIsLoading] = useState(false);
