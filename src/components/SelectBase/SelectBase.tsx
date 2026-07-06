@@ -2,31 +2,40 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import ChevronIcon from '@/components/icons/ChevronIcon';
+import { useInfiniteScroll } from '@/lib/useInfiniteScroll';
+import { SelectBaseItem } from "./SelectBaseItem";
 
 type SelectItem<T extends string> = { value: T; label: string };
 
 type SelectBaseProps<T extends string> = {
   items: readonly SelectItem<T>[];
   value: T;
-  onChange: (value: T) => void;
+  onChange?(value: T): void;
   placeholder?: string;
   notFoundText?: string;
   className?: string;
+  onScrollEnd?(): void;
+  isLoading?: boolean;
+  hasMore?: boolean;
 };
 
-export default function SelectBase<T extends string>({
+export function SelectBase<T extends string>({
   items,
   value,
   onChange,
   placeholder = 'Search...',
   notFoundText = 'Not found',
-  className = ''
+  className = '',
+  onScrollEnd,
+  isLoading = false,
+  hasMore = false
 }: SelectBaseProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const filteredItems = search
     ? items.filter((item) => item.label.toLowerCase().includes(search.toLowerCase()))
@@ -44,8 +53,10 @@ export default function SelectBase<T extends string>({
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  useInfiniteScroll(sentinelRef, onScrollEnd, hasMore && isOpen);
+
   const handleSelect = (item: SelectItem<T>) => {
-    onChange(item.value);
+    if(onChange) onChange(item.value);
     setIsOpen(false);
     setSearch('');
   };
@@ -66,7 +77,7 @@ export default function SelectBase<T extends string>({
         <input
           ref={inputRef}
           value={displayed}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(event) => setSearch(event.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
@@ -92,23 +103,26 @@ export default function SelectBase<T extends string>({
           }
         >
           <div className="max-h-56 overflow-y-auto custom-scrollbar">
-            {filteredItems.length === 0 ? (
+            {filteredItems.length === 0 && !isLoading ? (
               <div className="px-3 py-3 text-sm text-[#5a5a8a] text-center">
                 {notFoundText}
               </div>
             ) : (
-              filteredItems.map((item) => (
-                <button
-                  key={item.value}
-                  onClick={() => handleSelect(item)}
-                  className={
-                    `w-full text-left px-3 py-2 text-sm transition-colors
-                    ${item.value === value ? 'bg-[#6c6cff]/20 text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}
-                  `}
-                >
-                  {item.label}
-                </button>
-              ))
+              <>
+                {filteredItems.map((item) => (
+                  <SelectBaseItem
+                    key={item.value}
+                    onClick={() => handleSelect(item)}
+                    isCurrent={item.value === value}
+                    text={item.label}
+                  />
+                ))}
+                {hasMore && (
+                  <div ref={sentinelRef} className="flex items-center justify-center px-3 py-3">
+                    <div className={`h-5 w-5 rounded-full border-2 border-[#6c6cff] border-t-transparent ${isLoading ? 'animate-spin' : ''}`} />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

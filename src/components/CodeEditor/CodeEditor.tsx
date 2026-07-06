@@ -4,7 +4,8 @@ import CodeMirror from '@uiw/react-codemirror';
 import {useCallback, useMemo, useState} from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import SelectBase from '@/components/SelectBase';
+import { SelectBase } from '@/components/SelectBase';
+import ModelSelect from '@/components/ModelSelect';
 import StarIcon from '@/components/icons/StarIcon';
 import {
   DEFAULT_EDITOR_VALUE,
@@ -14,10 +15,17 @@ import {
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
 } from '@/components/CodeEditor/config';
+import type { ModelItem } from '@/lib/gen-ai';
 
-export default function CodeEditor() {
+type CodeEditorProps = {
+  initialModels: ModelItem[];
+  initialNextPageToken: string | null;
+};
+
+export default function CodeEditor({ initialModels, initialNextPageToken }: CodeEditorProps) {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
+  const [model, setModel] = useState(initialModels[0]?.name ?? '');
 
   const languageItems = useMemo(() => {
     return LANGUAGES_LIST.map((l) => ({
@@ -63,6 +71,19 @@ export default function CodeEditor() {
               <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
           </div>
+
+          {/* Model select */}
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
+            <ModelSelect
+              initialModels={initialModels}
+              initialNextPageToken={initialNextPageToken}
+              value={model}
+              onChange={setModel}
+            />
+          </div>
+
+          {/* Language select */}
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
             <SelectBase
