@@ -4,20 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ChevronIcon from '@/components/icons/ChevronIcon';
 import { useInfiniteScroll } from '@/lib/useInfiniteScroll';
 import { SelectBaseItem } from './SelectBaseItem';
-
-type SelectItem<T extends string> = { value: T; label: string };
-
-type SelectBaseProps<T extends string> = {
-  items: readonly SelectItem<T>[];
-  value: T;
-  onChange?(value: T): void;
-  placeholder?: string;
-  notFoundText?: string;
-  className?: string;
-  onScrollEnd?(): void;
-  isLoading?: boolean;
-  hasMore?: boolean;
-};
+import type { SelectItem, SelectBaseProps } from "@/components/SelectBase/types";
 
 export function SelectBase<T extends string>({
   items,

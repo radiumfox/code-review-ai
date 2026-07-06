@@ -1,11 +1,11 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import {useCallback, useMemo, useState} from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { SelectBase } from '@/components/SelectBase';
-import ModelSelect from '@/components/ModelSelect';
+import { ModelSelect } from '@/components/ModelSelect';
 import StarIcon from '@/components/icons/StarIcon';
 import {
   DEFAULT_EDITOR_VALUE,
@@ -15,14 +15,9 @@ import {
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
 } from '@/components/CodeEditor/config';
-import type { ModelItem } from '@/lib/gen-ai';
+import type { CodeEditorProps } from "@/components/CodeEditor/types";
 
-type CodeEditorProps = {
-  initialModels: ModelItem[];
-  initialNextPageToken: string | null;
-};
-
-export default function CodeEditor({ initialModels, initialNextPageToken }: CodeEditorProps) {
+export function CodeEditor({ initialModels, initialNextPageToken }: CodeEditorProps) {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState(initialModels[0]?.name ?? '');

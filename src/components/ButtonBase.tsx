@@ -8,7 +8,7 @@ interface ButtonBaseProps {
   text: string;
 }
 
-export default function ButtonBase({ onClick, icon, text }: ButtonBaseProps) {
+export function ButtonBase({ onClick, icon, text }: ButtonBaseProps) {
   return (
     <button
       onClick={onClick}

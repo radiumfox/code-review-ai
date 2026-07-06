@@ -11,7 +11,7 @@ interface ModelSelectProps {
   onChange(value: string): void;
 }
 
-export default function ModelSelect({
+export function ModelSelect({
   initialModels,
   initialNextPageToken,
   value,

@@ -1,11 +1,7 @@
 'use client';
 import React from 'react';
+import { SelectBaseItemProps } from "@/components/SelectBase/types";
 
-interface SelectBaseItemProps {
-    text: string;
-    isCurrent: boolean;
-    onClick?: () => void
-}
 
 export function SelectBaseItem({ onClick, text, isCurrent }: SelectBaseItemProps) {
   return (
