@@ -1,13 +1,9 @@
 import mongoose from 'mongoose';
+import {UserRole} from "@/lib/types";
 
 const { Schema } = mongoose;
 
 const USERS_COLLECTION_NAME = 'users';
-
-export enum UserRole {
-    Admin = 'admin',
-    User = 'user'
-}
 
 const UserSchema = new Schema({
   name: {

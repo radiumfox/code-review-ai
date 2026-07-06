@@ -2,7 +2,8 @@ import NextAuth from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
 import { connectToDatabase } from '@/lib/mongoose';
 import { type CallbacksOptions } from 'next-auth';
-import { UserModel, UserRole } from '@/models/User';
+import { UserModel } from '@/models/User';
+import { UserRole } from "@/lib/types";
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
