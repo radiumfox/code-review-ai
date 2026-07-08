@@ -1,4 +1,4 @@
-import {GoogleGenAI, type Model} from '@google/genai';
+import {ContentListUnion, GoogleGenAI, type Model} from '@google/genai';
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODELS_PAGE_SIZE = 20;
@@ -34,4 +34,18 @@ export async function fetchModels(pageToken?: string): Promise<FetchModelReturn>
     models,
     nextPageToken
   };
+}
+
+export async function generateContent({ contents, model }: { contents: ContentListUnion, model: string }) {
+  const aiClient = await googleGenAI();
+
+  const response = await aiClient.models.generateContent({
+    model,
+    contents,
+    config: {
+      responseMimeType: "application/json"
+    }
+  });
+
+  return response.candidates;
 }
