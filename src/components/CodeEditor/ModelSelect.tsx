@@ -1,25 +1,40 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { SelectBase } from '@/components/SelectBase';
-import type { ModelItem } from '@/lib/gen-ai';
+import { Model } from "@google/genai";
 
 interface ModelSelectProps {
-  initialModels: ModelItem[];
-  initialNextPageToken: string | null;
   value: string;
   onChange(value: string): void;
 }
 
 export function ModelSelect({
-  initialModels,
-  initialNextPageToken,
   value,
   onChange
 }: ModelSelectProps) {
-  const [models, setModels] = useState(initialModels);
-  const [nextPageToken, setNextPageToken] = useState(initialNextPageToken);
+  const [models, setModels] = useState<{ value: string; label: string }[]>([]);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/models')
+      .then(response => response.json())
+      .then(data => {
+        const items = data.models.map((model: Model) => ({
+          value: model.name,
+          label: model.displayName || model.name,
+        }));
+
+        setModels(items);
+        setNextPageToken(data.nextPageToken);
+
+        if (!value && items.length > 0) {
+          onChange(items[0].value);
+        }
+      })
+      .catch(error => console.error('Failed to load models', error));
+  }, []);
 
   const loadMore = useCallback(async () => {
     if (isLoading || !nextPageToken) return;
@@ -30,7 +45,12 @@ export function ModelSelect({
       const response = await fetch(`/api/models?pageToken=${encodeURIComponent(nextPageToken)}`);
       const data = await response.json();
 
-      setModels(prev => [...prev, ...data.models]);
+      const items = data.models.map((model: Model) => ({
+        value: model.name,
+        label: model.displayName || model.name,
+      }));
+
+      setModels(prev => [...prev, ...items]);
       setNextPageToken(data.nextPageToken);
     } catch (error) {
       console.error('Failed to load models', error);
@@ -39,14 +59,9 @@ export function ModelSelect({
     }
   }, [isLoading, nextPageToken]);
 
-  const items = models.map(model => ({
-    value: model.name,
-    label: model.displayName || model.name,
-  }));
-
   return (
     <SelectBase
-      items={items}
+      items={models}
       value={value}
       onChange={onChange}
       placeholder="Search model..."

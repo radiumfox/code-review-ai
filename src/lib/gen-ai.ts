@@ -1,4 +1,4 @@
-import {GoogleGenAI} from '@google/genai';
+import {GoogleGenAI, type Model} from '@google/genai';
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODELS_PAGE_SIZE = 20;
@@ -11,13 +11,8 @@ export const googleGenAI = async () => {
   return new GoogleGenAI({ apiKey: API_KEY });
 };
 
-export interface ModelItem {
-  name: string;
-  displayName: string
-}
-
 interface FetchModelReturn {
-  models: ModelItem[];
+  models: Model[];
   nextPageToken: string | null
 }
 
@@ -31,11 +26,7 @@ export async function fetchModels(pageToken?: string): Promise<FetchModelReturn>
     }
   });
 
-  const models = pager.page
-    .map(model => ({
-      name: model.name ?? '',
-      displayName: model.displayName ?? model.name ?? '' })
-    );
+  const models = pager.page;
 
   const nextPageToken = pager.hasNextPage() ? pager.params.config?.pageToken ?? null : null;
 
