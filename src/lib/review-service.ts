@@ -5,9 +5,8 @@ import {Candidate} from "@google/genai";
 import {reviewSchema} from "@/lib/validations/review";
 import {connectToDatabase} from "@/lib/mongoose";
 import {ReviewModel} from "@/models/Review";
-import {NextResponse} from "next/server";
 import {IssueCategory, IssueSeverity} from "@/lib/types";
-import { ObjectId } from "mongodb";
+import {ObjectId} from "mongodb";
 
 interface ReviewInput {
     userId: ObjectId;
@@ -24,7 +23,7 @@ interface Issue {
 }
 
 interface Review extends ReviewInput {
-    summary?: string;
+    summary: string;
     issues?: Issue[]
 }
 
@@ -35,6 +34,10 @@ function buildPrompt(input: ReviewInput) {
     });
 }
 
+function aiError(message: string, statusCode: number = 502) {
+    return { success: false as const, error: message, statusCode };
+}
+
 async function callAI(prompt: string) {
     try {
         return await generateContent({
@@ -42,7 +45,7 @@ async function callAI(prompt: string) {
             model: promptTemplate.model
         });
     } catch (error) {
-        console.error(error);
+        throw aiError('AI generation failed');
     }
 }
 
@@ -50,48 +53,36 @@ function extractText(candidates: Candidate[] | undefined): string | null {
     return candidates?.[0]?.content?.parts?.[0]?.text ?? null;
 }
 
-async function parseAIResponse(aiResponse: Candidate[]) {
-    try {
-        const text = extractText(aiResponse) ?? '';
-
-        return JSON.parse(text);
-    } catch (error) {
-        console.error(error);
-    }
+function parseAIResponse(aiResponse: Candidate[]) {
+    const text = extractText(aiResponse) ?? '';
+    return JSON.parse(text);
 }
 
 function validateReviewData(data: unknown) {
     const reviewData = reviewSchema.safeParse(data);
 
     if(!reviewData.success) {
-        return undefined;
+        throw reviewData.error;
     }
 
     return reviewData.data;
 }
 
 async function persistReview(payload: Review) {
-    try {
-        await connectToDatabase();
+    await connectToDatabase();
 
-        const review = await ReviewModel.create({
-            ...payload
-        });
-
-        return NextResponse.json(review, { status: 200 });
-    } catch (error) {
-        console.error('Error creating review');
-        return undefined;
-    }
+    return await ReviewModel.create({
+        ...payload
+    });
 }
 
 export async function createReview(input: ReviewInput) {
     const prompt = buildPrompt(input);
+
     const aiResponse = await callAI(prompt);
 
     if(!aiResponse) {
-        console.error('Error creating review');
-        return undefined;
+        throw aiError('AI returned no candidates', 502);
     }
 
     const reviewData = await parseAIResponse(aiResponse);

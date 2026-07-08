@@ -4,14 +4,21 @@ import { z } from 'zod';
 import { createReview } from "@/lib/review-service";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  const input = reviewInputSchema.safeParse(body);
+    const input = reviewInputSchema.safeParse(body);
 
-  if(!input.success) {
-    return NextResponse.json(z.treeifyError(input.error), { status: 400 });
+    if(!input.success) {
+      return NextResponse.json(z.treeifyError(input.error), { status: 400 });
+    }
+
+    const review = await createReview(input.data);
+    return NextResponse.json(review, { status: 200 });
+  } catch (error: any) {
+    if (error?.success === false) {
+      return NextResponse.json({ error: error.error }, { status: error.statusCode });
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const review = await createReview(input.data);
-  return NextResponse.json(review, { status: 200 });
 }
