@@ -1,4 +1,4 @@
-import {ContentListUnion, GoogleGenAI, type Model} from '@google/genai';
+import { ContentListUnion, GoogleGenAI, type Model } from '@google/genai';
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODELS_PAGE_SIZE = 20;
@@ -43,7 +43,7 @@ export async function generateContent({ contents, model }: { contents: ContentLi
     model,
     contents,
     config: {
-      responseMimeType: "application/json"
+      responseMimeType: 'application/json'
     }
   });
 

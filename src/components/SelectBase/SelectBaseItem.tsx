@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { SelectBaseItemProps } from "@/components/SelectBase/types";
+import { SelectBaseItemProps } from '@/components/SelectBase/types';
 
 
 export function SelectBaseItem({ onClick, text, isCurrent }: SelectBaseItemProps) {

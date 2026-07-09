@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import {UserRole} from '@/lib/types';
+import { UserRole } from '@/lib/types';
 
 const { Schema } = mongoose;
 

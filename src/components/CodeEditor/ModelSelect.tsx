@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { SelectBase } from '@/components/SelectBase';
-import { Model } from "@google/genai";
+import { Model } from '@google/genai';
 
 interface ModelSelectProps {
   value: string;

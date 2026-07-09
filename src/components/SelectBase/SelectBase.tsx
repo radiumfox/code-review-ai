@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ChevronIcon from '@/components/icons/ChevronIcon';
 import { useInfiniteScroll } from '@/lib/useInfiniteScroll';
 import { SelectBaseItem } from './SelectBaseItem';
-import type { SelectItem, SelectBaseProps } from "@/components/SelectBase/types";
+import type { SelectItem, SelectBaseProps } from '@/components/SelectBase/types';
 
 export function SelectBase<T extends string>({
   items,
