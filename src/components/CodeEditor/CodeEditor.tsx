@@ -6,7 +6,7 @@ import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from '@/components/CodeEditor/ModelSelect';
 import { LanguageSelect } from '@/components/CodeEditor/LanguageSelect';
-import StarIcon from '@/components/icons/StarIcon';
+import { StarIcon } from '@/components/icons/StarIcon';
 import {
   DEFAULT_EDITOR_VALUE,
   DEFAULT_LANGUAGE,
@@ -14,11 +14,20 @@ import {
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
 } from '@/components/CodeEditor/config';
+import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
+import { useFetch } from '@/lib/useFetch';
+import { ReviewInput } from '@/lib/review-service/types';
+
+import { useSession } from 'next-auth/react';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
+
+  const { data: session } = useSession();
+
+  const starIcon = StarIcon();
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
@@ -37,13 +46,38 @@ export function CodeEditor() {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
 
+  const reviewInput = useMemo((): ReviewInput => {
+    return {
+      userId: session?.user.id,
+      language: lang,
+      codeSnippet: value,
+      model: model
+    };
+  }, [lang, value, session, model]);
+
+  const {
+    fetchData: fetchReview,
+    data: reviewData,
+    error: reviewError,
+    loading: reviewLoading
+  } = useFetch(
+    '/api/reviews',
+    { method: 'POST', body: JSON.stringify(reviewInput) }
+  );
+
+  const getReview = async () => {
+    console.log(reviewInput);
+    await fetchReview();
+    console.log(reviewData);
+  };
+
   return (
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
 
         {/* Toolbar */}
         <div className={
-          `flex flex-col md:flex-row items-stretch md:items-center gap-2 sm:gap-3 
+          `flex flex-col items-stretch gap-2 sm:gap-3 
           px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 transition-all duration-300
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
@@ -54,22 +88,24 @@ export function CodeEditor() {
             </div>
           </div>
 
-          {/* Model select */}
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
-            <ModelSelect
-              value={model}
-              onChange={setModel}
-            />
-          </div>
+          <div className="flex gap-6">
+            {/* Model select */}
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
+              <ModelSelect
+                value={model}
+                onChange={setModel}
+              />
+            </div>
 
-          {/* Language select */}
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
-            <LanguageSelect
-              value={lang}
-              onChange={setLang}
-            />
+            {/* Language select */}
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
+              <LanguageSelect
+                value={lang}
+                onChange={setLang}
+              />
+            </div>
           </div>
         </div>
 
@@ -95,6 +131,16 @@ export function CodeEditor() {
             {linesCount}
           </span>
         </div>
+      </div>
+
+      {/* Review button */}
+      <div className="mt-6 flex justify-center">
+        <ButtonBase
+          text="Get Review"
+          onClick={getReview}
+          icon={starIcon}
+          size={ButtonBaseSizes.Md}
+        />
       </div>
     </div>
   );

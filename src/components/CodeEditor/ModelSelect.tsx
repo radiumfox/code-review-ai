@@ -22,7 +22,7 @@ export function ModelSelect({
       .then(response => response.json())
       .then(data => {
         const items = data.models.map((model: Model) => ({
-          value: model.name,
+          value: model.name?.replace('models/', ''),
           label: model.displayName || model.name,
         }));
 

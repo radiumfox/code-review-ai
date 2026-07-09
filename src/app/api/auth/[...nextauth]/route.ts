@@ -1,9 +1,10 @@
-import NextAuth from 'next-auth';
+import NextAuth, { DefaultSession } from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
 import { connectToDatabase } from '@/lib/mongoose';
 import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
+import { ObjectId } from 'mongodb';
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
@@ -12,6 +13,9 @@ const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
 declare module 'next-auth' {
     interface Profile {
         login: string, id: number
+    }
+    interface Session {
+      user: { id: ObjectId } & DefaultSession['user'];
     }
 }
 
@@ -32,6 +36,18 @@ export const authOptions = {
   ],
   secret: NEXTAUTH_SECRET,
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.id = user.id;
+
+      return token;
+    },
+    async session({ session, token }) {
+      if(session.user) {
+        session.user.id = token.id as ObjectId;
+      }
+
+      return session;
+    },
     async signIn ({ user, profile }) {
       if(!user.email) return false;
 
@@ -39,13 +55,17 @@ export const authOptions = {
         const currentUser = await UserModel.findOne({ email: user.email });
 
         if(!currentUser){
-          await UserModel.create({
+          const newUser = await UserModel.create({
             name: user.name,
             email: user.email,
             role: UserRole.User,
             githubUsername: profile?.login,
             githubId: profile?.id
           });
+
+          user.id = newUser._id.toString();
+        } else {
+          user.id = currentUser._id.toString();
         }
       } catch (error) {
         console.error(error);

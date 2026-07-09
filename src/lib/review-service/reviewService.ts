@@ -26,9 +26,9 @@ export function isAiError(error: unknown): error is ReturnType<typeof aiError> {
         && typeof error.statusCode === 'number';
 }
 
-async function callAI(prompt: string) {
+async function callAI(prompt: string, model?: string) {
   try {
-    return await generateContent({ contents: prompt, model: promptTemplate.model });
+    return await generateContent({ contents: prompt, model: model ?? promptTemplate.model });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'AI generation failed';
     throw aiError(message, 502);
@@ -68,7 +68,7 @@ async function persistReview(payload: Review) {
 export async function createReview(input: ReviewInput) {
   const prompt = buildPrompt(input);
 
-  const aiResponse = await callAI(prompt);
+  const aiResponse = await callAI(prompt, input.model);
 
   if(!aiResponse) {
     throw aiError('AI returned no candidates', 502);
