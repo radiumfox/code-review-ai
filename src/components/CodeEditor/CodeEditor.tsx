@@ -140,6 +140,7 @@ export function CodeEditor() {
           onClick={getReview}
           icon={starIcon}
           size={ButtonBaseSizes.Md}
+          isLoading={reviewLoading}
         />
       </div>
     </div>

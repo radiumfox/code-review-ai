@@ -13,6 +13,7 @@ interface ButtonBaseProps {
   text: string;
   size?: ButtonBaseSizes;
   className?: string;
+  isLoading?: boolean;
 }
 
 const sizeStyles: Record<NonNullable<ButtonBaseSizes>, string> = {
@@ -20,20 +21,30 @@ const sizeStyles: Record<NonNullable<ButtonBaseSizes>, string> = {
   [ButtonBaseSizes.Md]: 'gap-2 px-6 py-3 text-base',
 };
 
-export function ButtonBase({ onClick, icon, text, className, size = ButtonBaseSizes.Lg }: ButtonBaseProps) {
+function Spinner() {
+  return (
+    <span
+      className="inline-block w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"
+    />
+  );
+}
+
+export function ButtonBase({ onClick, icon, text, className, size = ButtonBaseSizes.Lg, isLoading }: ButtonBaseProps) {
   return (
     <button
       onClick={onClick}
+      disabled={isLoading}
       className={
         `flex items-center border-2 border-[#dfdfe2]
         bg-transparent uppercase tracking-[0.15em]
         text-[#dfdfe2] transition-all duration-200
         hover:bg-[#dfdfe2] hover:text-[#0a0a23]
-        focus:outline-none ${sizeStyles[size]}
+        focus:outline-none disabled:opacity-50 disabled:pointer-events-none
+        ${sizeStyles[size]}
         ${className}`
       }
     >
-      {icon}
+      {isLoading ? <Spinner /> : icon}
       {text}
     </button>
   );

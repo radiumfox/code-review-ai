@@ -1,6 +1,5 @@
 import NextAuth, { DefaultSession } from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
-import { connectToDatabase } from '@/lib/mongoose';
 import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
