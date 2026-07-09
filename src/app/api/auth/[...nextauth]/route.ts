@@ -36,7 +36,6 @@ export const authOptions = {
       if(!user.email) return false;
 
       try {
-        await connectToDatabase();
         const currentUser = await UserModel.findOne({ email: user.email });
 
         if(!currentUser){

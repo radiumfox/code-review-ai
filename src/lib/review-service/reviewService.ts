@@ -3,7 +3,6 @@ import promptTemplate from '@/prompts/code-review-default.json';
 import { generateContent } from '@/lib/gen-ai';
 import { Candidate } from '@google/genai';
 import { reviewSchema } from '@/lib/validations/review';
-import { connectToDatabase } from '@/lib/mongoose';
 import { ReviewModel } from '@/models/Review';
 import { Review, ReviewInput } from './types';
 
@@ -61,8 +60,6 @@ function validateReviewData(data: unknown) {
 }
 
 async function persistReview(payload: Review) {
-  await connectToDatabase();
-
   return await ReviewModel.create({
     ...payload
   });
