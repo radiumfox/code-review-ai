@@ -34,7 +34,7 @@ export function ModelSelect({
         }
       })
       .catch(error => console.error('Failed to load models', error));
-  }, []);
+  }, [onChange, value]);
 
   const loadMore = useCallback(async () => {
     if (isLoading || !nextPageToken) return;

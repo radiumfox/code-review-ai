@@ -22,7 +22,7 @@ export function isAiError(error: unknown): error is ReturnType<typeof aiError> {
   return typeof error === 'object'
         && error !== null
         && 'success' in error
-        && 'error' in error
+        && 'message' in error
         && 'statusCode' in error
         && typeof error.statusCode === 'number';
 }
@@ -45,7 +45,7 @@ function parseAIResponse(aiResponse: Candidate[]) {
 
   try {
     return JSON.parse(text);
-  } catch (error) {
+  } catch {
     throw aiError('AI returned invalid JSON');
   }
 }

@@ -26,5 +26,5 @@ export function useInfiniteScroll(
     observer.observe(sentinel);
 
     return () => observer.disconnect();
-  }, [onScrollEnd, enabled]);
+  }, [onScrollEnd, enabled, rootMargin, sentinelRef]);
 }
