@@ -1,37 +1,34 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import {useCallback, useMemo, useState} from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import SelectBase from '@/components/SelectBase';
-import StarIcon from '@/components/icons/StarIcon';
+import { ModelSelect } from '@/components/CodeEditor/ModelSelect';
+import { LanguageSelect } from '@/components/CodeEditor/LanguageSelect';
+import { StarIcon } from '@/components/icons/StarIcon';
 import {
   DEFAULT_EDITOR_VALUE,
   DEFAULT_LANGUAGE,
-  LANGUAGES_LIST,
   LANGUAGES_NAMES_MAP,
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
 } from '@/components/CodeEditor/config';
+import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
+import { useFetch } from '@/lib/useFetch';
+import { Review, ReviewInput } from '@/lib/review-service/types';
 
-export default function CodeEditor() {
+import { useSession } from 'next-auth/react';
+
+export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
+  const [model, setModel] = useState('');
 
-  const languageItems = useMemo(() => {
-    return LANGUAGES_LIST.map((l) => ({
-      value: l,
-      label: LANGUAGES_NAMES_MAP[l] ?? l,
-    }));
-  }, []);
+  const { data: session } = useSession();
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
-  }, []);
-
-  const onLanguageChange = useCallback((lang: keyof typeof langs) => {
-    setLang(lang);
   }, []);
 
   const linesCount = useMemo(() => {
@@ -47,13 +44,43 @@ export default function CodeEditor() {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
 
+  const {
+    executeFetch: fetchReview,
+    data: reviewData,
+    error: reviewError,
+    loading: reviewLoading
+  } = useFetch<ReviewInput, Review>(
+    '/api/reviews',
+    { method: 'POST' }
+  );
+
+  const getReview = async () => {
+    if(!session?.user.id) {
+      console.error('User ID is missing');
+
+      return;
+    }
+
+    await fetchReview({
+      userId: session.user.id,
+      language: lang,
+      codeSnippet: value,
+      model: model
+    });
+  };
+
+  useEffect(() => {
+    console.log(reviewData);
+    console.log(reviewError);
+  }, [reviewData, reviewError]);
+
   return (
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
 
         {/* Toolbar */}
         <div className={
-          `flex flex-col md:flex-row items-stretch md:items-center gap-2 sm:gap-3 
+          `flex flex-col items-stretch gap-2 sm:gap-3 
           px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 transition-all duration-300
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
@@ -63,15 +90,25 @@ export default function CodeEditor() {
               <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
-            <SelectBase
-              items={languageItems}
-              value={lang}
-              onChange={onLanguageChange}
-              placeholder="Search language..."
-              notFoundText="No languages found"
-            />
+
+          <div className="flex gap-6">
+            {/* Model select */}
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
+              <ModelSelect
+                value={model}
+                onChange={setModel}
+              />
+            </div>
+
+            {/* Language select */}
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
+              <LanguageSelect
+                value={lang}
+                onChange={setLang}
+              />
+            </div>
           </div>
         </div>
 
@@ -97,6 +134,17 @@ export default function CodeEditor() {
             {linesCount}
           </span>
         </div>
+      </div>
+
+      {/* Review button */}
+      <div className="mt-6 flex justify-center">
+        <ButtonBase
+          text="Get Review"
+          onClick={getReview}
+          icon={<StarIcon />}
+          size={ButtonBaseSizes.Md}
+          isLoading={reviewLoading}
+        />
       </div>
     </div>
   );

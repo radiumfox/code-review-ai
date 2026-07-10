@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import Providers from './providers';
-import HeaderBase from '@/components/HeaderBase';
+import { Providers } from './providers';
+import { HeaderBase } from '@/components/HeaderBase';
 import { getServerSession } from 'next-auth';
 import './globals.css';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { connectToDatabase } from '@/lib/mongoose';
 import React from 'react';
 
 const geistSans = Geist({
@@ -19,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'CodeReview AI',
-  description: 'An AI-powered code review application that analyzes source code and provides structured feedback on potential bugs, security issues, performance improvements, and code style.',
+  description: 'An AI-powered code reviews application that analyzes source code and provides structured feedback on potential bugs, security issues, performance improvements, and code style.',
 };
 
 export default async function RootLayout({
@@ -27,6 +28,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await connectToDatabase();
   const session = await getServerSession(authOptions);
 
   return (

@@ -10,6 +10,7 @@ const eslintConfig = defineConfig([
       quotes: ['error', 'single'],
       indent: ['error', 2],
       semi: ['error', 'always'],
+      'object-curly-spacing': ['error', 'always'],
     },
   },
   globalIgnores([

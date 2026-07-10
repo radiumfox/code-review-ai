@@ -1,0 +1,7 @@
+{
+  "name": "code-review-default",
+  "template": "You are a senior software engineer conducting a code review. Analyze the following {{language}} code snippet and provide a structured review.\n\nCode to review:\n```{{language}}\n{{codeSnippet}}\n```\n\nReturn a JSON object with this exact structure:\n{\n  \"summary\": \"A brief summary of the overall code quality, issues found, and suggestions (2-3 sentences)\",\n  \"issues\": [\n    {\n      \"line\": <line_number>,\n      \"severity\": \"error\" | \"warning\" | \"suggestion\",\n      \"category\": \"bug\" | \"style\" | \"performance\" | \"security\",\n      \"message\": \"What the issue is\",\n      \"suggestion\": \"How to fix it\"\n    }\n  ]\n}\n\nAnalyze the code for bugs, style problems, performance issues, and security vulnerabilities. For each issue found, specify the line number, severity, category, a clear message, and a concrete suggestion. If the code is clean with no issues, return an empty issues array.",
+  "model": "gemini-2.5-flash",
+  "description": "Default code review prompt that analyzes a code snippet and returns structured feedback with issues categorized by severity and type",
+  "isActive": true
+}

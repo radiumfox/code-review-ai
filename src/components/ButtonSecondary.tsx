@@ -8,7 +8,7 @@ interface ButtonSecondaryProps {
   text: string;
 }
 
-export default function ButtonSecondary({ onClick, icon, text }: ButtonSecondaryProps) {
+export function ButtonSecondary({ onClick, icon, text }: ButtonSecondaryProps) {
   return (
     <button
       onClick={onClick}

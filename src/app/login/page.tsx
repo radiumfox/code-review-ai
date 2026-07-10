@@ -1,13 +1,11 @@
 'use client';
 
-import ButtonBase from '@/components/ButtonBase';
+import { ButtonBase } from '@/components/ButtonBase';
 import { GithubIcon } from '@/components/icons/GithubIcon';
 import { signIn, useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
-  const githubIcon = GithubIcon();
-
   const { data: session } = useSession();
 
   if(session) {
@@ -27,7 +25,7 @@ export default function LoginPage() {
       <ButtonBase
         onClick={ signIn }
         text={ 'Sign in with GitHub' }
-        icon={ githubIcon }
+        icon={ <GithubIcon /> }
       />
     </div>
   );
