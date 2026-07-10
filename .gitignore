@@ -46,3 +46,7 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
+#AI agents
+
+opencode.json

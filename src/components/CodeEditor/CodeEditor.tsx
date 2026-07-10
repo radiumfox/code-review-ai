@@ -1,11 +1,12 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactCodeMirrorRef } from "@uiw/react-codemirror";
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { ModelSelect } from '@/components/CodeEditor/ModelSelect';
-import { LanguageSelect } from '@/components/CodeEditor/LanguageSelect';
+import { ModelSelect } from './ModelSelect';
+import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
 import {
   DEFAULT_EDITOR_VALUE,
@@ -13,17 +14,21 @@ import {
   LANGUAGES_NAMES_MAP,
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
-} from '@/components/CodeEditor/config';
+} from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/useFetch';
 import { Review, ReviewInput } from '@/lib/review-service/types';
-
 import { useSession } from 'next-auth/react';
+import {Issue} from "@/lib/types";
+import { issueDecorationsField, setIssuesEffect } from "./plugins/highlightIssues";
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
+  const [issues, setIssues] = useState<Issue[]>([]);
+
+  const viewRef = useRef<ReactCodeMirrorRef>(null);
 
   const { data: session } = useSession();
 
@@ -37,8 +42,11 @@ export function CodeEditor() {
   }, [value]);
 
   const extensions = useMemo(() => {
-    return [langs[lang]()];
-  }, [lang]);
+    return [
+      langs[lang](),
+      issueDecorationsField
+    ]
+  }, [lang])
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
@@ -73,6 +81,19 @@ export function CodeEditor() {
     console.log(reviewData);
     console.log(reviewError);
   }, [reviewData, reviewError]);
+
+  useEffect(() => {
+    if (reviewData?.issues) {
+      setIssues(reviewData.issues)
+
+      if(viewRef.current) {
+        console.log(viewRef.current);
+        viewRef.current.view?.dispatch({
+          effects: setIssuesEffect.of(reviewData.issues)
+        })
+      }
+    }
+  }, [reviewData, viewRef.current])
 
   return (
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
@@ -115,6 +136,7 @@ export function CodeEditor() {
         {/* Editor */}
         <div className="p-0">
           <CodeMirror
+            ref={viewRef}
             value={value}
             height="300px"
             width="100%"
