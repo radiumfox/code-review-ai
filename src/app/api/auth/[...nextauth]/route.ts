@@ -3,7 +3,6 @@ import GithubProvider from 'next-auth/providers/github';
 import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
-import { ObjectId } from 'mongodb';
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
@@ -14,7 +13,7 @@ declare module 'next-auth' {
         login: string, id: number
     }
     interface Session {
-      user: { id: ObjectId } & DefaultSession['user'];
+      user: { id: string } & DefaultSession['user'];
     }
 }
 
@@ -42,7 +41,7 @@ export const authOptions = {
     },
     async session({ session, token }) {
       if(session.user) {
-        session.user.id = token.id as ObjectId;
+        session.user.id = token.id as string;
       }
 
       return session;

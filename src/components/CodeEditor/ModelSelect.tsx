@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { SelectBase } from '@/components/SelectBase';
 import { Model } from '@google/genai';
 
@@ -16,25 +16,30 @@ export function ModelSelect({
   const [models, setModels] = useState<{ value: string; label: string }[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const valueRef = useRef(value);
+
+  const prepareModelName = (name: string) => {
+    return name.replace('models/', '');
+  };
 
   useEffect(() => {
     fetch('/api/models')
       .then(response => response.json())
       .then(data => {
         const items = data.models.map((model: Model) => ({
-          value: model.name?.replace('models/', ''),
+          value: model.name ? prepareModelName(model.name) : '',
           label: model.displayName || model.name,
         }));
 
         setModels(items);
         setNextPageToken(data.nextPageToken);
 
-        if (!value && items.length > 0) {
+        if (!valueRef.current && items.length > 0) {
           onChange(items[0].value);
         }
       })
       .catch(error => console.error('Failed to load models', error));
-  }, [onChange, value]);
+  }, [onChange]);
 
   const loadMore = useCallback(async () => {
     if (isLoading || !nextPageToken) return;
@@ -46,7 +51,7 @@ export function ModelSelect({
       const data = await response.json();
 
       const items = data.models.map((model: Model) => ({
-        value: model.name,
+        value: model.name ? prepareModelName(model.name) : '',
         label: model.displayName || model.name,
       }));
 

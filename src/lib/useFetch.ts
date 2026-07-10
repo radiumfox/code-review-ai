@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export function useFetch<T>(
+export function useFetch<P extends object, T = unknown>(
   url: string,
-  options: RequestInit
+  options?: RequestInit
 ) {
-  const [state, setState] = useState<{
-        loading: boolean;
-        data?: T;
-        error?: string
-    }>({ loading: false });
+  const [data, setData] = useState<T>();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const controllerRef = useRef(new AbortController());
 
@@ -18,38 +16,47 @@ export function useFetch<T>(
     };
   }, []);
 
-  const fetchData = useCallback(async () => {
-    setState({ loading: true });
+  const memoizedOptions = useMemo(() => options, [options]);
+
+  const executeFetch = useCallback(async (params?: P) => {
+    setLoading(true);
+    setError(null);
 
     const controller = new AbortController();
     controllerRef.current = controller;
 
     try {
-      const response = await fetch(url, { ...options, signal: controller.signal });
+      const response = await fetch(
+        url, {
+          ...memoizedOptions,
+          body: JSON.stringify(params),
+          signal: controller.signal
+        });
       const responseData = await response.json();
 
       if (!response.ok) {
         const errorMessage = responseData.error ?? 'Error fetching data';
-        setState({ loading: false, error: errorMessage });
+        setError(errorMessage);
 
         console.error(responseData);
         return;
       }
 
-      setState({
-        loading: false,
-        data: responseData as T
-      });
+      setData(responseData);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error fetching data';
-      setState({ loading: false, error: errorMessage });
+      setError(errorMessage);
 
       console.error(error);
+    } finally {
+      setLoading(false);
     }
-  }, [url, options]);
+  }, [url, memoizedOptions]);
 
   return {
-    ...state,
-    fetchData
+    executeFetch,
+    loading,
+    error,
+    data
   };
 }

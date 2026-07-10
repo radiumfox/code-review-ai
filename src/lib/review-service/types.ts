@@ -1,8 +1,7 @@
-import { ObjectId } from 'mongodb';
 import { IssueCategory, IssueSeverity } from '@/lib/types/review';
 
 export interface ReviewInput {
-    userId: ObjectId | undefined;
+    userId: string;
     language: string;
     codeSnippet: string;
     model?: string;

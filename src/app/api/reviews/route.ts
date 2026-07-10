@@ -17,9 +17,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(review, { status: 200 });
   } catch (error) {
     if(isAiError(error)) {
-      if (!error?.success) {
-        return NextResponse.json({ error: error.message }, { status: error.statusCode });
-      }
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

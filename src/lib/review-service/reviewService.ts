@@ -60,9 +60,7 @@ function validateReviewData(data: unknown) {
 }
 
 async function persistReview(payload: Review) {
-  return await ReviewModel.create({
-    ...payload
-  });
+  return await ReviewModel.create(payload);
 }
 
 export async function createReview(input: ReviewInput) {

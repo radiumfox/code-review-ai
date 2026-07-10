@@ -3,8 +3,6 @@ import { UserRole } from '@/lib/types';
 
 const { Schema } = mongoose;
 
-const USERS_COLLECTION_NAME = 'users';
-
 const UserSchema = new Schema({
   name: {
     type: String,
@@ -29,7 +27,7 @@ const UserSchema = new Schema({
   }
 }, {
   timestamps: true,
-  collection: USERS_COLLECTION_NAME
+  collection: 'users'
 });
 
 export const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);

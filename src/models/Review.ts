@@ -3,8 +3,6 @@ import { IssueSeverity, IssueCategory } from '@/lib/types';
 
 const { Schema } = mongoose;
 
-const REVIEW_COLLECTION_NAME = 'reviews';
-
 const ReviewSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -21,6 +19,9 @@ const ReviewSchema = new Schema({
   summary: {
     type: String,
     required: true
+  },
+  model: {
+    type: String
   },
   issues: {
     type: [{
@@ -51,7 +52,7 @@ const ReviewSchema = new Schema({
   }
 }, {
   timestamps: true,
-  collection: REVIEW_COLLECTION_NAME
+  collection: 'reviews'
 });
 
 export const ReviewModel = mongoose.models.Review || mongoose.model('Review', ReviewSchema);

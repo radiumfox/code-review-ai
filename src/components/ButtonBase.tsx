@@ -16,7 +16,7 @@ interface ButtonBaseProps {
   isLoading?: boolean;
 }
 
-const sizeStyles: Record<NonNullable<ButtonBaseSizes>, string> = {
+const sizeStyles: Record<ButtonBaseSizes, string> = {
   [ButtonBaseSizes.Lg]: 'gap-3 px-8 py-4 text-lg',
   [ButtonBaseSizes.Md]: 'gap-2 px-6 py-3 text-base',
 };

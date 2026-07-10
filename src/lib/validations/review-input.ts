@@ -1,9 +1,7 @@
 import { z } from 'zod';
-import { ObjectId } from 'mongodb';
 
 export const reviewInputSchema = z.object({
-  userId: z.instanceof( ObjectId )
-    .or( z.string().transform( ObjectId.createFromHexString ) ),
+  userId: z.string(),
   language: z.string().min(1),
   codeSnippet: z.string().min(1).max(50_000),
   model: z.string().min(1).max(100).optional(),

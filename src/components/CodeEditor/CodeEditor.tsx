@@ -1,7 +1,7 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from '@/components/CodeEditor/ModelSelect';
@@ -16,7 +16,7 @@ import {
 } from '@/components/CodeEditor/config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/useFetch';
-import { ReviewInput } from '@/lib/review-service/types';
+import { Review, ReviewInput } from '@/lib/review-service/types';
 
 import { useSession } from 'next-auth/react';
 
@@ -26,8 +26,6 @@ export function CodeEditor() {
   const [model, setModel] = useState('');
 
   const { data: session } = useSession();
-
-  const starIcon = StarIcon();
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
@@ -46,30 +44,35 @@ export function CodeEditor() {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
 
-  const reviewInput = useMemo((): ReviewInput => {
-    return {
-      userId: session?.user.id,
-      language: lang,
-      codeSnippet: value,
-      model: model
-    };
-  }, [lang, value, session, model]);
-
   const {
-    fetchData: fetchReview,
+    executeFetch: fetchReview,
     data: reviewData,
     error: reviewError,
     loading: reviewLoading
-  } = useFetch(
+  } = useFetch<ReviewInput, Review>(
     '/api/reviews',
-    { method: 'POST', body: JSON.stringify(reviewInput) }
+    { method: 'POST' }
   );
 
   const getReview = async () => {
-    console.log(reviewInput);
-    await fetchReview();
-    console.log(reviewData);
+    if(!session?.user.id) {
+      console.error('User ID is missing');
+
+      return;
+    }
+
+    await fetchReview({
+      userId: session.user.id,
+      language: lang,
+      codeSnippet: value,
+      model: model
+    });
   };
+
+  useEffect(() => {
+    console.log(reviewData);
+    console.log(reviewError);
+  }, [reviewData, reviewError]);
 
   return (
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
@@ -138,7 +141,7 @@ export function CodeEditor() {
         <ButtonBase
           text="Get Review"
           onClick={getReview}
-          icon={starIcon}
+          icon={<StarIcon />}
           size={ButtonBaseSizes.Md}
           isLoading={reviewLoading}
         />
