@@ -19,18 +19,40 @@ import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/useFetch';
 import { Review, ReviewInput } from '@/lib/review-service/types';
 import { useSession } from 'next-auth/react';
-import { Issue } from '@/lib/types';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
+import { ReviewSummary } from './ReviewSummary';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
-  const [issues, setIssues] = useState<Issue[]>([]);
+  const { data: session } = useSession();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
+  const {
+    executeFetch: fetchReview,
+    data: reviewData,
+    error: reviewError,
+    loading: reviewLoading
+  } = useFetch<ReviewInput, Review>(
+    '/api/reviews',
+    { method: 'POST' }
+  );
 
-  const { data: session } = useSession();
+  const issues = useMemo(() => reviewData?.issues ?? [], [reviewData]);
+
+  useEffect(() => {
+    console.log(reviewData);
+    console.log(reviewError);
+  }, [reviewData, reviewError]);
+
+  useEffect(() => {
+    if (reviewData?.issues && viewRef.current) {
+      viewRef.current.view?.dispatch({
+        effects: setIssuesEffect.of(reviewData.issues)
+      });
+    }
+  }, [reviewData]);
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
@@ -53,16 +75,6 @@ export function CodeEditor() {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
 
-  const {
-    executeFetch: fetchReview,
-    data: reviewData,
-    error: reviewError,
-    loading: reviewLoading
-  } = useFetch<ReviewInput, Review>(
-    '/api/reviews',
-    { method: 'POST' }
-  );
-
   const getReview = async () => {
     if(!session?.user.id) {
       console.error('User ID is missing');
@@ -78,29 +90,9 @@ export function CodeEditor() {
     });
   };
 
-  useEffect(() => {
-    console.log(reviewData);
-    console.log(reviewError);
-  }, [reviewData, reviewError]);
-
-  useEffect(() => {
-    if (reviewData?.issues) {
-      setIssues(reviewData.issues);
-
-      if(viewRef.current) {
-        viewRef.current.view?.dispatch({
-          effects: setIssuesEffect.of(reviewData.issues)
-        });
-      }
-    }
-  }, [reviewData, viewRef.current]);
-
   return (
-
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
-
-
         {/* Toolbar */}
         <div className={
           `flex flex-col items-stretch gap-2 sm:gap-3 
@@ -135,17 +127,29 @@ export function CodeEditor() {
           </div>
         </div>
 
-        {/* Editor */}
-        <div className="p-0">
-          <CodeMirror
-            ref={viewRef}
-            value={value}
-            height="300px"
-            width="100%"
-            extensions={extensions}
-            onChange={onValueChange}
-            basicSetup={EDITOR_BASIC_SETUP}
-            theme={theme}
+        {/* Editor + Summary */}
+        <div className="flex flex-col md:flex-row min-h-0">
+          {/* Editor */}
+          <div className="flex-1 min-w-0">
+            <CodeMirror
+              ref={viewRef}
+              value={value}
+              height="400px"
+              width="100%"
+              extensions={extensions}
+              onChange={onValueChange}
+              basicSetup={EDITOR_BASIC_SETUP}
+              theme={theme}
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="hidden md:block w-px bg-[#1e1e4a]" />
+
+          {/* Summary panel */}
+          <ReviewSummary
+            text={reviewData?.summary}
+            className="hidden md:flex max-h-75 md:max-h-none"
           />
         </div>
 
