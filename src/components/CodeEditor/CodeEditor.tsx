@@ -1,8 +1,8 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from './ModelSelect';
@@ -19,8 +19,8 @@ import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/useFetch';
 import { Review, ReviewInput } from '@/lib/review-service/types';
 import { useSession } from 'next-auth/react';
-import {Issue} from "@/lib/types";
-import { issueDecorationsField, setIssuesEffect } from "./plugins/highlightIssues";
+import { Issue } from '@/lib/types';
+import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -44,9 +44,10 @@ export function CodeEditor() {
   const extensions = useMemo(() => {
     return [
       langs[lang](),
-      issueDecorationsField
-    ]
-  }, [lang])
+      issueDecorationsField,
+      hoverIssueTooltip(issues)
+    ];
+  }, [lang, issues]);
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
@@ -84,20 +85,21 @@ export function CodeEditor() {
 
   useEffect(() => {
     if (reviewData?.issues) {
-      setIssues(reviewData.issues)
+      setIssues(reviewData.issues);
 
       if(viewRef.current) {
-        console.log(viewRef.current);
         viewRef.current.view?.dispatch({
           effects: setIssuesEffect.of(reviewData.issues)
-        })
+        });
       }
     }
-  }, [reviewData, viewRef.current])
+  }, [reviewData, viewRef.current]);
 
   return (
+
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
+
 
         {/* Toolbar */}
         <div className={
