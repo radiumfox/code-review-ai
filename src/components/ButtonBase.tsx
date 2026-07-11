@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
+import { type ReactNode } from 'react';
 
 export enum ButtonBaseSizes {
     Lg = 'lg',
     Md = 'md',
+    Sm = 'sm',
 }
 
 interface ButtonBaseProps {
   onClick?: () => void;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   text: string;
   size?: ButtonBaseSizes;
   className?: string;
@@ -19,6 +20,7 @@ interface ButtonBaseProps {
 const sizeStyles: Record<ButtonBaseSizes, string> = {
   [ButtonBaseSizes.Lg]: 'gap-3 px-8 py-4 text-lg',
   [ButtonBaseSizes.Md]: 'gap-2 px-6 py-3 text-base',
+  [ButtonBaseSizes.Sm]: 'gap-1.5 px-4 py-2 text-sm',
 };
 
 function Spinner() {
@@ -39,7 +41,7 @@ export function ButtonBase({ onClick, icon, text, className, size = ButtonBaseSi
         bg-transparent uppercase tracking-[0.15em]
         text-[#dfdfe2] transition-all duration-200
         hover:bg-[#dfdfe2] hover:text-[#0a0a23]
-        focus:outline-none disabled:opacity-50 disabled:pointer-events-none
+        focus:outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer
         ${sizeStyles[size]}
         ${className}`
       }

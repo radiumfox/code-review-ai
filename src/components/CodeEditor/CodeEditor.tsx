@@ -8,6 +8,7 @@ import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from './ModelSelect';
 import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
   DEFAULT_EDITOR_VALUE,
   DEFAULT_LANGUAGE,
@@ -21,11 +22,14 @@ import { Review, ReviewInput } from '@/lib/review-service/types';
 import { useSession } from 'next-auth/react';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from './ReviewSummary';
+import { SlideOutDrawer } from '@/components/SlideOutDrawer';
+import { ButtonIcon } from '@/components/ButtonIcon';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const { data: session } = useSession();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
@@ -104,9 +108,15 @@ export function CodeEditor() {
               <StarIcon className="text-[#6c6cff] w-5 h-5" />
               <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
+
+            <ButtonIcon
+              onClick={() => setIsSummaryOpen(true)}
+              icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
+              ariaLabel="Open summary"
+            />
           </div>
 
-          <div className="flex gap-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
             {/* Model select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
@@ -134,12 +144,13 @@ export function CodeEditor() {
             <CodeMirror
               ref={viewRef}
               value={value}
-              height="400px"
+              height="100%"
               width="100%"
               extensions={extensions}
               onChange={onValueChange}
               basicSetup={EDITOR_BASIC_SETUP}
               theme={theme}
+              className="md:h-100"
             />
           </div>
 
@@ -174,6 +185,17 @@ export function CodeEditor() {
           isLoading={reviewLoading}
         />
       </div>
+
+      {/* Mobile summary drawer */}
+      <SlideOutDrawer
+        isOpen={isSummaryOpen}
+        onClose={() => setIsSummaryOpen(false)}
+      >
+        <ReviewSummary
+          text={reviewData?.summary}
+          className="flex-1 w-auto!"
+        />
+      </SlideOutDrawer>
     </div>
   );
 }
