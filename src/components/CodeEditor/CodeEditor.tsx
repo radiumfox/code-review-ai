@@ -24,6 +24,7 @@ import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plu
 import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
+import { NotificationType, useNotification } from '@/lib/notifications';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -31,6 +32,7 @@ export function CodeEditor() {
   const [model, setModel] = useState('');
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const { data: session } = useSession();
+  const { showNotification } = useNotification();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
   const {
@@ -46,9 +48,13 @@ export function CodeEditor() {
   const issues = useMemo(() => reviewData?.issues ?? [], [reviewData]);
 
   useEffect(() => {
-    console.log(reviewData);
-    console.log(reviewError);
-  }, [reviewData, reviewError]);
+    if(reviewError) {
+      showNotification({
+        type: NotificationType.Error,
+        message: reviewError,
+      });
+    }
+  }, [reviewError]);
 
   useEffect(() => {
     if (reviewData?.issues && viewRef.current) {
@@ -81,7 +87,10 @@ export function CodeEditor() {
 
   const getReview = async () => {
     if(!session?.user.id) {
-      console.error('User ID is missing');
+      showNotification({
+        type: NotificationType.Error,
+        message: 'User ID is missing',
+      });
 
       return;
     }
@@ -92,6 +101,13 @@ export function CodeEditor() {
       codeSnippet: value,
       model: model
     });
+
+    if(reviewError) {
+      showNotification({
+        type: NotificationType.Error,
+        message: reviewError,
+      });
+    }
   };
 
   return (
@@ -144,6 +160,7 @@ export function CodeEditor() {
             <CodeMirror
               ref={viewRef}
               value={value}
+              minHeight="100px"
               height="100%"
               width="100%"
               extensions={extensions}
