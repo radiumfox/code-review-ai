@@ -31,7 +31,14 @@ function Spinner() {
   );
 }
 
-export function ButtonBase({ onClick, icon, text, className, size = ButtonBaseSizes.Lg, isLoading }: ButtonBaseProps) {
+export function ButtonBase({
+  onClick,
+  icon,
+  text,
+  className,
+  size = ButtonBaseSizes.Lg,
+  isLoading
+}: ButtonBaseProps) {
   return (
     <button
       onClick={onClick}

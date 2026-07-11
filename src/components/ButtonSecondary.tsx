@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import { type ReactNode } from 'react';
 
 interface ButtonSecondaryProps {
   onClick?: () => void;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   text: string;
 }
 

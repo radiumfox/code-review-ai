@@ -1,6 +1,6 @@
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 interface SlideOutDrawerProps {
     children: ReactNode;

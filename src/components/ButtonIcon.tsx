@@ -1,6 +1,14 @@
-import { ReactNode } from 'react';
+'use client';
 
-export function ButtonIcon({ icon, onClick, ariaLabel }: { icon: ReactNode; onClick: () => void; ariaLabel: string }) {
+import { type ReactNode } from 'react';
+
+interface ButtonIconProps {
+    icon: ReactNode;
+    onClick: () => void;
+    ariaLabel: string
+}
+
+export function ButtonIcon({ icon, onClick, ariaLabel }: ButtonIconProps) {
   return (
     <button
       onClick={onClick}
