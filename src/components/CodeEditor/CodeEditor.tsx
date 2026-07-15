@@ -1,31 +1,66 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { ModelSelect } from '@/components/CodeEditor/ModelSelect';
-import { LanguageSelect } from '@/components/CodeEditor/LanguageSelect';
+import { ModelSelect } from './ModelSelect';
+import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
+import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
   DEFAULT_EDITOR_VALUE,
   DEFAULT_LANGUAGE,
   LANGUAGES_NAMES_MAP,
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
-} from '@/components/CodeEditor/config';
+} from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
-import { useFetch } from '@/lib/useFetch';
-import { Review, ReviewInput } from '@/lib/review-service/types';
-
-import { useSession } from 'next-auth/react';
+import { useFetch } from '@/lib/hooks';
+import { Review, ReviewInput } from '@/lib/reviewService/types';
+import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
+import { ReviewSummary } from './ReviewSummary';
+import { SlideOutDrawer } from '@/components/SlideOutDrawer';
+import { ButtonIcon } from '@/components/ButtonIcon';
+import { NotificationType, useNotification } from '@/lib/notifications';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const { showNotification } = useNotification();
 
-  const { data: session } = useSession();
+  const viewRef = useRef<ReactCodeMirrorRef>(null);
+  const {
+    executeFetch: fetchReview,
+    data: reviewData,
+    error: reviewError,
+    loading: reviewLoading
+  } = useFetch<ReviewInput, Review>(
+    '/api/reviews',
+    { method: 'POST' }
+  );
+
+  const issues = useMemo(() => reviewData?.issues ?? [], [reviewData]);
+
+  useEffect(() => {
+    if(reviewError) {
+      showNotification({
+        type: NotificationType.Error,
+        message: reviewError,
+      });
+    }
+  }, [reviewError]);
+
+  useEffect(() => {
+    if (reviewData?.issues && viewRef.current) {
+      viewRef.current.view?.dispatch({
+        effects: setIssuesEffect.of(reviewData.issues)
+      });
+    }
+  }, [reviewData]);
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
@@ -37,47 +72,28 @@ export function CodeEditor() {
   }, [value]);
 
   const extensions = useMemo(() => {
-    return [langs[lang]()];
-  }, [lang]);
+    return [
+      langs[lang](),
+      issueDecorationsField,
+      hoverIssueTooltip(issues)
+    ];
+  }, [lang, issues]);
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
 
-  const {
-    executeFetch: fetchReview,
-    data: reviewData,
-    error: reviewError,
-    loading: reviewLoading
-  } = useFetch<ReviewInput, Review>(
-    '/api/reviews',
-    { method: 'POST' }
-  );
-
   const getReview = async () => {
-    if(!session?.user.id) {
-      console.error('User ID is missing');
-
-      return;
-    }
-
     await fetchReview({
-      userId: session.user.id,
       language: lang,
       codeSnippet: value,
       model: model
     });
   };
 
-  useEffect(() => {
-    console.log(reviewData);
-    console.log(reviewError);
-  }, [reviewData, reviewError]);
-
   return (
     <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
-
         {/* Toolbar */}
         <div className={
           `flex flex-col items-stretch gap-2 sm:gap-3 
@@ -89,9 +105,15 @@ export function CodeEditor() {
               <StarIcon className="text-[#6c6cff] w-5 h-5" />
               <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
+
+            <ButtonIcon
+              onClick={() => setIsSummaryOpen(true)}
+              icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
+              ariaLabel="Open summary"
+            />
           </div>
 
-          <div className="flex gap-6">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
             {/* Model select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
@@ -112,16 +134,31 @@ export function CodeEditor() {
           </div>
         </div>
 
-        {/* Editor */}
-        <div className="p-0">
-          <CodeMirror
-            value={value}
-            height="300px"
-            width="100%"
-            extensions={extensions}
-            onChange={onValueChange}
-            basicSetup={EDITOR_BASIC_SETUP}
-            theme={theme}
+        {/* Editor + Summary */}
+        <div className="flex flex-col md:flex-row min-h-0">
+          {/* Editor */}
+          <div className="flex-1 min-w-0">
+            <CodeMirror
+              ref={viewRef}
+              value={value}
+              minHeight="100px"
+              height="100%"
+              width="100%"
+              extensions={extensions}
+              onChange={onValueChange}
+              basicSetup={EDITOR_BASIC_SETUP}
+              theme={theme}
+              className="md:h-100"
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="hidden md:block w-px bg-[#1e1e4a]" />
+
+          {/* Summary panel */}
+          <ReviewSummary
+            text={reviewData?.summary}
+            className="hidden md:flex max-h-75 md:max-h-none"
           />
         </div>
 
@@ -139,13 +176,24 @@ export function CodeEditor() {
       {/* Review button */}
       <div className="mt-6 flex justify-center">
         <ButtonBase
-          text="Get Review"
+          text={reviewLoading ? 'Reviewing...' : 'Get Review'}
           onClick={getReview}
           icon={<StarIcon />}
           size={ButtonBaseSizes.Md}
           isLoading={reviewLoading}
         />
       </div>
+
+      {/* Mobile summary drawer */}
+      <SlideOutDrawer
+        isOpen={isSummaryOpen}
+        onClose={() => setIsSummaryOpen(false)}
+      >
+        <ReviewSummary
+          text={reviewData?.summary}
+          className="flex-1 w-auto!"
+        />
+      </SlideOutDrawer>
     </div>
   );
 }

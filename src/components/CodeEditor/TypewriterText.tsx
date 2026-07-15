@@ -1,0 +1,44 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+interface TypewriterTextProps {
+  text: string;
+  speed?: number;
+  className?: string;
+}
+
+export function TypewriterText({ text, speed = 30, className = '' }: TypewriterTextProps) {
+  const [displayedCount, setDisplayedCount] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    if (!text) return;
+
+    let index = 0;
+
+    const timer = setInterval(() => {
+      index++;
+      setDisplayedCount(index);
+
+      if (index >= text.length) {
+        setIsComplete(true);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return (
+    <span className={className}>
+      {text.slice(0, displayedCount)}
+      {text && !isComplete && (
+        <span
+          className="inline-block w-0.5 h-[1em] align-middle ml-0.5 bg-[#6c6cff]"
+          style={{ animation: 'blink-caret 0.75s step-end infinite' }}
+        />
+      )}
+    </span>
+  );
+}

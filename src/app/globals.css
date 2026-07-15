@@ -31,3 +31,8 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #3a3a7a;
 }
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #6c6cff; }
+}

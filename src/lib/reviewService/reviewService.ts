@@ -1,6 +1,6 @@
 import { fillTemplate } from '@/lib/helpers/fillTemplate';
 import promptTemplate from '@/prompts/code-review-default.json';
-import { generateContent } from '@/lib/gen-ai';
+import { generateContent } from '@/lib/genAI';
 import { Candidate } from '@google/genai';
 import { reviewSchema } from '@/lib/validations/review';
 import { ReviewModel } from '@/models/Review';
@@ -63,7 +63,7 @@ async function persistReview(payload: Review) {
   return await ReviewModel.create(payload);
 }
 
-export async function createReview(input: ReviewInput) {
+export async function createReview(userId: string, input: ReviewInput) {
   const prompt = buildPrompt(input);
 
   const aiResponse = await callAI(prompt, input.model);
@@ -74,5 +74,5 @@ export async function createReview(input: ReviewInput) {
 
   const reviewData = parseAIResponse(aiResponse);
   const validated = validateReviewData(reviewData);
-  return persistReview({ ...input, ...validated });
+  return persistReview({ userId, ...input, ...validated });
 }

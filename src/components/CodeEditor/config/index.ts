@@ -1,6 +1,4 @@
-import { langs } from '@uiw/codemirror-extensions-langs';
-
-export type LanguageExtension = keyof typeof langs;
+import { LanguageExtension } from '@/components/CodeEditor/types';
 
 export const LANGUAGES_LIST: LanguageExtension[] = [
   'js', 'ts', 'tsx', 'jsx', 'py', 'rs', 'go',

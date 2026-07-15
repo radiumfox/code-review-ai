@@ -3,12 +3,18 @@ import { ContentListUnion, GoogleGenAI, type Model } from '@google/genai';
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODELS_PAGE_SIZE = 20;
 
+let aiClient: GoogleGenAI | null = null;
+
 export const googleGenAI = async () => {
-  if(!API_KEY) {
-    throw new Error('Missing API key environment variable');
+  if(!aiClient) {
+    if(!API_KEY) {
+      throw new Error('Missing API key environment variable');
+    }
+
+    aiClient = new GoogleGenAI({ apiKey: API_KEY });
   }
 
-  return new GoogleGenAI({ apiKey: API_KEY });
+  return aiClient;
 };
 
 interface FetchModelReturn {

@@ -5,8 +5,8 @@ import { SelectBase } from '@/components/SelectBase';
 import {
   LANGUAGES_LIST,
   LANGUAGES_NAMES_MAP,
-} from '@/components/CodeEditor/config';
-import type { LanguageExtension } from '@/components/CodeEditor/config';
+} from './config';
+import type { LanguageExtension } from './types';
 
 interface LanguageSelectProps {
   value: LanguageExtension;

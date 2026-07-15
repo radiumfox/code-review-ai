@@ -50,25 +50,21 @@ export const authOptions = {
       if(!user.email) return false;
 
       try {
-        const currentUser = await UserModel.findOne({ email: user.email });
+        const currentUser = await UserModel.findOneAndUpdate({ email: user.email }, {
+          name: user.name,
+          email: user.email,
+          role: UserRole.User,
+          githubUsername: profile?.login,
+          githubId: profile?.id
+        }, { upsert: true });
 
-        if(!currentUser){
-          const newUser = await UserModel.create({
-            name: user.name,
-            email: user.email,
-            role: UserRole.User,
-            githubUsername: profile?.login,
-            githubId: profile?.id
-          });
+        user.id = currentUser._id.toString();
 
-          user.id = newUser._id.toString();
-        } else {
-          user.id = currentUser._id.toString();
-        }
+        return true;
       } catch (error) {
         console.error(error);
+        return false;
       }
-      return true;
     }
   } satisfies Partial<CallbacksOptions>
 };

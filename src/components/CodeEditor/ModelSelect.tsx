@@ -24,7 +24,9 @@ export function ModelSelect({
 
   useEffect(() => {
     fetch('/api/models')
-      .then(response => response.json())
+      .then(response => {
+        return response.json();
+      })
       .then(data => {
         const items = data.models.map((model: Model) => ({
           value: model.name ? prepareModelName(model.name) : '',
