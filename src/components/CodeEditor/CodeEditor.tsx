@@ -17,9 +17,8 @@ import {
   THEME_CUSTOM_SETTINGS
 } from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
-import { useFetch } from '@/lib/useFetch';
-import { Review, ReviewInput } from '@/lib/review-service/types';
-import { useSession } from 'next-auth/react';
+import { useFetch } from '@/lib/hooks';
+import { Review, ReviewInput } from '@/lib/reviewService/types';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
@@ -31,7 +30,6 @@ export function CodeEditor() {
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
-  const { data: session } = useSession();
   const { showNotification } = useNotification();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
@@ -86,28 +84,11 @@ export function CodeEditor() {
   }, []);
 
   const getReview = async () => {
-    if(!session?.user.id) {
-      showNotification({
-        type: NotificationType.Error,
-        message: 'User ID is missing',
-      });
-
-      return;
-    }
-
     await fetchReview({
-      userId: session.user.id,
       language: lang,
       codeSnippet: value,
       model: model
     });
-
-    if(reviewError) {
-      showNotification({
-        type: NotificationType.Error,
-        message: reviewError,
-      });
-    }
   };
 
   return (
@@ -195,7 +176,7 @@ export function CodeEditor() {
       {/* Review button */}
       <div className="mt-6 flex justify-center">
         <ButtonBase
-          text="Get Review"
+          text={reviewLoading ? 'Reviewing...' : 'Get Review'}
           onClick={getReview}
           icon={<StarIcon />}
           size={ButtonBaseSizes.Md}

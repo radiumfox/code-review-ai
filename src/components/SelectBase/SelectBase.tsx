@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import ChevronIcon from '@/components/icons/ChevronIcon';
-import { useInfiniteScroll } from '@/lib/useInfiniteScroll';
+import { useInfiniteScroll } from '@/lib/hooks';
 import { SelectBaseItem } from './SelectBaseItem';
 import type { SelectItem, SelectBaseProps } from '@/components/SelectBase/types';
 

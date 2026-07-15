@@ -30,7 +30,11 @@ export function useFetch<P extends object, T = unknown>(
         url, {
           ...memoizedOptions,
           body: JSON.stringify(params),
-          signal: controller.signal
+          signal: controller.signal,
+          headers: {
+            'content-type': 'application/json',
+            ...memoizedOptions?.headers
+          }
         });
       const responseData = await response.json();
 
