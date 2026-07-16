@@ -39,7 +39,7 @@ export function CodeEditor() {
     error: reviewError,
     loading: reviewLoading
   } = useFetch<ReviewInput, Review>(
-    '/api/reviews',
+    '/api/reviews/create',
     { method: 'POST' }
   );
 
@@ -92,7 +92,7 @@ export function CodeEditor() {
   };
 
   return (
-    <div className="mx-auto w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl transition-all duration-300">
+    <div className="flex-1 min-w-0 transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
         {/* Toolbar */}
         <div className={
@@ -110,6 +110,7 @@ export function CodeEditor() {
               onClick={() => setIsSummaryOpen(true)}
               icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
               ariaLabel="Open summary"
+              className="md:hidden"
             />
           </div>
 
@@ -141,14 +142,14 @@ export function CodeEditor() {
             <CodeMirror
               ref={viewRef}
               value={value}
-              minHeight="100px"
+              minHeight="200px"
               height="100%"
               width="100%"
               extensions={extensions}
               onChange={onValueChange}
               basicSetup={EDITOR_BASIC_SETUP}
               theme={theme}
-              className="md:h-100"
+              className="h-full"
             />
           </div>
 
