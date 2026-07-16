@@ -24,12 +24,14 @@ import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
+import { ReviewsList } from '@/components/ReviewsList';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
   const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
   const [model, setModel] = useState('');
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const { showNotification } = useNotification();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
@@ -100,18 +102,31 @@ export function CodeEditor() {
           px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 transition-all duration-300
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
-          <div className="flex items-center gap-2 sm:gap-3 flex-1">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-between">
             <div className="flex items-center gap-2">
               <StarIcon className="text-[#6c6cff] w-5 h-5" />
               <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
 
-            <ButtonIcon
-              onClick={() => setIsSummaryOpen(true)}
-              icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
-              ariaLabel="Open summary"
-              className="md:hidden"
-            />
+            <div className="flex gap-x-5">
+              <div className="flex lg:hidden gap-x-3 items-center">
+                <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Reviews history</span>
+                <ButtonIcon
+                  onClick={() => setIsReviewsOpen(true)}
+                  icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
+                  ariaLabel="Open reviews history"
+                />
+              </div>
+              <div className="flex md:hidden gap-x-3 items-center">
+                <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Summary</span>
+                <ButtonIcon
+                  onClick={() => setIsSummaryOpen(true)}
+                  icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
+                  ariaLabel="Open summary"
+                />
+              </div>
+            </div>
+
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
@@ -189,10 +204,27 @@ export function CodeEditor() {
       <SlideOutDrawer
         isOpen={isSummaryOpen}
         onClose={() => setIsSummaryOpen(false)}
+        title="Summary"
+        buttonCloseAreaLabel="Close summary drawer"
+        className="md:hidden"
       >
         <ReviewSummary
           text={reviewData?.summary}
           className="flex-1 w-auto!"
+        />
+      </SlideOutDrawer>
+
+      {/* Mobile reviews history drawer */}
+      <SlideOutDrawer
+        isOpen={isReviewsOpen}
+        onClose={() => setIsReviewsOpen(false)}
+        title="Reviews history"
+        buttonCloseAreaLabel="Close reviews drawer"
+        className="lg:hidden"
+      >
+        <ReviewsList
+          showTitle={false}
+          className="w-full"
         />
       </SlideOutDrawer>
     </div>

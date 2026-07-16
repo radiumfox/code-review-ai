@@ -33,30 +33,33 @@ const MOCK_REVIEWS: ReviewItemData[] = [
     language: 'Go',
     summary: 'The goroutine has no synchronization mechanism. Use a WaitGroup or channel to ensure all goroutines complete before the function returns.',
   },
-    {
-        id: '6',
-        createdAt: new Date('2026-07-13T16:30:00'),
-        language: 'Go',
-        summary: 'The goroutine has no synchronization mechanism. Use a WaitGroup or channel to ensure all goroutines complete before the function returns.',
-    },
-    {
-        id: '7',
-        createdAt: new Date('2026-07-13T16:30:00'),
-        language: 'Go',
-        summary: 'The goroutine has no synchronization mechanism. Use a WaitGroup or channel to ensure all goroutines complete before the function returns.',
-    },
+  {
+    id: '6',
+    createdAt: new Date('2026-07-13T16:30:00'),
+    language: 'Go',
+    summary: 'The goroutine has no synchronization mechanism. Use a WaitGroup or channel to ensure all goroutines complete before the function returns.',
+  },
+  {
+    id: '7',
+    createdAt: new Date('2026-07-13T16:30:00'),
+    language: 'Go',
+    summary: 'The goroutine has no synchronization mechanism. Use a WaitGroup or channel to ensure all goroutines complete before the function returns.',
+  },
 ];
 
 interface ReviewsListProps {
   className?: string;
+  showTitle?: boolean;
 }
 
-export function ReviewsList({ className = '' }: ReviewsListProps) {
+export function ReviewsList({ className = '', showTitle = true }: ReviewsListProps) {
   return (
     <div className={`flex flex-col w-50 min-w-0 border-r border-[#1e1e4a] overflow-hidden ${className}`}>
-      <div className="px-3 py-3 border-b border-[#1e1e4a] sticky top-0 left-0 bg-[#0a0a23]">
-        <span className="uppercase text-sm font-semibold tracking-wide text-[#6c6cff]">Reviews history</span>
-      </div>
+      {showTitle && (
+        <div className="px-3 py-3 border-b border-[#1e1e4a] sticky top-0 left-0 bg-[#0a0a23]">
+          <span className="uppercase text-sm font-semibold tracking-wide text-[#6c6cff]">Reviews history</span>
+        </div>
+      )}
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col">
         {MOCK_REVIEWS.map((review) => (
           <ReviewItem key={review.id} review={review} />
