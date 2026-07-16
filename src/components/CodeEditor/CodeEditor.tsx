@@ -18,13 +18,14 @@ import {
 } from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/hooks';
-import { Review, ReviewInput } from '@/lib/reviewService/types';
+import { Review, ReviewGenerateRequest } from '@/lib/createReviewService/types';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
+import { setCurrentReview } from '@/store';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -40,7 +41,7 @@ export function CodeEditor() {
     data: reviewData,
     error: reviewError,
     loading: reviewLoading
-  } = useFetch<ReviewInput, Review>(
+  } = useFetch<ReviewGenerateRequest, Review>(
     '/api/reviews/create',
     { method: 'POST' }
   );
@@ -57,6 +58,10 @@ export function CodeEditor() {
   }, [reviewError]);
 
   useEffect(() => {
+    if(reviewData) {
+      setCurrentReview(reviewData);
+    }
+
     if (reviewData?.issues && viewRef.current) {
       viewRef.current.view?.dispatch({
         effects: setIssuesEffect.of(reviewData.issues)

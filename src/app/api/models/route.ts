@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await fetchModels(pageToken);
-    return NextResponse.json(result);
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Error fetching models' });
