@@ -2,47 +2,18 @@
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { SelectBase } from '@/components/SelectBase';
-import { Model } from '@google/genai';
+
 import { useFetch } from '@/lib/hooks';
+import {
+  MODELS_ACTION_TYPES,
+  ModelsAction,
+  ModelSelectProps,
+  ModelsResponse,
+  ModelsState
+} from '@/components/ModelSelect/types';
+import { mapModels, prepareModelName } from '@/components/ModelSelect/helpers';
 
-const MODELS_ACTION_TYPES = {
-  append: 'APPEND'
-} as const;
-
-interface ModelsResponse {
-  models: Model[];
-  nextPageToken?: string;
-}
-
-interface ModelSelectProps {
-  value: string;
-  onChange(value: string): void;
-}
-
-function prepareModelName(name: string) {
-  return name.replace('models/', '');
-}
-
-function mapModels(models: Model[]) {
-  return models.map((model) => ({
-    value: model.name ? prepareModelName(model.name) : '',
-    label: model.displayName || model.name || 'Unknown model',
-  }));
-}
-
-interface ModelsState {
-  models: { value: string; label: string }[];
-  nextPageToken: string | null;
-}
-
-type ModelsActionType = typeof MODELS_ACTION_TYPES[keyof typeof MODELS_ACTION_TYPES];
-
-interface Action {
-  type: ModelsActionType;
-  payload: ModelsResponse
-}
-
-function modelsReducer(state: ModelsState, action: Action): ModelsState {
+function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
   switch (action.type) {
   case 'APPEND':
     return {

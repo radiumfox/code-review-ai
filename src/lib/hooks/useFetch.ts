@@ -19,8 +19,8 @@ export function useFetch<P extends object, T = unknown>(
   const memoizedOptions = useMemo(() => options, [options]);
 
   const executeFetch = useCallback(async (
-      params?: P,
-      searchParams?: Record<string, string>
+    params?: P,
+    searchParams?: Record<string, string>
   ) => {
     setLoading(true);
     setError(null);

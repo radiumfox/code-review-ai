@@ -5,14 +5,12 @@ import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { ModelSelect } from './ModelSelect';
-import { LanguageSelect } from './LanguageSelect';
+import { ModelSelect } from '@/components/ModelSelect';
+import { LanguageSelect, LANGUAGES_NAMES_MAP, DEFAULT_LANGUAGE } from '@/components/LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
   DEFAULT_EDITOR_VALUE,
-  DEFAULT_LANGUAGE,
-  LANGUAGES_NAMES_MAP,
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
 } from './config';
@@ -20,12 +18,12 @@ import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/hooks';
 import { Review, ReviewGenerateRequest } from '@/lib/createReviewService/types';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
-import { ReviewSummary } from './ReviewSummary';
+import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
-import { setCurrentReview } from '@/store';
+import { setCurrentReview, currentReviewSlice } from '@/store';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -60,6 +58,7 @@ export function CodeEditor() {
   useEffect(() => {
     if(reviewData) {
       setCurrentReview(reviewData);
+      console.log(currentReviewSlice);
     }
 
     if (reviewData?.issues && viewRef.current) {
