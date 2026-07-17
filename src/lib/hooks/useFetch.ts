@@ -18,18 +18,27 @@ export function useFetch<P extends object, T = unknown>(
 
   const memoizedOptions = useMemo(() => options, [options]);
 
-  const executeFetch = useCallback(async (params?: P) => {
+  const executeFetch = useCallback(async (
+      params?: P,
+      searchParams?: Record<string, string>
+  ) => {
     setLoading(true);
     setError(null);
 
     const controller = new AbortController();
     controllerRef.current = controller;
 
+    const fetchUrl = searchParams
+      ? `${url}?${new URLSearchParams(searchParams)}`
+      : url;
+
+    const isGet = memoizedOptions?.method?.toUpperCase() === 'GET';
+
     try {
       const response = await fetch(
-        url, {
+        fetchUrl, {
           ...memoizedOptions,
-          body: JSON.stringify(params),
+          ...(isGet ? {} : { body: JSON.stringify(params) }),
           signal: controller.signal,
           headers: {
             'content-type': 'application/json',

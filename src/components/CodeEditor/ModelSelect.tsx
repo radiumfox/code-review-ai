@@ -1,70 +1,108 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { SelectBase } from '@/components/SelectBase';
 import { Model } from '@google/genai';
+import { useFetch } from '@/lib/hooks';
+
+const MODELS_ACTION_TYPES = {
+  append: 'APPEND'
+} as const;
+
+interface ModelsResponse {
+  models: Model[];
+  nextPageToken?: string;
+}
 
 interface ModelSelectProps {
   value: string;
   onChange(value: string): void;
 }
 
+function prepareModelName(name: string) {
+  return name.replace('models/', '');
+}
+
+function mapModels(models: Model[]) {
+  return models.map((model) => ({
+    value: model.name ? prepareModelName(model.name) : '',
+    label: model.displayName || model.name || 'Unknown model',
+  }));
+}
+
+interface ModelsState {
+  models: { value: string; label: string }[];
+  nextPageToken: string | null;
+}
+
+type ModelsActionType = typeof MODELS_ACTION_TYPES[keyof typeof MODELS_ACTION_TYPES];
+
+interface Action {
+  type: ModelsActionType;
+  payload: ModelsResponse
+}
+
+function modelsReducer(state: ModelsState, action: Action): ModelsState {
+  switch (action.type) {
+  case 'APPEND':
+    return {
+      models: [
+        ...state.models,
+        ...mapModels(action.payload.models)
+      ],
+      nextPageToken: action.payload.nextPageToken ?? null,
+    };
+  }
+}
+
 export function ModelSelect({
   value,
   onChange
 }: ModelSelectProps) {
-  const [models, setModels] = useState<{ value: string; label: string }[]>([]);
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const valueRef = useRef(value);
 
-  const prepareModelName = (name: string) => {
-    return name.replace('models/', '');
-  };
+  const [{ models, nextPageToken }, dispatch] = useReducer(modelsReducer, {
+    models: [],
+    nextPageToken: null,
+  });
+
+  const {
+    executeFetch,
+    data,
+    loading
+  } = useFetch<Record<string, never>, ModelsResponse>(
+    '/api/models',
+    { method: 'GET' }
+  );
 
   useEffect(() => {
-    fetch('/api/models')
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        const items = data.models.map((model: Model) => ({
-          value: model.name ? prepareModelName(model.name) : '',
-          label: model.displayName || model.name,
-        }));
+    executeFetch();
+  }, []);
 
-        setModels(items);
-        setNextPageToken(data.nextPageToken);
+  useEffect(() => {
+    if (!data) return;
 
-        if (!valueRef.current && items.length > 0) {
-          onChange(items[0].value);
-        }
-      })
-      .catch(error => console.error('Failed to load models', error));
-  }, [onChange]);
+    dispatch({
+      type: MODELS_ACTION_TYPES.append,
+      payload: data
+    });
+  }, [data]);
+
+  useEffect(() => {
+    if (!data || valueRef.current) return;
+
+    const firstModel = data.models[0];
+
+    if (firstModel) {
+      onChange(prepareModelName(firstModel.name ?? ''));
+    }
+  }, [data, onChange]);
 
   const loadMore = useCallback(async () => {
-    if (isLoading || !nextPageToken) return;
+    if (!nextPageToken) return;
 
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`/api/models?pageToken=${encodeURIComponent(nextPageToken)}`);
-      const data = await response.json();
-
-      const items = data.models.map((model: Model) => ({
-        value: model.name ? prepareModelName(model.name) : '',
-        label: model.displayName || model.name,
-      }));
-
-      setModels(prev => [...prev, ...items]);
-      setNextPageToken(data.nextPageToken);
-    } catch (error) {
-      console.error('Failed to load models', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isLoading, nextPageToken]);
+    await executeFetch(undefined, { pageToken: nextPageToken });
+  }, [nextPageToken, executeFetch]);
 
   return (
     <SelectBase
@@ -74,7 +112,7 @@ export function ModelSelect({
       placeholder="Search model..."
       notFoundText="No models found"
       onScrollEnd={loadMore}
-      isLoading={isLoading}
+      isLoading={loading}
       hasMore={!!nextPageToken}
     />
   );
