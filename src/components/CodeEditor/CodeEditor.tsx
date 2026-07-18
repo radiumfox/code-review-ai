@@ -23,7 +23,6 @@ import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
-import { setCurrentReview, currentReviewSlice } from '@/store';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -56,11 +55,6 @@ export function CodeEditor() {
   }, [reviewError]);
 
   useEffect(() => {
-    if(reviewData) {
-      setCurrentReview(reviewData);
-      console.log(currentReviewSlice);
-    }
-
     if (reviewData?.issues && viewRef.current) {
       viewRef.current.view?.dispatch({
         effects: setIssuesEffect.of(reviewData.issues)

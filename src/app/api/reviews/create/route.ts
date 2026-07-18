@@ -1,4 +1,4 @@
-import { reviewGenerateRequestSchema } from '@/lib/validations/reviewGenerateRequestSchema';
+import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createReview, isAiError } from '@/lib/createReviewService';
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const input = reviewGenerateRequestSchema.safeParse(body);
+    const input = reviewGenerateRequest.safeParse(body);
 
     if(!input.success) {
       return NextResponse.json(z.treeifyError(input.error), { status: 400 });

@@ -4,8 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { NextRequest, NextResponse } from 'next/server';
 import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { z } from 'zod';
-
-const REVIEWS_LIMIT = 10;
+import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +21,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(z.treeifyError(input.error), { status: 400 });
     }
 
-    const list = await ReviewModel.find({ userId: session.user.id }).limit(REVIEWS_LIMIT).skip(REVIEWS_LIMIT * input.data.page);
+    const list = await ReviewModel.find({ userId: session.user.id }).limit(REVIEWS_LIST_LIMIT).skip(REVIEWS_LIST_LIMIT * input.data.page);
 
     return NextResponse.json(list, { status: 200 });
   } catch(error) {

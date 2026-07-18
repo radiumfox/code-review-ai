@@ -5,6 +5,7 @@ import ChevronIcon from '@/components/icons/ChevronIcon';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SelectBaseItem } from './SelectBaseItem';
 import type { SelectItem, SelectBaseProps } from '@/components/SelectBase/types';
+import { SpinnerBase } from '@/components/SpinnerBase';
 
 export function SelectBase<T extends string>({
   items,
@@ -105,8 +106,8 @@ export function SelectBase<T extends string>({
                   />
                 ))}
                 {hasMore && (
-                  <div ref={sentinelRef} className="flex items-center justify-center px-3 py-3">
-                    <div className={`h-5 w-5 rounded-full border-2 border-[#6c6cff] border-t-transparent ${isLoading ? 'animate-spin' : ''}`} />
+                  <div ref={sentinelRef}>
+                    <SpinnerBase />
                   </div>
                 )}
               </>
