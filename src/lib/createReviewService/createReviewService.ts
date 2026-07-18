@@ -4,9 +4,9 @@ import { generateContent } from '@/lib/genAI';
 import { Candidate } from '@google/genai';
 import { reviewSchema } from '@/lib/validations/review';
 import { ReviewModel } from '@/models/Review';
-import { Review, ReviewInput } from './types';
+import { ReviewGenerateRequest, ReviewPersistRequest } from './types';
 
-function buildPrompt(input: ReviewInput) {
+function buildPrompt(input: ReviewGenerateRequest) {
   return fillTemplate(promptTemplate.template, {
     language: input.language,
     codeSnippet: input.codeSnippet
@@ -59,14 +59,14 @@ function validateReviewData(data: unknown) {
   return reviewData.data;
 }
 
-async function persistReview(payload: Review) {
-  return await ReviewModel.create(payload);
+async function persistReview(userId: string, params: ReviewPersistRequest) {
+  return await ReviewModel.create({ userId, ...params });
 }
 
-export async function createReview(userId: string, input: ReviewInput) {
-  const prompt = buildPrompt(input);
+export async function createReview(userId: string, params: ReviewGenerateRequest) {
+  const prompt = buildPrompt(params);
 
-  const aiResponse = await callAI(prompt, input.model);
+  const aiResponse = await callAI(prompt, params.model);
 
   if(!aiResponse) {
     throw aiError('AI returned no candidates', 502);
@@ -74,5 +74,5 @@ export async function createReview(userId: string, input: ReviewInput) {
 
   const reviewData = parseAIResponse(aiResponse);
   const validated = validateReviewData(reviewData);
-  return persistReview({ userId, ...input, ...validated });
+  return persistReview(userId, { ...params, ...validated });
 }

@@ -1,0 +1,1 @@
+export const REVIEWS_LIST_LIMIT = 20;

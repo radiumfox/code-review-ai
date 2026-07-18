@@ -5,7 +5,7 @@ import { HeaderBase } from '@/components/HeaderBase';
 import { getServerSession } from 'next-auth';
 import './globals.css';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { connectToDatabase } from '@/lib/mongoose';
+import { connectToDatabase } from '@/lib/server';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

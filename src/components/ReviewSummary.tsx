@@ -9,7 +9,7 @@ interface ReviewSummaryProps {
 
 export function ReviewSummary({ text, className = '' }: ReviewSummaryProps) {
   return (
-    <div className={`flex flex-col w-50 min-w-0 overflow-y-auto h-100 wrap-break-word ${className}`}>
+    <div className={`flex flex-col w-50 min-w-0 overflow-y-auto min-h-100 wrap-break-word h-full ${className}`}>
       <div className="flex-1 min-h-0 overflow-y-auto bg-[#0d0d2b] custom-scrollbar p-4 text-xs sm:text-sm">
         {text ? (
           <code className="text-gray-200">

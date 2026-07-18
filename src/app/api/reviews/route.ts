@@ -1,10 +1,10 @@
-import { reviewInputSchema } from '@/lib/validations/reviewInput';
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { createReview, isAiError } from '@/lib/reviewService';
+import { ReviewModel } from '@/models/Review';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { applyRateLimiter } from '@/lib/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
+import { z } from 'zod';
+import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,26 +14,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
     }
 
-    const rateLimitResponse = await applyRateLimiter(`${session.user.id}.${request.url}`);
-    if(rateLimitResponse) return rateLimitResponse;
-
     const body = await request.json();
-
-    const input = reviewInputSchema.safeParse(body);
+    const input = reviewListRequestSchema.safeParse(body);
 
     if(!input.success) {
       return NextResponse.json(z.treeifyError(input.error), { status: 400 });
     }
 
-    const review = await createReview(session.user.id, input.data);
-    return NextResponse.json(review, { status: 200 });
-  } catch (error) {
+    const list = await ReviewModel.find({ userId: session.user.id }).limit(REVIEWS_LIST_LIMIT).skip(REVIEWS_LIST_LIMIT * input.data.page);
+
+    return NextResponse.json(list, { status: 200 });
+  } catch(error) {
     console.error(error);
 
-    if(isAiError(error)) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
-    }
-    
-    return NextResponse.json({ error: 'Error creating review' });
+    return NextResponse.json({ error: 'Error fetching reviews list' });
   }
 }

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export function useFetch<P extends object, T = unknown>(
   url: string,
-  options?: RequestInit
+  method: string,
+  headers?: Record<string, string>
 ) {
   const [data, setData] = useState<T>();
   const [error, setError] = useState<string | null>(null);
@@ -16,24 +17,31 @@ export function useFetch<P extends object, T = unknown>(
     };
   }, []);
 
-  const memoizedOptions = useMemo(() => options, [options]);
-
-  const executeFetch = useCallback(async (params?: P) => {
+  const executeFetch = useCallback(async (
+    params?: P,
+    searchParams?: Record<string, string>
+  ) => {
     setLoading(true);
     setError(null);
 
     const controller = new AbortController();
     controllerRef.current = controller;
 
+    const fetchUrl = searchParams
+      ? `${url}?${new URLSearchParams(searchParams)}`
+      : url;
+
+    const isGet = method?.toUpperCase() === 'GET';
+
     try {
       const response = await fetch(
-        url, {
-          ...memoizedOptions,
-          body: JSON.stringify(params),
+        fetchUrl, {
+          method,
+          ...(isGet ? {} : { body: JSON.stringify(params) }),
           signal: controller.signal,
           headers: {
             'content-type': 'application/json',
-            ...memoizedOptions?.headers
+            ...headers
           }
         });
       const responseData = await response.json();
@@ -55,7 +63,7 @@ export function useFetch<P extends object, T = unknown>(
     } finally {
       setLoading(false);
     }
-  }, [url, memoizedOptions]);
+  }, [url, method, headers]);
 
   return {
     executeFetch,
