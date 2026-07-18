@@ -1,12 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Review } from '@/lib/createReviewService/types';
+import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import type { RootState } from './index';
 
 interface ReviewState {
   currentReview: Review | null;
   reviews: Review[];
   currentPage: number;
+  hasMore: boolean;
   loading: boolean;
   error: string | null;
 }
@@ -14,7 +16,8 @@ interface ReviewState {
 const initialState: ReviewState = {
   currentReview: null,
   reviews: [],
-  currentPage: 0,
+  currentPage: -1,
+  hasMore: true,
   loading: false,
   error: null,
 };
@@ -51,12 +54,6 @@ export const reviewsSlice = createSlice({
     setCurrentReview: (state, action: PayloadAction<Review | null>) => {
       state.currentReview = action.payload;
     },
-    setReviewsList: (state, action: PayloadAction<Review[]>) => {
-      state.reviews = action.payload;
-    },
-    setCurrentPage: (state, action: PayloadAction<number>) => {
-      state.currentPage = action.payload;
-    }
   },
   extraReducers: (builder) => {
     builder
@@ -66,8 +63,9 @@ export const reviewsSlice = createSlice({
       })
       .addCase(fetchReviews.fulfilled, (state, action) => {
         state.loading = false;
-        state.reviews = action.payload;
+        state.reviews = [...state.reviews, ...action.payload];
         state.currentPage = action.meta.arg.page;
+        state.hasMore = action.payload.length === REVIEWS_LIST_LIMIT;
       })
       .addCase(fetchReviews.rejected, (state, action) => {
         state.loading = false;
@@ -76,9 +74,10 @@ export const reviewsSlice = createSlice({
   },
 });
 
-export const { setCurrentReview, setReviewsList, setCurrentPage } = reviewsSlice.actions;
+export const { setCurrentReview } = reviewsSlice.actions;
 
 export const selectReviews = (state: RootState) => state.reviews.reviews;
 export const selectReviewsLoading = (state: RootState) => state.reviews.loading;
 export const selectReviewsError = (state: RootState) => state.reviews.error;
 export const selectCurrentPage = (state: RootState) => state.reviews.currentPage;
+export const selectHasMore = (state: RootState) => state.reviews.hasMore;
