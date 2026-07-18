@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export function useFetch<P extends object, T = unknown>(
   url: string,
-  options?: RequestInit
+  method: string,
+  headers?: Record<string, string>
 ) {
   const [data, setData] = useState<T>();
   const [error, setError] = useState<string | null>(null);
@@ -15,8 +16,6 @@ export function useFetch<P extends object, T = unknown>(
       controllerRef.current.abort();
     };
   }, []);
-
-  const memoizedOptions = useMemo(() => options, [options]);
 
   const executeFetch = useCallback(async (
     params?: P,
@@ -32,17 +31,17 @@ export function useFetch<P extends object, T = unknown>(
       ? `${url}?${new URLSearchParams(searchParams)}`
       : url;
 
-    const isGet = memoizedOptions?.method?.toUpperCase() === 'GET';
+    const isGet = method?.toUpperCase() === 'GET';
 
     try {
       const response = await fetch(
         fetchUrl, {
-          ...memoizedOptions,
+          method,
           ...(isGet ? {} : { body: JSON.stringify(params) }),
           signal: controller.signal,
           headers: {
             'content-type': 'application/json',
-            ...memoizedOptions?.headers
+            ...headers
           }
         });
       const responseData = await response.json();
@@ -64,7 +63,7 @@ export function useFetch<P extends object, T = unknown>(
     } finally {
       setLoading(false);
     }
-  }, [url, memoizedOptions]);
+  }, [url, method, headers]);
 
   return {
     executeFetch,

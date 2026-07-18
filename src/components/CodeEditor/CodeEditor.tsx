@@ -40,7 +40,7 @@ export function CodeEditor() {
     loading: reviewLoading
   } = useFetch<ReviewGenerateRequest, Review>(
     '/api/reviews/create',
-    { method: 'POST' }
+    'POST'
   );
 
   const issues = useMemo(() => reviewData?.issues ?? [], [reviewData]);
@@ -52,7 +52,7 @@ export function CodeEditor() {
         message: reviewError,
       });
     }
-  }, [reviewError]);
+  }, [reviewError, showNotification]);
 
   useEffect(() => {
     if (reviewData?.issues && viewRef.current) {
@@ -204,7 +204,8 @@ export function CodeEditor() {
         onClose={() => setIsSummaryOpen(false)}
         title="Summary"
         buttonCloseAreaLabel="Close summary drawer"
-        className="md:hidden"
+        backdropClassName="md:hidden"
+        panelClassName="md:hidden"
       >
         <ReviewSummary
           text={reviewData?.summary}
@@ -218,7 +219,8 @@ export function CodeEditor() {
         onClose={() => setIsReviewsOpen(false)}
         title="Reviews history"
         buttonCloseAreaLabel="Close reviews drawer"
-        className="lg:hidden"
+        panelClassName="lg:hidden"
+        backdropClassName="lg:hidden"
       >
         <ReviewsList
           showTitle={false}

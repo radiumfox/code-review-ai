@@ -44,7 +44,16 @@ export const fetchReviews = createAsyncThunk<Review[], { page: number }>(
 
       return rejectWithValue(message);
     }
-  }
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+
+      if(state.reviews.loading) {
+        return false;
+      }
+    },
+  },
 );
 
 export const reviewsSlice = createSlice({

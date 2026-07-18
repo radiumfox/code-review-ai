@@ -43,7 +43,7 @@ export function ModelSelect({
     loading
   } = useFetch<Record<string, never>, ModelsResponse>(
     '/api/models',
-    { method: 'GET' }
+    'GET'
   );
 
   useEffect(() => {
