@@ -1,34 +1,22 @@
 'use client';
 
+import { formatDate, formatTime } from '@/components/ReviewsList/helpers';
+
 export interface ReviewItemData {
   id: string;
-  createdAt: Date;
+  createdAt: string;
   language: string;
   summary: string;
 }
 
 interface ReviewItemProps {
   review: ReviewItemData;
+  onClick?: () => void;
 }
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-export function ReviewItem({ review }: ReviewItemProps) {
+export function ReviewItem({ review, onClick }: ReviewItemProps) {
   return (
-    <div className="flex flex-col gap-1.5 px-3 py-3 border-b border-[#1e1e4a] last:border-b-0 cursor-pointer hover:bg-[#151540]/50 transition-colors duration-200">
+    <div onClick={onClick} className="flex flex-col gap-1.5 px-3 py-3 border-b border-[#1e1e4a] last:border-b-0 cursor-pointer hover:bg-[#151540]/50 transition-colors duration-200">
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">
           {formatDate(review.createdAt)} &middot; {formatTime(review.createdAt)}

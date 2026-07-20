@@ -1,3 +1,3 @@
 import { langs } from '@uiw/codemirror-extensions-langs';
 
-export type LanguageExtension = keyof typeof langs;
+export type CodingLanguage = keyof typeof langs;

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { Review } from '@/lib/createReviewService/types';
+import { Review } from '@/lib/types';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import type { RootState } from './index';
 
@@ -90,3 +90,4 @@ export const selectReviewsLoading = (state: RootState) => state.reviews.loading;
 export const selectReviewsError = (state: RootState) => state.reviews.error;
 export const selectCurrentPage = (state: RootState) => state.reviews.currentPage;
 export const selectHasMore = (state: RootState) => state.reviews.hasMore;
+export const selectCurrentReview = (state: RootState) => state.reviews.currentReview;

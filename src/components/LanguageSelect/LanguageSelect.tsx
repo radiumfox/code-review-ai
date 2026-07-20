@@ -6,11 +6,11 @@ import {
   LANGUAGES_LIST,
   LANGUAGES_NAMES_MAP,
 } from './config';
-import type { LanguageExtension } from './types';
+import type { CodingLanguage } from '@/lib/types';
 
 interface LanguageSelectProps {
-  value: LanguageExtension;
-  onChange(value: LanguageExtension): void;
+  value: CodingLanguage;
+  onChange(value: CodingLanguage): void;
 }
 
 export function LanguageSelect({ value, onChange }: LanguageSelectProps) {

@@ -2,7 +2,7 @@
 
 import CodeMirror from '@uiw/react-codemirror';
 import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from '@/components/ModelSelect';
@@ -16,13 +16,15 @@ import {
 } from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { useFetch } from '@/lib/hooks';
-import { Review, ReviewGenerateRequest } from '@/lib/createReviewService/types';
+import { Review, ReviewGenerateRequest } from '@/lib/types';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCurrentReview, setCurrentReview } from '@/store/reviewsStore';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
@@ -31,6 +33,8 @@ export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const { showNotification } = useNotification();
+  const currentReview = useSelector(selectCurrentReview);
+  const dispatch = useDispatch();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
   const {
@@ -43,7 +47,7 @@ export function CodeEditor() {
     'POST'
   );
 
-  const issues = useMemo(() => reviewData?.issues ?? [], [reviewData]);
+  const issues = useMemo(() => currentReview?.issues ?? [], [currentReview]);
 
   useEffect(() => {
     if(reviewError) {
@@ -55,10 +59,14 @@ export function CodeEditor() {
   }, [reviewError, showNotification]);
 
   useEffect(() => {
-    if (reviewData?.issues && viewRef.current) {
-      viewRef.current.view?.dispatch({
-        effects: setIssuesEffect.of(reviewData.issues)
-      });
+    if(reviewData) {
+      dispatch(setCurrentReview(reviewData));
+
+      if (reviewData?.issues && viewRef.current) {
+        viewRef.current.view?.dispatch({
+          effects: setIssuesEffect.of(reviewData.issues)
+        });
+      }
     }
   }, [reviewData]);
 
@@ -91,12 +99,30 @@ export function CodeEditor() {
     });
   };
 
+  useLayoutEffect(() => {
+    if (currentReview && viewRef.current) {
+      viewRef.current.view?.dispatch({
+        changes: {
+          from: 0,
+          to: viewRef.current.view.state.doc.length,
+          insert: currentReview.codeSnippet
+        },
+      });
+
+      if(currentReview.issues && viewRef.current) {
+        viewRef.current.view?.dispatch({
+          effects: setIssuesEffect.of(currentReview.issues)
+        });
+      }
+    }
+  }, [currentReview]);
+
   return (
-    <div className="flex-1 min-w-0 transition-all duration-300">
-      <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
+    <div className="transition-all duration-300">
+      <div className=" bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
         {/* Toolbar */}
         <div className={
-          `flex flex-col items-stretch gap-2 sm:gap-3 
+          `flex flex-col gap-2 sm:gap-3
           px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 transition-all duration-300
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
@@ -141,7 +167,7 @@ export function CodeEditor() {
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
               <LanguageSelect
-                value={lang}
+                value={currentReview?.language ?? lang}
                 onChange={setLang}
               />
             </div>
@@ -149,30 +175,27 @@ export function CodeEditor() {
         </div>
 
         {/* Editor + Summary */}
-        <div className="flex flex-col md:flex-row min-h-0">
+        <div className="flex flex-col md:flex-row h-75 lg-y:h-150 xl-y:h-200">
           {/* Editor */}
-          <div className="flex-1 min-w-0">
-            <CodeMirror
-              ref={viewRef}
-              value={value}
-              minHeight="200px"
-              height="100%"
-              width="100%"
-              extensions={extensions}
-              onChange={onValueChange}
-              basicSetup={EDITOR_BASIC_SETUP}
-              theme={theme}
-              className="h-full"
-            />
-          </div>
+          <CodeMirror
+            ref={viewRef}
+            value={value}
+            height="100%"
+            width="100%"
+            extensions={extensions}
+            onChange={onValueChange}
+            basicSetup={EDITOR_BASIC_SETUP}
+            theme={theme}
+            className="flex-1"
+          />
 
           {/* Divider */}
           <div className="hidden md:block w-px bg-[#1e1e4a]" />
 
           {/* Summary panel */}
           <ReviewSummary
-            text={reviewData?.summary}
-            className="hidden md:flex max-h-75 md:max-h-none"
+            text={currentReview?.summary}
+            className="hidden md:flex md:w-50 xl:w-75"
           />
         </div>
 
@@ -208,7 +231,7 @@ export function CodeEditor() {
         panelClassName="md:hidden"
       >
         <ReviewSummary
-          text={reviewData?.summary}
+          text={currentReview?.summary}
           className="flex-1 w-auto!"
         />
       </SlideOutDrawer>

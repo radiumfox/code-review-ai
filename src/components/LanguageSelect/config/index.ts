@@ -1,6 +1,6 @@
-import { LanguageExtension } from '../types';
+import type { CodingLanguage } from '@/lib/types';
 
-export const LANGUAGES_LIST: LanguageExtension[] = [
+export const LANGUAGES_LIST: CodingLanguage[] = [
   'js', 'ts', 'tsx', 'jsx', 'py', 'rs', 'go',
   'java', 'cpp', 'cs', 'rb', 'php', 'swift',
   'kt', 'scala', 'dart', 'html', 'css',
@@ -8,7 +8,7 @@ export const LANGUAGES_LIST: LanguageExtension[] = [
   'markdown', 'vue', 'svelte',
 ];
 
-export const LANGUAGES_NAMES_MAP: Partial<Record<LanguageExtension, string>> = {
+export const LANGUAGES_NAMES_MAP: Partial<Record<CodingLanguage, string>> = {
   js: 'JavaScript',
   ts: 'TypeScript',
   tsx: 'TSX',
@@ -38,4 +38,4 @@ export const LANGUAGES_NAMES_MAP: Partial<Record<LanguageExtension, string>> = {
   svelte: 'Svelte',
 };
 
-export const DEFAULT_LANGUAGE: LanguageExtension = 'js';
+export const DEFAULT_LANGUAGE: CodingLanguage = 'js';

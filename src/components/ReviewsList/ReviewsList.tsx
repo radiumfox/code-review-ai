@@ -11,6 +11,7 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
+  setCurrentReview
 } from '@/store/reviewsStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
@@ -48,8 +49,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   const reviewsList = useMemo(() => {
     return reviews.map((review, index) => ({
       id: index.toString(),
-      ...review,
-      createdAt: new Date(review.createdAt),
+      ...review
     }));
   }, [reviews]);
 
@@ -74,7 +74,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
       ) : reviewsList.length > 0 ? (
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
           {reviewsList.map((review) => (
-            <ReviewItem key={review.id} review={review} />
+            <ReviewItem onClick={() => dispatch(setCurrentReview(review))} key={review.id} review={review} />
           ))}
           {hasMore && (
             <div ref={sentinelRef}>
