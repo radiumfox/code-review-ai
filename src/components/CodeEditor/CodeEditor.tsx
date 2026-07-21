@@ -24,7 +24,7 @@ import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectCurrentReview, setCurrentReview } from '@/store/reviewsStore';
+import { fetchReviews, selectCurrentReview, setCurrentReview } from '@/store/reviewsStore';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);

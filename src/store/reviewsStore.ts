@@ -38,7 +38,7 @@ export const fetchReviews = createAsyncThunk<Review[], { page: number }>(
         return rejectWithValue(data.error ?? 'Error fetching reviews');
       }
 
-      return data as Review[];
+      return data.data as Review[];
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error fetching reviews';
 
@@ -72,6 +72,7 @@ export const reviewsSlice = createSlice({
       })
       .addCase(fetchReviews.fulfilled, (state, action) => {
         state.loading = false;
+
         state.reviews = [...state.reviews, ...action.payload];
         state.currentPage = action.meta.arg.page;
         state.hasMore = action.payload.length === REVIEWS_LIST_LIMIT;
