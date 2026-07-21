@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { SelectBase } from '@/components/SelectBase';
 
 import { useFetch } from '@/lib/hooks';
@@ -30,8 +30,6 @@ export function ModelSelect({
   value,
   onChange
 }: ModelSelectProps) {
-  const valueRef = useRef(value);
-
   const [{ models, nextPageToken }, dispatch] = useReducer(modelsReducer, {
     models: [],
     nextPageToken: null,
@@ -60,14 +58,14 @@ export function ModelSelect({
   }, [data]);
 
   useEffect(() => {
-    if (!data || valueRef.current) return;
+    if (!data || value) return;
 
     const firstModel = data.models[0];
 
     if (firstModel) {
       onChange(prepareModelName(firstModel.name ?? ''));
     }
-  }, [data, onChange]);
+  }, [data, onChange, value]);
 
   const loadMore = useCallback(async () => {
     if (!nextPageToken) return;

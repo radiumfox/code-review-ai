@@ -5,7 +5,7 @@ import { SelectBase } from '@/components/SelectBase';
 import {
   LANGUAGES_LIST,
   LANGUAGES_NAMES_MAP,
-} from './config';
+} from '@/lib/config';
 import type { CodingLanguage } from '@/lib/types';
 
 interface LanguageSelectProps {

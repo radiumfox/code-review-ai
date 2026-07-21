@@ -6,7 +6,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from '@/components/ModelSelect';
-import { LanguageSelect, LANGUAGES_NAMES_MAP, DEFAULT_LANGUAGE } from '@/components/LanguageSelect';
+import { LanguageSelect } from '@/components/LanguageSelect';
+import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
@@ -15,8 +16,6 @@ import {
   THEME_CUSTOM_SETTINGS
 } from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
-import { useFetch } from '@/lib/hooks';
-import { Review, ReviewGenerateRequest } from '@/lib/types';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
@@ -24,28 +23,31 @@ import { ButtonIcon } from '@/components/ButtonIcon';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchReviews, selectCurrentReview, setCurrentReview } from '@/store/reviewsStore';
+import type { AppDispatch } from '@/store';
+import {
+  createReview,
+  selectCurrentReview,
+  selectLang,
+  selectModel,
+  selectCreateReviewLoading,
+  selectCreateReviewError,
+  setLanguage,
+  setModel,
+} from '@/store/reviewsStore';
 
 export function CodeEditor() {
   const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
-  const [lang, setLang] = useState<keyof typeof langs>(DEFAULT_LANGUAGE);
-  const [model, setModel] = useState('');
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const { showNotification } = useNotification();
   const currentReview = useSelector(selectCurrentReview);
-  const dispatch = useDispatch();
+  const language = useSelector(selectLang);
+  const model = useSelector(selectModel);
+  const reviewLoading = useSelector(selectCreateReviewLoading);
+  const reviewError = useSelector(selectCreateReviewError);
+  const dispatch = useDispatch<AppDispatch>();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
-  const {
-    executeFetch: fetchReview,
-    data: reviewData,
-    error: reviewError,
-    loading: reviewLoading
-  } = useFetch<ReviewGenerateRequest, Review>(
-    '/api/reviews/create',
-    'POST'
-  );
 
   const issues = useMemo(() => currentReview?.issues ?? [], [currentReview]);
 
@@ -59,16 +61,12 @@ export function CodeEditor() {
   }, [reviewError, showNotification]);
 
   useEffect(() => {
-    if(reviewData) {
-      dispatch(setCurrentReview(reviewData));
-
-      if (reviewData?.issues && viewRef.current) {
-        viewRef.current.view?.dispatch({
-          effects: setIssuesEffect.of(reviewData.issues)
-        });
-      }
+    if(currentReview?.issues && viewRef.current) {
+      viewRef.current.view?.dispatch({
+        effects: setIssuesEffect.of(currentReview.issues)
+      });
     }
-  }, [reviewData]);
+  }, [currentReview]);
 
   const onValueChange = useCallback((val: string) => {
     setValue(val);
@@ -81,22 +79,22 @@ export function CodeEditor() {
 
   const extensions = useMemo(() => {
     return [
-      langs[lang](),
+      langs[language](),
       issueDecorationsField,
       hoverIssueTooltip(issues)
     ];
-  }, [lang, issues]);
+  }, [language, issues]);
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
 
-  const getReview = async () => {
-    await fetchReview({
-      language: lang,
+  const getReview = () => {
+    dispatch(createReview({
+      language: language,
       codeSnippet: value,
       model: model
-    });
+    }));
   };
 
   useLayoutEffect(() => {
@@ -159,7 +157,7 @@ export function CodeEditor() {
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
               <ModelSelect
                 value={model}
-                onChange={setModel}
+                onChange={(value) => dispatch(setModel(value))}
               />
             </div>
 
@@ -167,8 +165,8 @@ export function CodeEditor() {
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
               <LanguageSelect
-                value={currentReview?.language ?? lang}
-                onChange={setLang}
+                value={language}
+                onChange={(value) => dispatch(setLanguage(value))}
               />
             </div>
           </div>
@@ -202,7 +200,7 @@ export function CodeEditor() {
         {/* Footer */}
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
           <span className="text-xs text-gray-500 truncate">
-            {LANGUAGES_NAMES_MAP[lang] ?? lang}
+            {LANGUAGES_NAMES_MAP[language] ?? language}
           </span>
           <span className="text-xs text-gray-500">
             {linesCount}
