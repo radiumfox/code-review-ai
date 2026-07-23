@@ -1,6 +1,7 @@
 'use client';
 
 import { ReviewItem } from './ReviewItem';
+import { CreateReviewButton } from './CreateReviewButton';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/store';
@@ -11,10 +12,15 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
+  setCurrentReview,
+  resetCurrentReview,
+  selectIsInitialReviewsFetching,
+  selectCurrentReview
 } from '@/store/reviewsStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';
+import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 
 interface ReviewsListProps {
   className?: string;
@@ -28,6 +34,8 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   const error = useSelector(selectReviewsError);
   const currentPage = useSelector(selectCurrentPage);
   const hasMore = useSelector(selectHasMore);
+  const isInitialLoading = useSelector(selectIsInitialReviewsFetching);
+  const currentReview = useSelector(selectCurrentReview);
 
   const nextPage = currentPage + 1;
 
@@ -43,15 +51,16 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  useInfiniteScroll(sentinelRef, loadMore, hasMore);
-
   const reviewsList = useMemo(() => {
-    return reviews.map((review, index) => ({
-      id: index.toString(),
-      ...review,
-      createdAt: new Date(review.createdAt),
-    }));
+    return reviews.map((review) => {
+      return {
+        ...review,
+        languageTitle: LANGUAGES_NAMES_MAP[review.language] ?? review.language,
+      };
+    });
   }, [reviews]);
+
+  useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
   return (
     <div className={`flex flex-col w-50 min-w-0 border-r border-[#1e1e4a] overflow-hidden ${className}`}>
@@ -65,7 +74,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
         <div className="flex-1 flex items-center justify-center px-3 py-6">
           <p className="text-xs text-[#ff5555] text-center">{error}</p>
         </div>
-      ) : loading && reviewsList.length === 0 ? (
+      ) : isInitialLoading && loading ? (
         <div className="flex flex-col">
           {[0, 1, 2].map((index) => (
             <ReviewPreloader key={index} />
@@ -73,8 +82,18 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
         </div>
       ) : reviewsList.length > 0 ? (
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
+          <CreateReviewButton
+            isActive={currentReview === null}
+            onClick={() => dispatch(resetCurrentReview())}
+          />
           {reviewsList.map((review) => (
-            <ReviewItem key={review.id} review={review} />
+            <ReviewItem
+              onClick={() => dispatch(setCurrentReview(review))}
+              key={review.id}
+              review={review}
+              isActive={review.id === currentReview?.id}
+              languageTitle={review.languageTitle}
+            />
           ))}
           {hasMore && (
             <div ref={sentinelRef}>
@@ -83,8 +102,14 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
           )}
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center px-3 py-6">
-          <p className="text-sm text-gray-500 text-center">No reviews yet</p>
+        <div className="flex-1 flex flex-col">
+          <CreateReviewButton
+            isActive={currentReview === null}
+            onClick={() => dispatch(resetCurrentReview())}
+          />
+          <div className="flex-1 flex items-center justify-center px-3 py-6">
+            <p className="text-sm text-gray-500 text-center">No reviews yet</p>
+          </div>
         </div>
       )}
     </div>

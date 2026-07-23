@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const review = await createReview(session.user.id, input.data);
-    return NextResponse.json(review, { status: 200 });
+    return NextResponse.json({ data: { ...review._doc, id: review._id } }, { status: 200 });
   } catch (error) {
     console.error(error);
 
@@ -34,6 +34,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
     
-    return NextResponse.json({ error: 'Error creating review' });
+    return NextResponse.json({ error: 'Error creating review' }, { status: 500 });
   }
 }

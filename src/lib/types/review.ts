@@ -1,3 +1,5 @@
+import type { CodingLanguage } from '@/lib/types/languages';
+
 export enum IssueSeverity {
     Error = 'error',
     Warning = 'warning',
@@ -17,4 +19,28 @@ export interface Issue {
     category: IssueCategory;
     message: string;
     suggestion: string
+}
+
+export interface ReviewGenerateRequest {
+    language: string;
+    codeSnippet: string;
+    model: string;
+}
+
+export interface ReviewPersistRequest {
+    summary: string;
+    issues?: Issue[];
+    language: string;
+    codeSnippet: string;
+    model?: string;
+}
+
+export interface Review {
+    id: string;
+    summary: string;
+    issues?: Issue[];
+    createdAt: string;
+    language: CodingLanguage;
+    codeSnippet: string;
+    model: string;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ChevronIcon from '@/components/icons/ChevronIcon';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SelectBaseItem } from './SelectBaseItem';
@@ -16,7 +16,8 @@ export function SelectBase<T extends string>({
   className = '',
   onScrollEnd,
   isLoading = false,
-  hasMore = false
+  hasMore = false,
+  disabled = false,
 }: SelectBaseProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -64,19 +65,21 @@ export function SelectBase<T extends string>({
       <div className="relative">
         <input
           ref={inputRef}
-          value={displayed}
+          value={displayed ?? ''}
           onChange={(event) => setSearch(event.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={
-            `w-full bg-[#1a1a3e] text-[#dfdfe2] text-sm rounded-lg border border-[#2a2a5a] 
-             px-3 py-2 pr-10 outline-none 
+            `w-full  text-sm rounded-lg border border-[#2a2a5a] 
+             px-3 py-2 pr-10 outline-none
              placeholder:text-[#5a5a8a] transition-colors
              focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40
-             cursor-text`
+             ${disabled ? 'cursor-default text-[#dfdfe2]/50' : isOpen ? 'cursor-text text-[#dfdfe2]' : 'cursor-pointer text-[#dfdfe2]'}
+             `
           }
           autoComplete="off"
+          disabled={disabled}
         />
         <ChevronIcon className={`${isOpen ? 'rotate-180' : ''} transition-transform duration-150`} />
       </div>

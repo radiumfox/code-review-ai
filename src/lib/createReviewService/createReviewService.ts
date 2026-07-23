@@ -1,10 +1,11 @@
-import { fillTemplate } from '@/lib/helpers/fillTemplate';
+import { fillTemplate } from './helpers';
 import promptTemplate from '@/prompts/code-review-default.json';
 import { generateContent } from '@/lib/genAI';
 import { Candidate } from '@google/genai';
 import { reviewSchema } from '@/lib/validations/review';
 import { ReviewModel } from '@/models/Review';
-import { ReviewGenerateRequest, ReviewPersistRequest } from './types';
+import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
+import { DEFAULT_MODEL } from '@/lib/config';
 
 function buildPrompt(input: ReviewGenerateRequest) {
   return fillTemplate(promptTemplate.template, {
@@ -28,7 +29,7 @@ export function isAiError(error: unknown): error is ReturnType<typeof aiError> {
 
 async function callAI(prompt: string, model?: string) {
   try {
-    return await generateContent({ contents: prompt, model: model ?? promptTemplate.model });
+    return await generateContent({ contents: prompt, model: model ?? DEFAULT_MODEL });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'AI generation failed';
     throw aiError(message, 502);

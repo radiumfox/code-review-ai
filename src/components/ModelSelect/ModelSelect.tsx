@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { SelectBase } from '@/components/SelectBase';
 
 import { useFetch } from '@/lib/hooks';
@@ -11,7 +11,7 @@ import {
   ModelsResponse,
   ModelsState
 } from '@/components/ModelSelect/types';
-import { mapModels, prepareModelName } from '@/components/ModelSelect/helpers';
+import { mapModels } from '@/components/ModelSelect/helpers';
 
 function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
   switch (action.type) {
@@ -28,10 +28,9 @@ function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
 
 export function ModelSelect({
   value,
-  onChange
+  onChange,
+  disabled
 }: ModelSelectProps) {
-  const valueRef = useRef(value);
-
   const [{ models, nextPageToken }, dispatch] = useReducer(modelsReducer, {
     models: [],
     nextPageToken: null,
@@ -59,16 +58,6 @@ export function ModelSelect({
     });
   }, [data]);
 
-  useEffect(() => {
-    if (!data || valueRef.current) return;
-
-    const firstModel = data.models[0];
-
-    if (firstModel) {
-      onChange(prepareModelName(firstModel.name ?? ''));
-    }
-  }, [data, onChange]);
-
   const loadMore = useCallback(async () => {
     if (!nextPageToken) return;
 
@@ -85,6 +74,7 @@ export function ModelSelect({
       onScrollEnd={loadMore}
       isLoading={loading}
       hasMore={!!nextPageToken}
+      disabled={disabled}
     />
   );
 }

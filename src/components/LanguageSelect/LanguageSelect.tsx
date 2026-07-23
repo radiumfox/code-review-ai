@@ -5,19 +5,20 @@ import { SelectBase } from '@/components/SelectBase';
 import {
   LANGUAGES_LIST,
   LANGUAGES_NAMES_MAP,
-} from './config';
-import type { LanguageExtension } from './types';
+} from '@/lib/config';
+import type { CodingLanguage } from '@/lib/types';
 
 interface LanguageSelectProps {
-  value: LanguageExtension;
-  onChange(value: LanguageExtension): void;
+  value: CodingLanguage | null;
+  onChange(value: CodingLanguage): void;
+  disabled?: boolean;
 }
 
-export function LanguageSelect({ value, onChange }: LanguageSelectProps) {
+export function LanguageSelect({ value, onChange, disabled }: LanguageSelectProps) {
   const items = useMemo(() => {
-    return LANGUAGES_LIST.map((l) => ({
-      value: l,
-      label: LANGUAGES_NAMES_MAP[l] ?? l,
+    return LANGUAGES_LIST.map((language) => ({
+      value: language,
+      label: LANGUAGES_NAMES_MAP[language] ?? language,
     }));
   }, []);
 
@@ -28,6 +29,7 @@ export function LanguageSelect({ value, onChange }: LanguageSelectProps) {
       onChange={onChange}
       placeholder="Search language..."
       notFoundText="No languages found"
+      disabled={disabled}
     />
   );
 }

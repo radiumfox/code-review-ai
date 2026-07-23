@@ -26,6 +26,10 @@ export const issueDecorationsField = StateField.define<DecorationSet>({
       }
     }
 
+    if (transaction.docChanged) {
+      return Decoration.none;
+    }
+
     return decorations.map(transaction.changes);
   },
   provide: field => EditorView.decorations.from(field)

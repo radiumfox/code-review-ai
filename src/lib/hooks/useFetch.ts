@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useFetch<P extends object, T = unknown>(
   url: string,
@@ -44,11 +44,11 @@ export function useFetch<P extends object, T = unknown>(
             ...headers
           }
         });
+
       const responseData = await response.json();
 
       if (!response.ok) {
-        const errorMessage = responseData.error ?? 'Error fetching data';
-        setError(errorMessage);
+        setError(`${response.statusText}: ${responseData.error}`);
 
         console.error(responseData);
         return;

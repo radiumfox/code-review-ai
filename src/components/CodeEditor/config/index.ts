@@ -13,4 +13,4 @@ export const THEME_CUSTOM_SETTINGS = {
   }
 };
 
-export const DEFAULT_EDITOR_VALUE = 'console.log(\'hello world!\');';
+
