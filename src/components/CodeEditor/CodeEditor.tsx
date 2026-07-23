@@ -2,7 +2,7 @@
 
 import CodeMirror from '@uiw/react-codemirror';
 import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { ModelSelect } from '@/components/ModelSelect';
@@ -11,7 +11,6 @@ import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
-  DEFAULT_EDITOR_VALUE,
   EDITOR_BASIC_SETUP,
   THEME_CUSTOM_SETTINGS
 } from './config';
@@ -31,16 +30,22 @@ import {
   selectModel,
   selectCreateReviewLoading,
   selectCreateReviewError,
+  selectCodeSnippet,
+  selectSummary,
   setLanguage,
   setModel,
+  setCodeSnippet,
+  fetchReviews,
+  setInitialReviewsFetching
 } from '@/store/reviewsStore';
 
 export function CodeEditor() {
-  const [value, setValue] = useState(DEFAULT_EDITOR_VALUE);
+  const codeSnippet = useSelector(selectCodeSnippet);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const { showNotification } = useNotification();
   const currentReview = useSelector(selectCurrentReview);
+  const summary = useSelector(selectSummary);
   const language = useSelector(selectLang);
   const model = useSelector(selectModel);
   const reviewLoading = useSelector(selectCreateReviewLoading);
@@ -61,6 +66,7 @@ export function CodeEditor() {
   }, [reviewError, showNotification]);
 
   useEffect(() => {
+    console.log(currentReview);
     if(currentReview?.issues && viewRef.current) {
       viewRef.current.view?.dispatch({
         effects: setIssuesEffect.of(currentReview.issues)
@@ -69,13 +75,13 @@ export function CodeEditor() {
   }, [currentReview]);
 
   const onValueChange = useCallback((val: string) => {
-    setValue(val);
-  }, []);
+    dispatch(setCodeSnippet(val));
+  }, [dispatch]);
 
   const linesCount = useMemo(() => {
-    const valueLength = value.split('\n').length;
+    const valueLength = codeSnippet.split('\n').length;
     return `${valueLength} line${valueLength !== 1 ? 's' : ''}`;
-  }, [value]);
+  }, [codeSnippet]);
 
   const extensions = useMemo(() => {
     return [
@@ -91,29 +97,14 @@ export function CodeEditor() {
 
   const getReview = () => {
     dispatch(createReview({
-      language: language,
-      codeSnippet: value,
-      model: model
-    }));
+      language,
+      codeSnippet,
+      model
+    })).then(() => {
+      dispatch(setInitialReviewsFetching(true));
+      dispatch(fetchReviews({ page: 0 }));
+    });
   };
-
-  useLayoutEffect(() => {
-    if (currentReview && viewRef.current) {
-      viewRef.current.view?.dispatch({
-        changes: {
-          from: 0,
-          to: viewRef.current.view.state.doc.length,
-          insert: currentReview.codeSnippet
-        },
-      });
-
-      if(currentReview.issues && viewRef.current) {
-        viewRef.current.view?.dispatch({
-          effects: setIssuesEffect.of(currentReview.issues)
-        });
-      }
-    }
-  }, [currentReview]);
 
   return (
     <div className="transition-all duration-300">
@@ -177,7 +168,7 @@ export function CodeEditor() {
           {/* Editor */}
           <CodeMirror
             ref={viewRef}
-            value={value}
+            value={codeSnippet}
             height="100%"
             width="100%"
             extensions={extensions}
@@ -192,7 +183,7 @@ export function CodeEditor() {
 
           {/* Summary panel */}
           <ReviewSummary
-            text={currentReview?.summary}
+            text={summary}
             className="hidden md:flex md:w-50 xl:w-75"
           />
         </div>
@@ -229,7 +220,7 @@ export function CodeEditor() {
         panelClassName="md:hidden"
       >
         <ReviewSummary
-          text={currentReview?.summary}
+          text={summary}
           className="flex-1 w-auto!"
         />
       </SlideOutDrawer>

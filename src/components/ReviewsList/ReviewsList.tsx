@@ -11,7 +11,7 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
-  setCurrentReview
+  setCurrentReview, selectIsInitialReviewsFetching
 } from '@/store/reviewsStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
@@ -29,6 +29,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   const error = useSelector(selectReviewsError);
   const currentPage = useSelector(selectCurrentPage);
   const hasMore = useSelector(selectHasMore);
+  const isInitialLoading = useSelector(selectIsInitialReviewsFetching);
 
   const nextPage = currentPage + 1;
 
@@ -65,7 +66,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
         <div className="flex-1 flex items-center justify-center px-3 py-6">
           <p className="text-xs text-[#ff5555] text-center">{error}</p>
         </div>
-      ) : loading && reviewsList.length === 0 ? (
+      ) : isInitialLoading && loading ? (
         <div className="flex flex-col">
           {[0, 1, 2].map((index) => (
             <ReviewPreloader key={index} />

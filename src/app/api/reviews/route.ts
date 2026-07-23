@@ -22,8 +22,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(z.treeifyError(input.error), { status: 400 });
     }
 
-    console.log(session.user.id);
-
     const result = await ReviewModel.aggregate([
       { $match: { userId: { $eq: new ObjectId(session.user.id) } }, },
       {

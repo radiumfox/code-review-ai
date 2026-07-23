@@ -1,4 +1,5 @@
 import type { CodingLanguage } from '@/lib/types';
+import promptTemplate from '@/prompts/code-review-default.json';
 
 export const REVIEWS_LIST_LIMIT = 20;
 
@@ -41,3 +42,7 @@ export const LANGUAGES_NAMES_MAP: Partial<Record<CodingLanguage, string>> = {
 };
 
 export const DEFAULT_LANGUAGE: CodingLanguage = 'js';
+
+export const DEFAULT_MODEL = promptTemplate.model;
+
+export const DEFAULT_EDITOR_VALUE = 'console.log(\'hello world!\');';

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Review, ReviewGenerateRequest } from '@/lib/types';
-import { DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT } from '@/lib/config';
+import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, DEFAULT_MODEL, REVIEWS_LIST_LIMIT } from '@/lib/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
 
@@ -11,16 +11,20 @@ interface ReviewState {
   currentPage: number;
   hasMore: boolean;
   loading: boolean;
+  isInitialReviewsFetching: boolean;
   error: string | null;
   createReviewLoading: boolean;
   createReviewError: string | null;
   language: CodingLanguage;
   model: string;
+  codeSnippet: string;
+  summary: string;
 }
 
 const initialState: ReviewState = {
   currentReview: null,
   reviews: [],
+  isInitialReviewsFetching: true,
   currentPage: -1,
   hasMore: true,
   loading: false,
@@ -28,7 +32,9 @@ const initialState: ReviewState = {
   createReviewError: null,
   createReviewLoading: false,
   language: DEFAULT_LANGUAGE,
-  model: ''
+  model: '',
+  codeSnippet: DEFAULT_EDITOR_VALUE,
+  summary: '',
 };
 
 export const fetchReviews = createAsyncThunk<Review[], { page: number }>(
@@ -54,15 +60,15 @@ export const fetchReviews = createAsyncThunk<Review[], { page: number }>(
       return rejectWithValue(message);
     }
   },
-  {
-    condition: (_, { getState }) => {
-      const state = getState() as RootState;
-
-      if(state.reviews.loading) {
-        return false;
-      }
-    },
-  },
+  // {
+  //   condition: (_, { getState }) => {
+  //     const state = getState() as RootState;
+  //
+  //     if(state.reviews.loading) {
+  //       return false;
+  //     }
+  //   },
+  // },
 );
 
 export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
@@ -81,7 +87,7 @@ export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
         return rejectWithValue(data.error ?? 'Error creating review');
       }
 
-      return data.data as Review;
+      return data as Review;
     } catch(error) {
       const message = error instanceof Error ? error.message : 'Error creating review';
 
@@ -105,6 +111,10 @@ export const reviewsSlice = createSlice({
   reducers: {
     setCurrentReview: (state, action: PayloadAction<Review | null>) => {
       state.currentReview = action.payload;
+      state.language = action.payload?.language ?? DEFAULT_LANGUAGE;
+      state.model = action.payload?.model ?? DEFAULT_MODEL;
+      state.codeSnippet = action.payload?.codeSnippet ?? DEFAULT_EDITOR_VALUE;
+      state.summary = action.payload?.summary ?? '';
     },
     setLanguage: (state, action: PayloadAction<CodingLanguage>) => {
       state.language = action.payload;
@@ -112,6 +122,15 @@ export const reviewsSlice = createSlice({
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload;
     },
+    setCodeSnippet: (state, action: PayloadAction<string>) => {
+      state.codeSnippet = action.payload;
+    },
+    setSummary: (state, action: PayloadAction<string>) => {
+      state.summary = action.payload;
+    },
+    setInitialReviewsFetching: (state, action: PayloadAction<boolean>) => {
+      state.isInitialReviewsFetching = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -122,8 +141,15 @@ export const reviewsSlice = createSlice({
       .addCase(fetchReviews.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.reviews = [...state.reviews, ...action.payload];
-        state.currentPage = action.meta.arg.page;
+        if(state.isInitialReviewsFetching) {
+          state.reviews = [...action.payload];
+          state.currentPage = 0;
+          state.isInitialReviewsFetching = false;
+        } else {
+          state.reviews = [...state.reviews, ...action.payload];
+          state.currentPage = action.meta.arg.page;
+        }
+
         state.hasMore = action.payload.length === REVIEWS_LIST_LIMIT;
       })
       .addCase(fetchReviews.rejected, (state, action) => {
@@ -135,8 +161,11 @@ export const reviewsSlice = createSlice({
         state.createReviewError = null;
       })
       .addCase(createReview.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.createReviewLoading = false;
         state.currentReview = action.payload;
+        state.codeSnippet = action.payload?.codeSnippet;
+        state.summary = action.payload?.summary;
       })
       .addCase(createReview.rejected, (state, action) => {
         state.createReviewLoading = false;
@@ -145,7 +174,7 @@ export const reviewsSlice = createSlice({
   },
 });
 
-export const { setCurrentReview, setLanguage, setModel } = reviewsSlice.actions;
+export const { setCurrentReview, setLanguage, setModel, setCodeSnippet, setSummary, setInitialReviewsFetching } = reviewsSlice.actions;
 
 export const selectReviews = (state: RootState) => state.reviews.reviews;
 export const selectReviewsLoading = (state: RootState) => state.reviews.loading;
@@ -158,3 +187,7 @@ export const selectCreateReviewError = (state: RootState) => state.reviews.creat
 
 export const selectLang = (state: RootState) => state.reviews.language;
 export const selectModel = (state: RootState) => state.reviews.model;
+export const selectCodeSnippet = (state: RootState) => state.reviews.codeSnippet;
+export const selectSummary = (state: RootState) => state.reviews.summary;
+
+export const selectIsInitialReviewsFetching = (state: RootState) => state.reviews.isInitialReviewsFetching;
