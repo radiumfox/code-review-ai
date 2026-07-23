@@ -24,7 +24,7 @@ export interface Issue {
 export interface ReviewGenerateRequest {
     language: string;
     codeSnippet: string;
-    model?: string;
+    model: string;
 }
 
 export interface ReviewPersistRequest {
@@ -36,11 +36,11 @@ export interface ReviewPersistRequest {
 }
 
 export interface Review {
-    _id: string;
+    id: string;
     summary: string;
     issues?: Issue[];
     createdAt: string;
     language: CodingLanguage;
     codeSnippet: string;
-    model?: string;
+    model: string;
 }

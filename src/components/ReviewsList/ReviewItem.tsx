@@ -1,16 +1,10 @@
 'use client';
 
 import { formatDate, formatTime } from '@/components/ReviewsList/helpers';
-
-export interface ReviewItemData {
-  _id: string;
-  createdAt: string;
-  language: string;
-  summary: string;
-}
+import { Review } from '@/lib/types';
 
 interface ReviewItemProps {
-  review: ReviewItemData;
+  review: Review;
   isActive?: boolean;
   onClick?: () => void;
 }

@@ -23,6 +23,8 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await ReviewModel.aggregate([
+
+
       { $match: { userId: { $eq: new ObjectId(session.user.id) } }, },
       {
         $sort: {
@@ -30,13 +32,19 @@ export async function POST(request: NextRequest) {
         },
       },
       {
+        $set: {
+          "id": "$_id"
+        }
+      },
+      {
         $facet: {
           metadata: [{ $count: 'totalCount' }],
           data: [{ $skip: REVIEWS_LIST_LIMIT * input.data.page }, { $limit: REVIEWS_LIST_LIMIT }],
-
         },
       }
     ]);
+
+    console.log(result);
 
     const data = {
       metadata: {
@@ -51,6 +59,6 @@ export async function POST(request: NextRequest) {
   } catch(error) {
     console.error(error);
 
-    return NextResponse.json({ error: 'Error fetching reviews list' });
+    return NextResponse.json({ error: 'Error fetching reviews list' }, { status: 500 });
   }
 }

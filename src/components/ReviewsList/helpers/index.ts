@@ -19,7 +19,7 @@ export function formatDate(date: string): string {
     });
   }
 
-  return 'Invalid date';
+  return '';
 }
 
 export function formatTime(date: string): string {
@@ -32,5 +32,5 @@ export function formatTime(date: string): string {
     });
   }
 
-  return 'Invalid date';
+  return '';
 }

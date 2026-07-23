@@ -11,7 +11,7 @@ import {
   ModelsResponse,
   ModelsState
 } from '@/components/ModelSelect/types';
-import { mapModels, prepareModelName } from '@/components/ModelSelect/helpers';
+import { mapModels } from '@/components/ModelSelect/helpers';
 
 function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
   switch (action.type) {
@@ -56,16 +56,6 @@ export function ModelSelect({
       payload: data
     });
   }, [data]);
-
-  useEffect(() => {
-    if (!data || value) return;
-
-    const firstModel = data.models[0];
-
-    if (firstModel) {
-      onChange(prepareModelName(firstModel.name ?? ''));
-    }
-  }, [data, onChange, value]);
 
   const loadMore = useCallback(async () => {
     if (!nextPageToken) return;

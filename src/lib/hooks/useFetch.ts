@@ -45,15 +45,14 @@ export function useFetch<P extends object, T = unknown>(
           }
         });
 
-      if (!response.ok) {
-        const errorMessage = response.statusText;
-        setError(errorMessage);
+      const responseData = await response.json();
 
-        console.error(errorMessage);
+      if (!response.ok) {
+        setError(`${response.statusText}: ${responseData.error}`);
+
+        console.error(responseData);
         return;
       }
-
-      const responseData = await response.json();
 
       setData(responseData);
     } catch (error) {

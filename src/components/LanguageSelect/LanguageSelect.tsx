@@ -9,15 +9,15 @@ import {
 import type { CodingLanguage } from '@/lib/types';
 
 interface LanguageSelectProps {
-  value: CodingLanguage;
+  value: CodingLanguage | null;
   onChange(value: CodingLanguage): void;
 }
 
 export function LanguageSelect({ value, onChange }: LanguageSelectProps) {
   const items = useMemo(() => {
-    return LANGUAGES_LIST.map((l) => ({
-      value: l,
-      label: LANGUAGES_NAMES_MAP[l] ?? l,
+    return LANGUAGES_LIST.map((language) => ({
+      value: language,
+      label: LANGUAGES_NAMES_MAP[language] ?? language,
     }));
   }, []);
 

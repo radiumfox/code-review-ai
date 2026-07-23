@@ -23,6 +23,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Error fetching models' });
+    return NextResponse.json({ error: 'Error fetching models' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { ReviewItem } from './ReviewItem';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/store';
 import {
@@ -48,12 +48,6 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
 
   useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
-  const reviewsList = useMemo(() => {
-    return reviews.map((review) => ({
-      ...review
-    }));
-  }, [reviews]);
-
   return (
     <div className={`flex flex-col w-50 min-w-0 border-r border-[#1e1e4a] overflow-hidden ${className}`}>
       {showTitle && (
@@ -72,14 +66,14 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
             <ReviewPreloader key={index} />
           ))}
         </div>
-      ) : reviewsList.length > 0 ? (
+      ) : reviews.length > 0 ? (
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
-          {reviewsList.map((review) => (
+          {reviews.map((review) => (
             <ReviewItem
               onClick={() => dispatch(setCurrentReview(review))}
-              key={review._id}
+              key={review.id}
               review={review}
-              isActive={review._id === currentReview?._id}
+              isActive={review.id === currentReview?.id}
             />
           ))}
           {hasMore && (

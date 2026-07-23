@@ -64,7 +64,7 @@ export function SelectBase<T extends string>({
       <div className="relative">
         <input
           ref={inputRef}
-          value={displayed}
+          value={displayed ?? ''}
           onChange={(event) => setSearch(event.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}

@@ -35,8 +35,7 @@ import {
   setLanguage,
   setModel,
   setCodeSnippet,
-  fetchReviews,
-  setInitialReviewsFetching
+  fetchReviews
 } from '@/store/reviewsStore';
 
 export function CodeEditor() {
@@ -82,12 +81,22 @@ export function CodeEditor() {
     return `${valueLength} line${valueLength !== 1 ? 's' : ''}`;
   }, [codeSnippet]);
 
+  const languageName = useMemo(() => {
+    if(language && LANGUAGES_NAMES_MAP[language]) return LANGUAGES_NAMES_MAP[language];
+
+    return language ?? 'Unknown language';
+  }, [language]);
+
   const extensions = useMemo(() => {
-    return [
-      langs[language](),
-      issueDecorationsField,
-      hoverIssueTooltip(issues)
-    ];
+    const extensionsList = [];
+
+    extensionsList.push(hoverIssueTooltip(issues), issueDecorationsField);
+
+    if(language) {
+      extensionsList.push(langs[language]());
+    }
+
+    return extensionsList;
   }, [language, issues]);
 
   const theme = useMemo(() => {
@@ -95,19 +104,27 @@ export function CodeEditor() {
   }, []);
 
   const getReview = () => {
+    if(!language || !model) {
+      showNotification({
+        type: NotificationType.Error,
+        message: 'Language or model is missing',
+      });
+
+      return;
+    }
+
     dispatch(createReview({
       language,
       codeSnippet,
       model
     })).then(() => {
-      dispatch(setInitialReviewsFetching(true));
       dispatch(fetchReviews({ page: 0 }));
     });
   };
 
   return (
     <div className="transition-all duration-300">
-      <div className=" bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
+      <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
         {/* Toolbar */}
         <div className={
           `flex flex-col gap-2 sm:gap-3
@@ -190,7 +207,7 @@ export function CodeEditor() {
         {/* Footer */}
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
           <span className="text-xs text-gray-500 truncate">
-            {LANGUAGES_NAMES_MAP[language] ?? language}
+            {languageName}
           </span>
           <span className="text-xs text-gray-500">
             {linesCount}

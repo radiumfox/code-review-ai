@@ -10,7 +10,7 @@ export interface ModelsResponse {
 }
 
 export interface ModelSelectProps {
-    value: string;
+    value: string | null;
     onChange(value: string): void;
 }
 
