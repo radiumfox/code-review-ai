@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       },
       {
         $set: {
-          "id": "$_id"
+          'id': '$_id'
         }
       },
       {
@@ -43,8 +43,6 @@ export async function POST(request: NextRequest) {
         },
       }
     ]);
-
-    console.log(result);
 
     const data = {
       metadata: {

@@ -1,7 +1,8 @@
 'use client';
 
 import { ReviewItem } from './ReviewItem';
-import { useCallback, useEffect, useRef } from 'react';
+import { CreateReviewButton } from './CreateReviewButton';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/store';
 import {
@@ -11,11 +12,15 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
-  setCurrentReview, selectIsInitialReviewsFetching, selectCurrentReview
+  setCurrentReview,
+  resetCurrentReview,
+  selectIsInitialReviewsFetching,
+  selectCurrentReview
 } from '@/store/reviewsStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';
+import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 
 interface ReviewsListProps {
   className?: string;
@@ -46,6 +51,15 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
+  const reviewsList = useMemo(() => {
+    return reviews.map((review) => {
+      return {
+        ...review,
+        languageTitle: LANGUAGES_NAMES_MAP[review.language] ?? review.language,
+      };
+    });
+  }, [reviews]);
+
   useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
   return (
@@ -66,14 +80,19 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
             <ReviewPreloader key={index} />
           ))}
         </div>
-      ) : reviews.length > 0 ? (
+      ) : reviewsList.length > 0 ? (
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
-          {reviews.map((review) => (
+          <CreateReviewButton
+            isActive={currentReview === null}
+            onClick={() => dispatch(resetCurrentReview())}
+          />
+          {reviewsList.map((review) => (
             <ReviewItem
               onClick={() => dispatch(setCurrentReview(review))}
               key={review.id}
               review={review}
               isActive={review.id === currentReview?.id}
+              languageTitle={review.languageTitle}
             />
           ))}
           {hasMore && (
@@ -83,8 +102,14 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
           )}
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center px-3 py-6">
-          <p className="text-sm text-gray-500 text-center">No reviews yet</p>
+        <div className="flex-1 flex flex-col">
+          <CreateReviewButton
+            isActive={currentReview === null}
+            onClick={() => dispatch(resetCurrentReview())}
+          />
+          <div className="flex-1 flex items-center justify-center px-3 py-6">
+            <p className="text-sm text-gray-500 text-center">No reviews yet</p>
+          </div>
         </div>
       )}
     </div>

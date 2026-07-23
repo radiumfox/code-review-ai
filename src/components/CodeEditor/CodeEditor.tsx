@@ -32,6 +32,7 @@ import {
   selectCreateReviewError,
   selectCodeSnippet,
   selectSummary,
+  selectIsDraft,
   setLanguage,
   setModel,
   setCodeSnippet,
@@ -49,6 +50,7 @@ export function CodeEditor() {
   const model = useSelector(selectModel);
   const reviewLoading = useSelector(selectCreateReviewLoading);
   const reviewError = useSelector(selectCreateReviewError);
+  const isDraft = useSelector(selectIsDraft);
   const dispatch = useDispatch<AppDispatch>();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
@@ -165,6 +167,7 @@ export function CodeEditor() {
               <ModelSelect
                 value={model}
                 onChange={(value) => dispatch(setModel(value))}
+                disabled={!isDraft}
               />
             </div>
 
@@ -174,6 +177,7 @@ export function CodeEditor() {
               <LanguageSelect
                 value={language}
                 onChange={(value) => dispatch(setLanguage(value))}
+                disabled={!isDraft}
               />
             </div>
           </div>
@@ -192,6 +196,7 @@ export function CodeEditor() {
             basicSetup={EDITOR_BASIC_SETUP}
             theme={theme}
             className="flex-1"
+            readOnly={!isDraft}
           />
 
           {/* Divider */}
@@ -216,15 +221,17 @@ export function CodeEditor() {
       </div>
 
       {/* Review button */}
-      <div className="mt-6 flex justify-center">
-        <ButtonBase
-          text={reviewLoading ? 'Reviewing...' : 'Get Review'}
-          onClick={getReview}
-          icon={<StarIcon />}
-          size={ButtonBaseSizes.Md}
-          isLoading={reviewLoading}
-        />
-      </div>
+      {isDraft && (
+        <div className="mt-6 flex justify-center">
+          <ButtonBase
+            text={reviewLoading ? 'Reviewing...' : 'Get Review'}
+            onClick={getReview}
+            icon={<StarIcon />}
+            size={ButtonBaseSizes.Md}
+            isLoading={reviewLoading}
+          />
+        </div>
+      )}
 
       {/* Mobile summary drawer */}
       <SlideOutDrawer

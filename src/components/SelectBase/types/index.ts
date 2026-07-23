@@ -10,6 +10,7 @@ export interface SelectBaseProps<T extends string> {
     onScrollEnd?(): void;
     isLoading?: boolean;
     hasMore?: boolean;
+    disabled?: boolean;
 }
 
 export interface SelectBaseItemProps {

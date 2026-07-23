@@ -28,7 +28,8 @@ function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
 
 export function ModelSelect({
   value,
-  onChange
+  onChange,
+  disabled
 }: ModelSelectProps) {
   const [{ models, nextPageToken }, dispatch] = useReducer(modelsReducer, {
     models: [],
@@ -73,6 +74,7 @@ export function ModelSelect({
       onScrollEnd={loadMore}
       isLoading={loading}
       hasMore={!!nextPageToken}
+      disabled={disabled}
     />
   );
 }

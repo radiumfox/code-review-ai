@@ -11,9 +11,10 @@ import type { CodingLanguage } from '@/lib/types';
 interface LanguageSelectProps {
   value: CodingLanguage | null;
   onChange(value: CodingLanguage): void;
+  disabled?: boolean;
 }
 
-export function LanguageSelect({ value, onChange }: LanguageSelectProps) {
+export function LanguageSelect({ value, onChange, disabled }: LanguageSelectProps) {
   const items = useMemo(() => {
     return LANGUAGES_LIST.map((language) => ({
       value: language,
@@ -28,6 +29,7 @@ export function LanguageSelect({ value, onChange }: LanguageSelectProps) {
       onChange={onChange}
       placeholder="Search language..."
       notFoundText="No languages found"
+      disabled={disabled}
     />
   );
 }

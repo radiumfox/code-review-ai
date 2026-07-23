@@ -19,6 +19,7 @@ interface ReviewState {
   model: string | null;
   codeSnippet: string;
   summary: string;
+  isDraft: boolean;
 }
 
 const initialState: ReviewState = {
@@ -35,6 +36,7 @@ const initialState: ReviewState = {
   model: DEFAULT_MODEL,
   codeSnippet: DEFAULT_EDITOR_VALUE,
   summary: '',
+  isDraft: true,
 };
 
 interface FetchReviewsResult {
@@ -116,6 +118,7 @@ export const reviewsSlice = createSlice({
       state.model = action.payload?.model ?? null;
       state.codeSnippet = action.payload?.codeSnippet ?? '';
       state.summary = action.payload?.summary ?? '';
+      state.isDraft = false;
     },
     setLanguage: (state, action: PayloadAction<CodingLanguage>) => {
       state.language = action.payload;
@@ -128,6 +131,14 @@ export const reviewsSlice = createSlice({
     },
     setSummary: (state, action: PayloadAction<string>) => {
       state.summary = action.payload;
+    },
+    resetCurrentReview: (state) => {
+      state.currentReview = null;
+      state.language = DEFAULT_LANGUAGE;
+      state.model = DEFAULT_MODEL;
+      state.codeSnippet = DEFAULT_EDITOR_VALUE;
+      state.summary = '';
+      state.isDraft = true;
     }
   },
   extraReducers: (builder) => {
@@ -167,6 +178,7 @@ export const reviewsSlice = createSlice({
         state.summary = action.payload?.summary ?? '';
         state.language = action.payload?.language ?? null;
         state.model = action.payload?.model ?? null;
+        state.isDraft = false;
       })
       .addCase(createReview.rejected, (state, action) => {
         state.createReviewLoading = false;
@@ -175,7 +187,7 @@ export const reviewsSlice = createSlice({
   },
 });
 
-export const { setCurrentReview, setLanguage, setModel, setCodeSnippet, setSummary } = reviewsSlice.actions;
+export const { setCurrentReview, setLanguage, setModel, setCodeSnippet, setSummary, resetCurrentReview } = reviewsSlice.actions;
 
 export const selectReviews = (state: RootState) => state.reviews.reviews;
 export const selectReviewsLoading = (state: RootState) => state.reviews.loading;
@@ -190,5 +202,6 @@ export const selectLang = (state: RootState) => state.reviews.language;
 export const selectModel = (state: RootState) => state.reviews.model;
 export const selectCodeSnippet = (state: RootState) => state.reviews.codeSnippet;
 export const selectSummary = (state: RootState) => state.reviews.summary;
+export const selectIsDraft = (state: RootState) => state.reviews.isDraft;
 
 export const selectIsInitialReviewsFetching = (state: RootState) => state.reviews.isInitialReviewsFetching;
