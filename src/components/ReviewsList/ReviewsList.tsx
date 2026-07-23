@@ -11,7 +11,7 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
-  setCurrentReview, selectIsInitialReviewsFetching
+  setCurrentReview, selectIsInitialReviewsFetching, selectCurrentReview
 } from '@/store/reviewsStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
@@ -30,6 +30,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   const currentPage = useSelector(selectCurrentPage);
   const hasMore = useSelector(selectHasMore);
   const isInitialLoading = useSelector(selectIsInitialReviewsFetching);
+  const currentReview = useSelector(selectCurrentReview);
 
   const nextPage = currentPage + 1;
 
@@ -48,8 +49,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
   const reviewsList = useMemo(() => {
-    return reviews.map((review, index) => ({
-      id: index.toString(),
+    return reviews.map((review) => ({
       ...review
     }));
   }, [reviews]);
@@ -75,7 +75,12 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
       ) : reviewsList.length > 0 ? (
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
           {reviewsList.map((review) => (
-            <ReviewItem onClick={() => dispatch(setCurrentReview(review))} key={review.id} review={review} />
+            <ReviewItem
+              onClick={() => dispatch(setCurrentReview(review))}
+              key={review._id}
+              review={review}
+              isActive={review._id === currentReview?._id}
+            />
           ))}
           {hasMore && (
             <div ref={sentinelRef}>

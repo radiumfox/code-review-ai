@@ -3,7 +3,7 @@
 import { formatDate, formatTime } from '@/components/ReviewsList/helpers';
 
 export interface ReviewItemData {
-  id: string;
+  _id: string;
   createdAt: string;
   language: string;
   summary: string;
@@ -11,12 +11,13 @@ export interface ReviewItemData {
 
 interface ReviewItemProps {
   review: ReviewItemData;
+  isActive?: boolean;
   onClick?: () => void;
 }
 
-export function ReviewItem({ review, onClick }: ReviewItemProps) {
+export function ReviewItem({ review, isActive, onClick }: ReviewItemProps) {
   return (
-    <div onClick={onClick} className="flex flex-col gap-1.5 px-3 py-3 border-b border-[#1e1e4a] last:border-b-0 cursor-pointer hover:bg-[#151540]/50 transition-colors duration-200">
+    <div onClick={onClick} className={`flex flex-col gap-1.5 px-3 py-3 border-b border-[#1e1e4a] last:border-b-0 transition-colors duration-200 ${isActive ? 'bg-[#6c6cff]/20 border-l-2 border-l-[#6c6cff]' : 'hover:bg-[#151540]/50 cursor-pointer'}`}>
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">
           {formatDate(review.createdAt)} &middot; {formatTime(review.createdAt)}

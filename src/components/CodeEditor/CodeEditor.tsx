@@ -66,7 +66,6 @@ export function CodeEditor() {
   }, [reviewError, showNotification]);
 
   useEffect(() => {
-    console.log(currentReview);
     if(currentReview?.issues && viewRef.current) {
       viewRef.current.view?.dispatch({
         effects: setIssuesEffect.of(currentReview.issues)

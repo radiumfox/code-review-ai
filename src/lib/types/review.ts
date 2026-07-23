@@ -36,6 +36,7 @@ export interface ReviewPersistRequest {
 }
 
 export interface Review {
+    _id: string;
     summary: string;
     issues?: Issue[];
     createdAt: string;

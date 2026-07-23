@@ -60,15 +60,15 @@ export const fetchReviews = createAsyncThunk<Review[], { page: number }>(
       return rejectWithValue(message);
     }
   },
-  // {
-  //   condition: (_, { getState }) => {
-  //     const state = getState() as RootState;
-  //
-  //     if(state.reviews.loading) {
-  //       return false;
-  //     }
-  //   },
-  // },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+
+      if(state.reviews.loading) {
+        return false;
+      }
+    },
+  },
 );
 
 export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
@@ -161,7 +161,6 @@ export const reviewsSlice = createSlice({
         state.createReviewError = null;
       })
       .addCase(createReview.fulfilled, (state, action) => {
-        console.log(action.payload);
         state.createReviewLoading = false;
         state.currentReview = action.payload;
         state.codeSnippet = action.payload?.codeSnippet;
