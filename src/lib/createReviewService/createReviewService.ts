@@ -2,7 +2,7 @@ import { fillTemplate } from './helpers';
 import promptTemplate from '@/prompts/code-review-default.json';
 import { generateContent } from '@/lib/genAI';
 import { Candidate } from '@google/genai';
-import { reviewSchema } from '@/lib/validations/review';
+import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
 import { DEFAULT_MODEL } from '@/lib/config';
@@ -51,7 +51,7 @@ function parseAIResponse(aiResponse: Candidate[]) {
 }
 
 function validateReviewData(data: unknown) {
-  const reviewData = reviewSchema.safeParse(data);
+  const reviewData = reviewPersistRequestSchema.safeParse(data);
 
   if(!reviewData.success) {
     throw reviewData.error;

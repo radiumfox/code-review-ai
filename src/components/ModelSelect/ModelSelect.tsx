@@ -47,7 +47,7 @@ export function ModelSelect({
 
   useEffect(() => {
     executeFetch();
-  }, []);
+  }, [executeFetch]);
 
   useEffect(() => {
     if (!data) return;
