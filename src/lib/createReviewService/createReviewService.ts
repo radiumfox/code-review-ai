@@ -1,4 +1,4 @@
-import { fillTemplate } from './helpers';
+import { fillTemplate } from './helpers/fillTemplate';
 import promptTemplate from '@/prompts/code-review-default.json';
 import { generateContent } from '@/lib/genAI';
 import { Candidate } from '@google/genai';
@@ -74,6 +74,6 @@ export async function createReview(userId: string, params: ReviewGenerateRequest
   }
 
   const reviewData = parseAIResponse(aiResponse);
-  const validated = validateReviewData(reviewData);
+  const validated = validateReviewData({ ...reviewData, ...params });
   return persistReview(userId, { ...params, ...validated });
 }
