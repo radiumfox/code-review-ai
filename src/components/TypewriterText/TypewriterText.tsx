@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { TEST_IDS } from '@/components/TypewriterText/config';
 
 interface TypewriterTextProps {
   text: string;
@@ -31,12 +32,13 @@ export function TypewriterText({ text, speed = 30, className = '' }: TypewriterT
   }, [text, speed]);
 
   return (
-    <span className={className}>
+    <span className={className} data-testid={TEST_IDS.typewriterText}>
       {text.slice(0, displayedCount)}
       {text && !isComplete && (
         <span
           className="inline-block w-0.5 h-[1em] align-middle ml-0.5 bg-[#6c6cff]"
           style={{ animation: 'blink-caret 0.75s step-end infinite' }}
+          data-testid={TEST_IDS.typewriterCaret}
         />
       )}
     </span>

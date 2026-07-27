@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { SelectBase } from '@/components/SelectBase';
 import {
   LANGUAGES_LIST,
@@ -14,7 +14,7 @@ interface LanguageSelectProps {
   disabled?: boolean;
 }
 
-export function LanguageSelect({ value, onChange, disabled }: LanguageSelectProps) {
+const LanguageSelectComponent = function ({ value, onChange, disabled }: LanguageSelectProps) {
   const items = useMemo(() => {
     return LANGUAGES_LIST.map((language) => ({
       value: language,
@@ -32,4 +32,6 @@ export function LanguageSelect({ value, onChange, disabled }: LanguageSelectProp
       disabled={disabled}
     />
   );
-}
+};
+
+export const LanguageSelect = memo(LanguageSelectComponent);

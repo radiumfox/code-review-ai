@@ -34,6 +34,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
     
-    return NextResponse.json({ error: 'Error creating review' }, { status: 500 });
+    return NextResponse.json({ error: 'Error creating review', data: error }, { status: 500 });
   }
 }

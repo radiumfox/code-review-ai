@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, memo } from 'react';
 import { SelectBase } from '@/components/SelectBase';
 
 import { useFetch } from '@/lib/hooks';
@@ -26,7 +26,7 @@ function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
   }
 }
 
-export function ModelSelect({
+const ModelSelectComponent = function ({
   value,
   onChange,
   disabled
@@ -77,4 +77,6 @@ export function ModelSelect({
       disabled={disabled}
     />
   );
-}
+};
+
+export const ModelSelect = memo(ModelSelectComponent);
