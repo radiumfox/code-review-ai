@@ -41,7 +41,7 @@ describe('NotificationBase', () => {
     const onClose = vi.fn();
     render(<NotificationBase type={NotificationType.Neutral} message="info" onClose={onClose} />);
 
-    const button = screen.getAllByTestId(TEST_IDS.buttonClose)[0];
+    const button = screen.getByTestId(TEST_IDS.buttonClose);
     fireEvent.click(button);
 
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -51,7 +51,7 @@ describe('NotificationBase', () => {
     const onClose = vi.fn();
     render(<NotificationBase type={NotificationType.Error} message="fail" duration={5000} onClose={onClose} />);
 
-    const button = screen.getAllByTestId(TEST_IDS.buttonClose)[0];
+    const button = screen.getByTestId(TEST_IDS.buttonClose);
     fireEvent.click(button);
     act(() => { vi.advanceTimersByTime(5000); });
 

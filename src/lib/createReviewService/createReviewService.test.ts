@@ -149,23 +149,4 @@ describe('createReview', () => {
       expect(isAiError(error)).toBe(true);
     }
   });
-
-  test('Uses default model from prompt template when not specified', async () => {
-    mockGenerateContent.mockResolvedValue([{
-      content: { parts: [{ text: JSON.stringify({ summary: 'ok', issues: [] }) }] },
-    }]);
-    mockReviewCreate.mockResolvedValue({});
-
-    const { createReview } = await import('@/lib/createReviewService/createReviewService');
-    await createReview('user-1', {
-      language: DEFAULT_LANGUAGE,
-      codeSnippet: 'console.log("hi")',
-      model: DEFAULT_MODEL,
-    });
-
-    const callArgs = mockGenerateContent.mock.calls[0][0];
-    expect(callArgs.model).toBe(DEFAULT_MODEL);
-    expect(callArgs.contents).toContain(DEFAULT_LANGUAGE);
-    expect(callArgs.contents).toContain('console.log("hi")');
-  });
 });

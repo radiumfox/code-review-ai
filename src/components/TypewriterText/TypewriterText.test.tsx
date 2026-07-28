@@ -30,9 +30,9 @@ describe('TypewriterText', () => {
   });
 
   test('Shows blinking cursor while typing', () => {
-    const { container } = render(<TypewriterText text="A" speed={100} />);
+    const { container } = render(<TypewriterText text="Hello" speed={100} />);
 
-    act(() => { vi.advanceTimersByTime(100); });
+    act(() => { vi.advanceTimersByTime(50); });
 
     const cursor = container.querySelector(`[data-testid="${TEST_IDS.typewriterCaret}"]`);
     expect(cursor).toBeDefined();

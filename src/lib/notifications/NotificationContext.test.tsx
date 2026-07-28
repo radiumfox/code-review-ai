@@ -1,8 +1,9 @@
 import { describe, expect, test, vi, afterEach } from 'vitest';
-import { renderHook, act, cleanup } from '@testing-library/react';
+import { renderHook, act, cleanup, screen, fireEvent } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { NotificationProvider, useNotification } from './NotificationContext';
 import { NotificationType } from './types';
+import { TEST_IDS } from '@/lib/notifications/config';
 
 function wrapper({ children }: { children: ReactNode }) {
   return <NotificationProvider>{children}</NotificationProvider>;
@@ -62,6 +63,3 @@ describe('useNotification', () => {
     expect(screen.queryByText('Warning msg')).toBeNull();
   });
 });
-
-import { screen, fireEvent } from '@testing-library/react';
-import { TEST_IDS } from '@/lib/notifications/config';

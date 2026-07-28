@@ -34,9 +34,9 @@ describe('useFetch', () => {
 
     test('Becomes true when executeFetch is called and false after completion', async () => {
       const deferred = createDeferred<{
-                ok: boolean;
-                json: () => Promise<{ title: string }>
-            }>();
+        ok: boolean;
+        json: () => Promise<{ title: string }>
+      }>();
 
       fetchMock.mockReturnValue(deferred.promise);
 

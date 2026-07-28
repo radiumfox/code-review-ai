@@ -131,9 +131,9 @@ export function CodeEditor() {
     dispatch(setLanguage(value)),
   [dispatch]);
 
-  const openSummary = useCallback(() => setIsSummaryOpen(false), []);
+  const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
 
-  const openReviewsList = useCallback(() => setIsReviewsOpen(false), []);
+  const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
 
   return (
     <div className="transition-all duration-300">
@@ -245,7 +245,7 @@ export function CodeEditor() {
       {/* Mobile summary drawer */}
       <SlideOutDrawer
         isOpen={isSummaryOpen}
-        onClose={openSummary}
+        onClose={closeSummary}
         title="Summary"
         buttonCloseAreaLabel="Close summary drawer"
         backdropClassName="md:hidden"
@@ -260,7 +260,7 @@ export function CodeEditor() {
       {/* Mobile reviews history drawer */}
       <SlideOutDrawer
         isOpen={isReviewsOpen}
-        onClose={openReviewsList}
+        onClose={closeReviewList}
         title="Reviews history"
         buttonCloseAreaLabel="Close reviews drawer"
         panelClassName="lg:hidden"
