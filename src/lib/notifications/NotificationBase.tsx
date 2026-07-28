@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { NotificationType } from './types';
+import { TEST_IDS } from '@/lib/notifications/config';
 
 interface NotificationBaseProps {
   type: NotificationType;
@@ -83,6 +84,7 @@ export function NotificationBase({
         onClick={handleClose}
         className="shrink-0 p-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
         aria-label="Close notification"
+        data-testid={TEST_IDS.buttonClose}
       >
         <CloseIcon />
       </button>

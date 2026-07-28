@@ -21,7 +21,7 @@ interface ReviewState {
   summary: string;
 }
 
-const initialState: ReviewState = {
+export const initialState: ReviewState = {
   currentReview: null,
   reviews: [],
   isInitialReviewsFetching: true,

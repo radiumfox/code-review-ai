@@ -32,7 +32,7 @@ export interface ReviewPersistRequest {
     issues?: Issue[];
     language: string;
     codeSnippet: string;
-    model?: string;
+    model: string;
 }
 
 export interface Review {

@@ -3,9 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { NextRequest, NextResponse } from 'next/server';
 import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
-import { z } from 'zod';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
+import { flattenError } from 'zod';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +19,11 @@ export async function POST(request: NextRequest) {
     const input = reviewListRequestSchema.safeParse(body);
 
     if(!input.success) {
-      return NextResponse.json(z.treeifyError(input.error), { status: 400 });
+      const error = flattenError(input.error);
+      return NextResponse.json({ error }, { status: 400 });
     }
 
     const result = await ReviewModel.aggregate([
-
-
       { $match: { userId: { $eq: new ObjectId(session.user.id) } }, },
       {
         $sort: {

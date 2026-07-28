@@ -1,10 +1,10 @@
 import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { createReview, isAiError } from '@/lib/createReviewService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { applyRateLimiter } from '@/lib/server';
+import { flattenError } from 'zod';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
     const input = reviewGenerateRequest.safeParse(body);
 
     if(!input.success) {
-      return NextResponse.json(z.treeifyError(input.error), { status: 400 });
+      const error = flattenError(input.error);
+      return NextResponse.json({ error }, { status: 400 });
     }
 
     const review = await createReview(session.user.id, input.data);

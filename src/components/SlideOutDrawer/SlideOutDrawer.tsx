@@ -1,6 +1,7 @@
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
-import { type ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
+import { TEST_IDS } from '@/components/SlideOutDrawer/config';
 
 interface SlideOutDrawerProps {
     children: ReactNode;
@@ -12,7 +13,7 @@ interface SlideOutDrawerProps {
     panelClassName?: string;
 }
 
-export function SlideOutDrawer({ children, onClose, isOpen, buttonCloseAreaLabel, title, backdropClassName, panelClassName  }: SlideOutDrawerProps) {
+const SlideOutDrawerComponent = function({ children, onClose, isOpen, buttonCloseAreaLabel, title, backdropClassName, panelClassName  }: SlideOutDrawerProps) {
   return (
     <>
       <div
@@ -22,6 +23,7 @@ export function SlideOutDrawer({ children, onClose, isOpen, buttonCloseAreaLabel
           ${backdropClassName}`
         }
         onClick={onClose}
+        data-testid={TEST_IDS.drawerBackdrop}
       />
       <div
         className={
@@ -29,6 +31,7 @@ export function SlideOutDrawer({ children, onClose, isOpen, buttonCloseAreaLabel
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           ${panelClassName}`
         }
+        data-testid={TEST_IDS.drawerPanel}
       >
         <div className="flex items-center justify-between px-4 py-3 bg-[#151540] border-b border-[#1e1e4a]">
           <div className="flex items-center gap-2">
@@ -47,4 +50,6 @@ export function SlideOutDrawer({ children, onClose, isOpen, buttonCloseAreaLabel
       </div>
     </>
   );
-}
+};
+
+export const SlideOutDrawer = memo(SlideOutDrawerComponent);

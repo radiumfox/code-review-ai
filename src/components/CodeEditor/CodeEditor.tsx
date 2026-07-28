@@ -37,6 +37,7 @@ import {
   setCodeSnippet,
   fetchReviews
 } from '@/store/reviewsStore';
+import { CodingLanguage } from '@/lib/types';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -122,6 +123,18 @@ export function CodeEditor() {
     });
   };
 
+  const onModelChange = useCallback((value: string) => {
+    dispatch(setModel(value));
+  }, [dispatch]);
+
+  const onLanguageChange = useCallback((value: CodingLanguage) =>
+    dispatch(setLanguage(value)),
+  [dispatch]);
+
+  const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
+
+  const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
+
   return (
     <div className="transition-all duration-300">
       <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
@@ -164,7 +177,7 @@ export function CodeEditor() {
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
               <ModelSelect
                 value={model}
-                onChange={(value) => dispatch(setModel(value))}
+                onChange={onModelChange}
                 disabled={reviewLoading}
               />
             </div>
@@ -174,7 +187,7 @@ export function CodeEditor() {
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
               <LanguageSelect
                 value={language}
-                onChange={(value) => dispatch(setLanguage(value))}
+                onChange={onLanguageChange}
                 disabled={reviewLoading}
               />
             </div>
@@ -232,7 +245,7 @@ export function CodeEditor() {
       {/* Mobile summary drawer */}
       <SlideOutDrawer
         isOpen={isSummaryOpen}
-        onClose={() => setIsSummaryOpen(false)}
+        onClose={closeSummary}
         title="Summary"
         buttonCloseAreaLabel="Close summary drawer"
         backdropClassName="md:hidden"
@@ -247,7 +260,7 @@ export function CodeEditor() {
       {/* Mobile reviews history drawer */}
       <SlideOutDrawer
         isOpen={isReviewsOpen}
-        onClose={() => setIsReviewsOpen(false)}
+        onClose={closeReviewList}
         title="Reviews history"
         buttonCloseAreaLabel="Close reviews drawer"
         panelClassName="lg:hidden"
