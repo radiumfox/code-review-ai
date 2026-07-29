@@ -1,3 +1,3 @@
-export const TEST_IDS = {
+export const NOTIFICATION_TEST_IDS = {
   buttonClose: 'notification-button-close'
 };

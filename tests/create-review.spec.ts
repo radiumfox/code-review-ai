@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
-import { DEFAULT_LANGUAGE, DEFAULT_MODEL } from '@/lib/config';
+import { DEFAULT_LANGUAGE, DEFAULT_MODEL, DEFAULT_MODEL_NAME } from '@/lib/config';
 
 function mockReview(overrides = {}) {
   return {
@@ -30,7 +30,7 @@ test.describe('Create review pipeline', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          models: [{ name: `models/${DEFAULT_MODEL}`, displayName: 'Gemini 2.5 Flash' }],
+          models: [{ name: `models/${DEFAULT_MODEL}`, displayName: DEFAULT_MODEL_NAME }],
         }),
       });
     });
@@ -110,7 +110,7 @@ test.describe('Create review pipeline', () => {
     const button = page.getByRole('button', { name: 'Get review' });
     await expect(button).not.toBeDisabled();
 
-    const closeButton = page.getByTestId('notification-button-close');
+    const closeButton = page.getByRole('button', { name: 'Close notification' });
     await expect(closeButton).toBeVisible();
   });
 
@@ -133,7 +133,7 @@ test.describe('Create review pipeline', () => {
       resp.url().includes('/api/reviews/create') && resp.status() === 400
     );
 
-    const closeButton = page.getByTestId('notification-button-close');
+    const closeButton = page.getByRole('button', { name: 'Close notification' });
     await expect(closeButton).toBeVisible();
   });
 });
