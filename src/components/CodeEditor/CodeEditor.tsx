@@ -116,7 +116,7 @@ export function CodeEditor() {
 
     dispatch(createReview({
       language,
-      codeSnippet: '',
+      codeSnippet,
       model
     })).then(() => {
       dispatch(fetchReviews({ page: 0 }));

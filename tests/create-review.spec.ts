@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { CODE_SNIPPET_MAX_VALUE } from '@/lib/validations/config';
+import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
 import { DEFAULT_LANGUAGE, DEFAULT_MODEL } from '@/lib/config';
 
 function mockReview(overrides = {}) {
@@ -25,32 +25,40 @@ function mockReview(overrides = {}) {
 
 test.describe('Create review pipeline', () => {
   test.beforeEach('Log in', async ({ page }) => {
+    await page.route('/api/models', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          models: [{ name: `models/${DEFAULT_MODEL}`, displayName: 'Gemini 2.5 Flash' }],
+        }),
+      });
+    });
+
     await page.goto('/api/auth/e2e-signin');
     await page.waitForURL('/');
   });
 
   test('Create review', async ({ page }) => {
     await page.route('/api/reviews/create', async route => {
-      setTimeout(async () => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ data: mockReview() }),
-        });
-      }, 2000);
+      await new Promise(f => setTimeout(f, 500));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: mockReview() }),
+      });
     });
 
     await page.route('/api/reviews', async route => {
-      setTimeout(async () => {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            metadata: { totalCount: 1, page: 0, pageSize: 20 },
-            data: [mockReview()],
-          }),
-        });
-      }, 2000);
+      await new Promise(f => setTimeout(f, 500));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          metadata: { totalCount: 1, page: 0, pageSize: 20 },
+          data: [mockReview()],
+        }),
+      });
     });
 
     const codeEditor = page.locator('[contenteditable=true]');
@@ -77,18 +85,17 @@ test.describe('Create review pipeline', () => {
     const buttonGetReview = page.getByRole('button', { name: 'Get review' });
     await expect(buttonGetReview).not.toBeDisabled();
 
-    await expect(page.getByText(data.summary).first()).toBeVisible({ timeout: 50000 });
+    await expect(page.getByText(data.summary).first()).toBeVisible();
   });
 
   test('Shows validation error on empty code', async ({ page }) => {
     await page.route('/api/reviews/create', async route => {
-      setTimeout(async () => {
-        await route.fulfill({
-          status: 400,
-          contentType: 'application/json',
-          body: 'String must contain at least 1 character(s)',
-        });
-      }, 2000);
+      await new Promise(f => setTimeout(f, 500));
+      await route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: `Code length must be more than ${CODE_SNIPPET_MIN_VALUE} character(s) and less than ${CODE_SNIPPET_MAX_VALUE} character(s)` })
+      });
     });
 
     const codeEditor = page.locator('[contenteditable=true]');
@@ -109,13 +116,12 @@ test.describe('Create review pipeline', () => {
 
   test('Shows validation error on code exceeding max length', async ({ page }) => {
     await page.route('/api/reviews/create', async route => {
-      setTimeout(async () => {
-        await route.fulfill({
-          status: 400,
-          contentType: 'application/json',
-          body: 'String must contain at least 1 character(s)',
-        });
-      }, 2000);
+      await new Promise(f => setTimeout(f, 500));
+      await route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: `Code length must be more than ${CODE_SNIPPET_MIN_VALUE} character(s) and less than ${CODE_SNIPPET_MAX_VALUE} character(s)` })
+      });
     });
 
     const codeEditor = page.locator('[contenteditable=true]');
