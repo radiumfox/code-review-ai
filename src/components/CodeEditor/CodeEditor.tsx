@@ -116,7 +116,7 @@ export function CodeEditor() {
 
     dispatch(createReview({
       language,
-      codeSnippet,
+      codeSnippet: '',
       model
     })).then(() => {
       dispatch(fetchReviews({ page: 0 }));
@@ -207,6 +207,8 @@ export function CodeEditor() {
             basicSetup={EDITOR_BASIC_SETUP}
             theme={theme}
             className="flex-1"
+            aria-description="Code editor"
+            placeholder="Write your code here..."
             readOnly={reviewLoading}
           />
 

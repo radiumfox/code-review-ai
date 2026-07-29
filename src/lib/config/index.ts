@@ -44,5 +44,6 @@ export const LANGUAGES_NAMES_MAP: Partial<Record<CodingLanguage, string>> = {
 export const DEFAULT_LANGUAGE: CodingLanguage = 'js';
 
 export const DEFAULT_MODEL = promptTemplate.model;
+export const DEFAULT_MODEL_NAME = promptTemplate.modelName;
 
 export const DEFAULT_EDITOR_VALUE = 'console.log(\'hello world!\');';

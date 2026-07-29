@@ -31,8 +31,8 @@ export const initialState: ReviewState = {
   error: null,
   createReviewError: null,
   createReviewLoading: false,
-  language: DEFAULT_LANGUAGE,
-  model: DEFAULT_MODEL,
+  language: 'js',
+  model: 'gemini-2.5-flash',
   codeSnippet: DEFAULT_EDITOR_VALUE,
   summary: '',
 };

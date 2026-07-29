@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
-import { flattenError } from 'zod';
+import { prettifyError } from 'zod';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const input = reviewListRequestSchema.safeParse(body);
 
     if(!input.success) {
-      const error = flattenError(input.error);
+      const error = prettifyError(input.error);
       return NextResponse.json({ error }, { status: 400 });
     }
 
