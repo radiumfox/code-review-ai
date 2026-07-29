@@ -1,46 +1,26 @@
 import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
-import { DEFAULT_LANGUAGE, DEFAULT_MODEL, DEFAULT_MODEL_NAME } from '@/lib/config';
-
-function mockReview(overrides = {}) {
-  return {
-    id: 'mock-review-id',
-    language: DEFAULT_LANGUAGE,
-    codeSnippet: 'let x = 1;',
-    model: DEFAULT_MODEL,
-    summary: 'Prefer const over let for variables that are never reassigned.',
-    issues: [
-      {
-        line: 1,
-        severity: 'warning',
-        category: 'style',
-        message: 'Prefer const over let',
-        suggestion: 'Use const instead of let',
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    ...overrides,
-  };
-}
+import { mockReview, MOCK_MODELS_LIST } from "./helpers";
+import {ROUTES} from "@/lib/config";
 
 test.describe('Create review pipeline', () => {
   test.beforeEach('Log in', async ({ page }) => {
-    await page.route('/api/models', async route => {
+    await page.route(ROUTES.modelsList, async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          models: [{ name: `models/${DEFAULT_MODEL}`, displayName: DEFAULT_MODEL_NAME }],
+          models: MOCK_MODELS_LIST,
         }),
       });
     });
 
-    await page.goto('/api/auth/e2e-signin');
+    await page.goto(ROUTES.authE2E);
     await page.waitForURL('/');
   });
 
   test('Create review', async ({ page }) => {
-    await page.route('/api/reviews/create', async route => {
+    await page.route(ROUTES.createReview, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -49,7 +29,7 @@ test.describe('Create review pipeline', () => {
       });
     });
 
-    await page.route('/api/reviews', async route => {
+    await page.route(ROUTES.reviewsList, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -71,7 +51,7 @@ test.describe('Create review pipeline', () => {
     await expect(button).toBeDisabled();
 
     const createResponse = await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews/create') && resp.status() === 200
+      resp.url().includes(ROUTES.createReview) && resp.status() === 200
     );
 
     const { data } = await createResponse.json();
@@ -79,7 +59,7 @@ test.describe('Create review pipeline', () => {
     expect(data.summary).toBeTruthy();
 
     await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews') && resp.status() === 200
+      resp.url().includes(ROUTES.reviewsList) && resp.status() === 200
     );
 
     const buttonGetReview = page.getByRole('button', { name: 'Get review' });
@@ -89,7 +69,7 @@ test.describe('Create review pipeline', () => {
   });
 
   test('Shows validation error on empty code', async ({ page }) => {
-    await page.route('/api/reviews/create', async route => {
+    await page.route(ROUTES.createReview, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 400,
@@ -104,7 +84,7 @@ test.describe('Create review pipeline', () => {
     await page.getByRole('button', { name: 'Get review' }).click();
 
     await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews/create') && resp.status() === 400
+      resp.url().includes(ROUTES.createReview) && resp.status() === 400
     );
 
     const button = page.getByRole('button', { name: 'Get review' });
@@ -115,7 +95,7 @@ test.describe('Create review pipeline', () => {
   });
 
   test('Shows validation error on code exceeding max length', async ({ page }) => {
-    await page.route('/api/reviews/create', async route => {
+    await page.route(ROUTES.createReview, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 400,
@@ -130,7 +110,7 @@ test.describe('Create review pipeline', () => {
     await page.getByRole('button', { name: 'Get review' }).click();
 
     await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews/create') && resp.status() === 400
+      resp.url().includes(ROUTES.createReview) && resp.status() === 400
     );
 
     const closeButton = page.getByRole('button', { name: 'Close notification' });

@@ -1,49 +1,29 @@
 import { test, expect } from '@playwright/test';
-import { DEFAULT_LANGUAGE, DEFAULT_MODEL, DEFAULT_EDITOR_VALUE, DEFAULT_MODEL_NAME } from '@/lib/config';
+import {DEFAULT_EDITOR_VALUE, ROUTES} from '@/lib/config';
 import { EDITOR_TEST_IDS } from '@/components/CodeEditor/config';
-
-function mockReview(overrides = {}) {
-  return {
-    id: 'mock-review-id',
-    language: DEFAULT_LANGUAGE,
-    codeSnippet: 'let x = 1;',
-    model: DEFAULT_MODEL,
-    summary: 'Prefer const over let for variables that are never reassigned.',
-    issues: [
-      {
-        line: 1,
-        severity: 'warning',
-        category: 'style',
-        message: 'Prefer const over let',
-        suggestion: 'Use const instead of let',
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    ...overrides,
-  };
-}
+import {MOCK_MODELS_LIST, mockReview} from "./helpers";
 
 test.describe('Review selection', () => {
   test.beforeEach('Log in', async ({ page }) => {
-    await page.route('/api/models', async route => {
+    await page.route(ROUTES.modelsList, async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          models: [{ name: `models/${DEFAULT_MODEL}`, displayName: DEFAULT_MODEL_NAME }],
+          models: MOCK_MODELS_LIST,
         }),
       });
     });
 
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto('/api/auth/e2e-signin');
+    await page.goto(ROUTES.authE2E);
     await page.waitForURL('/');
   });
 
   test('Review list is fetched and displayed', async ({ page }) => {
     const review = mockReview();
 
-    await page.route('/api/reviews', async route => {
+    await page.route(ROUTES.reviewsList, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -56,7 +36,7 @@ test.describe('Review selection', () => {
     });
 
     await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews') && resp.status() === 200
+      resp.url().includes(ROUTES.reviewsList) && resp.status() === 200
     );
 
     await expect(page.getByText(review.summary).first()).toBeVisible();
@@ -70,7 +50,7 @@ test.describe('Review selection', () => {
       summary: 'This is a review for a Python script.',
     });
 
-    await page.route('/api/reviews', async route => {
+    await page.route(ROUTES.reviewsList, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -83,7 +63,7 @@ test.describe('Review selection', () => {
     });
 
     await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews') && resp.status() === 200
+      resp.url().includes(ROUTES.reviewsList) && resp.status() === 200
     );
 
     await page.getByText(pyReview.summary).first().click();
@@ -106,7 +86,7 @@ test.describe('Review selection', () => {
       summary: 'This is a review for a Python script.',
     });
 
-    await page.route('/api/reviews', async route => {
+    await page.route(ROUTES.reviewsList, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -119,7 +99,7 @@ test.describe('Review selection', () => {
     });
 
     await page.waitForResponse(resp =>
-      resp.url().includes('/api/reviews') && resp.status() === 200
+      resp.url().includes(ROUTES.reviewsList) && resp.status() === 200
     );
 
     await page.getByText(pyReview.summary).first().click();
