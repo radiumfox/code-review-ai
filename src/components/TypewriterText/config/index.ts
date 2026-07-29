@@ -1,4 +1,4 @@
-export const TEST_IDS = {
+export const TYPEWRITER_TEST_IDS = {
   typewriterCaret: 'typewriter-caret',
   typewriterText: 'typewriter-text',
 };

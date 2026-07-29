@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { SlideOutDrawer } from './SlideOutDrawer';
-import { TEST_IDS } from './config';
+import { SLIDEOUT_DRAWER_TEST_IDS } from './config';
 
 describe('SlideOutDrawer', () => {
   afterEach(() => {
@@ -25,7 +25,7 @@ describe('SlideOutDrawer', () => {
       </SlideOutDrawer>
     );
 
-    const backdrop = container.querySelector(`[data-testid="${TEST_IDS.drawerBackdrop}"]`)!;
+    const backdrop = container.querySelector(`[data-testid="${SLIDEOUT_DRAWER_TEST_IDS.drawerBackdrop}"]`)!;
     fireEvent.click(backdrop);
 
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -60,7 +60,7 @@ describe('SlideOutDrawer', () => {
         <div>content</div>
       </SlideOutDrawer>
     );
-    const backdrop = container.querySelector(`[data-testid="${TEST_IDS.drawerBackdrop}"]`)!;
+    const backdrop = container.querySelector(`[data-testid="${SLIDEOUT_DRAWER_TEST_IDS.drawerBackdrop}"]`)!;
     expect(backdrop.className).toContain('custom-backdrop');
   });
 
@@ -71,7 +71,7 @@ describe('SlideOutDrawer', () => {
       </SlideOutDrawer>
     );
 
-    const panel = container.querySelector(`[data-testid="${TEST_IDS.drawerPanel}"]`)!;
+    const panel = container.querySelector(`[data-testid="${SLIDEOUT_DRAWER_TEST_IDS.drawerPanel}"]`)!;
     expect(panel.className).toContain('custom-panel');
   });
 });

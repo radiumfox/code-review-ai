@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { render, act, cleanup } from '@testing-library/react';
 import { TypewriterText } from './TypewriterText';
-import { TEST_IDS } from './config';
+import { TYPEWRITER_TEST_IDS } from './config';
 
 describe('TypewriterText', () => {
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('TypewriterText', () => {
 
   test('Progressively reveals characters', () => {
     const { container } = render(<TypewriterText text="Hi" speed={100} />);
-    const span = container.querySelector(`[data-testid="${TEST_IDS.typewriterText}"]`)!;
+    const span = container.querySelector(`[data-testid="${TYPEWRITER_TEST_IDS.typewriterText}"]`)!;
 
     act(() => { vi.advanceTimersByTime(100); });
     expect(span.textContent).toContain('H');
@@ -34,7 +34,7 @@ describe('TypewriterText', () => {
 
     act(() => { vi.advanceTimersByTime(50); });
 
-    const cursor = container.querySelector(`[data-testid="${TEST_IDS.typewriterCaret}"]`);
+    const cursor = container.querySelector(`[data-testid="${TYPEWRITER_TEST_IDS.typewriterCaret}"]`);
     expect(cursor).toBeDefined();
   });
 
@@ -43,7 +43,7 @@ describe('TypewriterText', () => {
 
     act(() => { vi.advanceTimersByTime(100); });
 
-    const cursor = container.querySelector(`[data-testid="${TEST_IDS.typewriterCaret}"]`);
+    const cursor = container.querySelector(`[data-testid="${TYPEWRITER_TEST_IDS.typewriterCaret}"]`);
     expect(cursor).toBeNull();
   });
 

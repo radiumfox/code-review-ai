@@ -50,3 +50,10 @@ Thumbs.db
 #AI agents
 
 opencode.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

@@ -13,4 +13,6 @@ export const THEME_CUSTOM_SETTINGS = {
   }
 };
 
-
+export const EDITOR_TEST_IDS = {
+  languageName: 'language-name'
+};

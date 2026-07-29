@@ -11,7 +11,7 @@ import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
-  EDITOR_BASIC_SETUP,
+  EDITOR_BASIC_SETUP, EDITOR_TEST_IDS,
   THEME_CUSTOM_SETTINGS
 } from './config';
 import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
@@ -207,6 +207,8 @@ export function CodeEditor() {
             basicSetup={EDITOR_BASIC_SETUP}
             theme={theme}
             className="flex-1"
+            aria-description="Code editor"
+            placeholder="Write your code here..."
             readOnly={reviewLoading}
           />
 
@@ -222,7 +224,7 @@ export function CodeEditor() {
 
         {/* Footer */}
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
-          <span className="text-xs text-gray-500 truncate">
+          <span className="text-xs text-gray-500 truncate" data-testid={EDITOR_TEST_IDS.languageName}>
             {languageName}
           </span>
           <span className="text-xs text-gray-500">

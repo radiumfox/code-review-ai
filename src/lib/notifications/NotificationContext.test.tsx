@@ -3,7 +3,7 @@ import { renderHook, act, cleanup, screen, fireEvent } from '@testing-library/re
 import { ReactNode } from 'react';
 import { NotificationProvider, useNotification } from './NotificationContext';
 import { NotificationType } from './types';
-import { TEST_IDS } from '@/lib/notifications/config';
+import { NOTIFICATION_TEST_IDS } from './config';
 
 function wrapper({ children }: { children: ReactNode }) {
   return <NotificationProvider>{children}</NotificationProvider>;
@@ -57,7 +57,7 @@ describe('useNotification', () => {
 
     expect(screen.getByText('Warning msg')).toBeDefined();
 
-    const buttons = screen.getAllByTestId(TEST_IDS.buttonClose);
+    const buttons = screen.getAllByTestId(NOTIFICATION_TEST_IDS.buttonClose);
     fireEvent.click(buttons[buttons.length - 1]);
 
     expect(screen.queryByText('Warning msg')).toBeNull();

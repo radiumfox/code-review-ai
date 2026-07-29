@@ -1,7 +1,7 @@
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { memo, type ReactNode } from 'react';
-import { TEST_IDS } from '@/components/SlideOutDrawer/config';
+import { SLIDEOUT_DRAWER_TEST_IDS } from './config';
 
 interface SlideOutDrawerProps {
     children: ReactNode;
@@ -23,7 +23,7 @@ const SlideOutDrawerComponent = function({ children, onClose, isOpen, buttonClos
           ${backdropClassName}`
         }
         onClick={onClose}
-        data-testid={TEST_IDS.drawerBackdrop}
+        data-testid={SLIDEOUT_DRAWER_TEST_IDS.drawerBackdrop}
       />
       <div
         className={
@@ -31,7 +31,7 @@ const SlideOutDrawerComponent = function({ children, onClose, isOpen, buttonClos
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           ${panelClassName}`
         }
-        data-testid={TEST_IDS.drawerPanel}
+        data-testid={SLIDEOUT_DRAWER_TEST_IDS.drawerPanel}
       >
         <div className="flex items-center justify-between px-4 py-3 bg-[#151540] border-b border-[#1e1e4a]">
           <div className="flex items-center gap-2">

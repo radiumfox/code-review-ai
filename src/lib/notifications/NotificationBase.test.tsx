@@ -2,7 +2,7 @@ import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
 import { NotificationBase } from './NotificationBase';
 import { NotificationType } from './types';
-import { TEST_IDS } from '@/lib/notifications/config';
+import { NOTIFICATION_TEST_IDS } from './config';
 
 describe('NotificationBase', () => {
   beforeEach(() => {
@@ -41,7 +41,7 @@ describe('NotificationBase', () => {
     const onClose = vi.fn();
     render(<NotificationBase type={NotificationType.Neutral} message="info" onClose={onClose} />);
 
-    const button = screen.getByTestId(TEST_IDS.buttonClose);
+    const button = screen.getByTestId(NOTIFICATION_TEST_IDS.buttonClose);
     fireEvent.click(button);
 
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -51,7 +51,7 @@ describe('NotificationBase', () => {
     const onClose = vi.fn();
     render(<NotificationBase type={NotificationType.Error} message="fail" duration={5000} onClose={onClose} />);
 
-    const button = screen.getByTestId(TEST_IDS.buttonClose);
+    const button = screen.getByTestId(NOTIFICATION_TEST_IDS.buttonClose);
     fireEvent.click(button);
     act(() => { vi.advanceTimersByTime(5000); });
 

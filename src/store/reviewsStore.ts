@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Review, ReviewGenerateRequest } from '@/lib/types';
-import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, DEFAULT_MODEL, REVIEWS_LIST_LIMIT } from '@/lib/config';
+import {DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, DEFAULT_MODEL, REVIEWS_LIST_LIMIT, ROUTES} from '@/lib/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
 
@@ -31,8 +31,8 @@ export const initialState: ReviewState = {
   error: null,
   createReviewError: null,
   createReviewLoading: false,
-  language: DEFAULT_LANGUAGE,
-  model: DEFAULT_MODEL,
+  language: 'js',
+  model: 'gemini-2.5-flash',
   codeSnippet: DEFAULT_EDITOR_VALUE,
   summary: '',
 };
@@ -51,7 +51,7 @@ export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number 
     const fetchId = ++fetchReviewsCounter;
 
     try {
-      const response = await fetch('/api/reviews', {
+      const response = await fetch(ROUTES.reviewsList, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ page }),
@@ -76,7 +76,7 @@ export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
   'reviews/createReview',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/reviews/create', {
+      const response = await fetch(ROUTES.createReview, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(params)
