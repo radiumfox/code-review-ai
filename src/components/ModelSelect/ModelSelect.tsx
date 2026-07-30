@@ -12,7 +12,7 @@ import {
   ModelsState
 } from '@/components/ModelSelect/types';
 import { mapModels } from '@/components/ModelSelect/helpers';
-import {ROUTES} from "@/lib/config";
+import { ROUTES } from '@/lib/config';
 
 function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
   switch (action.type) {
@@ -21,8 +21,7 @@ function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
       models: [
         ...state.models,
         ...mapModels(action.payload.models)
-      ],
-      nextPageToken: action.payload.nextPageToken ?? null,
+      ]
     };
   }
 }
@@ -32,9 +31,8 @@ const ModelSelectComponent = function ({
   onChange,
   disabled
 }: ModelSelectProps) {
-  const [{ models, nextPageToken }, dispatch] = useReducer(modelsReducer, {
-    models: [],
-    nextPageToken: null,
+  const [{ models }, dispatch] = useReducer(modelsReducer, {
+    models: []
   });
 
   const {
@@ -52,18 +50,12 @@ const ModelSelectComponent = function ({
 
   useEffect(() => {
     if (!data) return;
-
+    console.log(data);
     dispatch({
       type: MODELS_ACTION_TYPES.append,
       payload: data
     });
   }, [data]);
-
-  const loadMore = useCallback(async () => {
-    if (!nextPageToken) return;
-
-    await executeFetch(undefined, { pageToken: nextPageToken });
-  }, [nextPageToken, executeFetch]);
 
   return (
     <SelectBase
@@ -72,9 +64,6 @@ const ModelSelectComponent = function ({
       onChange={onChange}
       placeholder="Search model..."
       notFoundText="No models found"
-      onScrollEnd={loadMore}
-      isLoading={loading}
-      hasMore={!!nextPageToken}
       disabled={disabled}
     />
   );

@@ -5,7 +5,7 @@ import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { ModelSelect } from '@/components/ModelSelect';
+// import { ModelSelect } from '@/components/ModelSelect';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
@@ -172,15 +172,15 @@ export function CodeEditor() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
-            {/* Model select */}
-            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
-              <ModelSelect
-                value={model}
-                onChange={onModelChange}
-                disabled={reviewLoading}
-              />
-            </div>
+            {/*/!* Model select *!/*/}
+            {/*<div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">*/}
+            {/*  <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>*/}
+            {/*  <ModelSelect*/}
+            {/*    value={model}*/}
+            {/*    onChange={onModelChange}*/}
+            {/*    disabled={reviewLoading}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
             {/* Language select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">

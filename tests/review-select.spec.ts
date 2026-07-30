@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import {DEFAULT_EDITOR_VALUE, ROUTES} from '@/lib/config';
+import { DEFAULT_EDITOR_VALUE, ROUTES } from '@/lib/config';
 import { EDITOR_TEST_IDS } from '@/components/CodeEditor/config';
-import {MOCK_MODELS_LIST, mockReview} from "./helpers";
+import { MOCK_MODELS_LIST, mockReview } from './helpers';
 
 test.describe('Review selection', () => {
   test.beforeEach('Log in', async ({ page }) => {

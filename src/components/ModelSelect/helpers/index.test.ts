@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'vitest';
 import { prepareModelName, mapModels } from './index';
+import { AIModel } from '@/lib/genAI/types';
 
 describe('prepareModelName', () => {
   test('Strips models/ prefix', () => {
-    expect(prepareModelName('models/gemini-2.5-flash')).toBe('gemini-2.5-flash');
+    expect(prepareModelName('models/gpt-4')).toBe('gpt-4');
   });
 
   test('Returns name unchanged when no prefix', () => {
-    expect(prepareModelName('gemini-2.5-flash')).toBe('gemini-2.5-flash');
+    expect(prepareModelName('gpt-4')).toBe('gpt-4');
   });
 
   test('Handles empty string', () => {
@@ -16,32 +17,18 @@ describe('prepareModelName', () => {
 });
 
 describe('mapModels', () => {
-  test('Maps models to value/label pairs', () => {
-    const models = [
-      { name: 'models/gemini-pro', displayName: 'Gemini Pro' },
-      { name: 'models/gemini-flash', displayName: 'Gemini Flash' },
+  test('Maps models to value/label pairs using id', () => {
+    const models: AIModel[] = [
+      { id: 'llama-3.3-70b-versatile', object: 'model', created: 1, owned_by: 'groq', name: 'Llama 3.1 8B' },
+      { id: 'qwen/qwen3.6-27b', object: 'model', created: 2, owned_by: 'Alibaba Cloud', name: 'Qwen/Qwen3.6-27B' },
     ];
 
     const result = mapModels(models);
 
     expect(result).toEqual([
-      { value: 'gemini-pro', label: 'Gemini Pro' },
-      { value: 'gemini-flash', label: 'Gemini Flash' },
+      { value: 'Llama 3.1 8B', label: 'llama-3.3-70b-versatile' },
+      { value: 'mixtral-8x7b-32768', label: 'mixtral-8x7b-32768' },
     ]);
-  });
-
-  test('Uses name as label when displayName is missing', () => {
-    const models = [{ name: 'models/gemini-pro' }];
-    const result = mapModels(models);
-
-    expect(result[0].label).toBe('models/gemini-pro');
-  });
-
-  test('Uses fallback when both name and displayName are missing', () => {
-    const models = [{}];
-    const result = mapModels(models);
-
-    expect(result[0]).toEqual({ value: '', label: 'Unknown model' });
   });
 
   test('Returns empty array for empty input', () => {

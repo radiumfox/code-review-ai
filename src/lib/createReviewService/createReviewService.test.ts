@@ -1,5 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { DEFAULT_LANGUAGE, DEFAULT_MODEL } from '@/lib/config';
+import { DEFAULT_LANGUAGE } from '@/lib/config';
+import { AI_MODEL } from '@/lib/genAI/config';
 
 const mockGenerateContent = vi.fn();
 const mockReviewCreate = vi.fn();
@@ -69,10 +70,10 @@ describe('createReview', () => {
     };
 
     mockGenerateContent.mockResolvedValue([{
-      content: { parts: [{ text: JSON.stringify(aiPayload) }] },
+      message: { content: JSON.stringify(aiPayload) },
     }]);
 
-    const created = { _id: 'rev-1', userId: 'user-1', ...aiPayload, language: DEFAULT_LANGUAGE, codeSnippet: 'let x = 1', model: DEFAULT_MODEL };
+    const created = { _id: 'rev-1', userId: 'user-1', ...aiPayload, language: DEFAULT_LANGUAGE, codeSnippet: 'let x = 1', model: AI_MODEL };
 
     mockReviewCreate.mockResolvedValue(created);
 
@@ -80,7 +81,7 @@ describe('createReview', () => {
     const result = await createReview('user-1', {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
-      model: DEFAULT_MODEL,
+      model: AI_MODEL,
     });
 
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
@@ -88,7 +89,7 @@ describe('createReview', () => {
       userId: 'user-1',
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
-      model: DEFAULT_MODEL,
+      model: AI_MODEL,
       summary: 'Clean code with minor issues',
       issues: aiPayload.issues,
     }));
@@ -103,7 +104,7 @@ describe('createReview', () => {
     await expect(createReview('user-1', {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
-      model: DEFAULT_MODEL,
+      model: AI_MODEL,
     })).rejects.toThrow('AI returned no candidates');
   });
 
@@ -115,13 +116,13 @@ describe('createReview', () => {
     await expect(createReview('user-1', {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
-      model: DEFAULT_MODEL,
+      model: AI_MODEL,
     })).rejects.toThrow();
   });
 
   test('Throws when AI returns invalid JSON', async () => {
     mockGenerateContent.mockResolvedValue([{
-      content: { parts: [{ text: 'not valid json' }] },
+      message: { content: 'not valid json' },
     }]);
 
     const { createReview } = await import('@/lib/createReviewService/createReviewService');
@@ -129,7 +130,7 @@ describe('createReview', () => {
     await expect(createReview('user-1', {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
-      model: DEFAULT_MODEL,
+      model: AI_MODEL,
     })).rejects.toThrow('AI returned invalid JSON');
   });
 
@@ -142,7 +143,7 @@ describe('createReview', () => {
       await createReview('user-1', {
         language: DEFAULT_LANGUAGE,
         codeSnippet: 'let x = 1',
-        model: DEFAULT_MODEL,
+        model: AI_MODEL,
       });
       expect.unreachable('Should have thrown');
     } catch (error) {

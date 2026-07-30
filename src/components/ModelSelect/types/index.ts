@@ -1,11 +1,11 @@
-import { Model } from '@google/genai';
+import { AIModel } from '@/lib/genAI/types';
 
 export const MODELS_ACTION_TYPES = {
   append: 'APPEND'
 } as const;
 
 export interface ModelsResponse {
-    models: Model[];
+    models: AIModel[];
     nextPageToken?: string;
 }
 
@@ -17,7 +17,6 @@ export interface ModelSelectProps {
 
 export interface ModelsState {
     models: { value: string; label: string }[];
-    nextPageToken: string | null;
 }
 
 export type ModelsActionType = typeof MODELS_ACTION_TYPES[keyof typeof MODELS_ACTION_TYPES];

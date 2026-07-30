@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Review, ReviewGenerateRequest } from '@/lib/types';
-import {DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, DEFAULT_MODEL, REVIEWS_LIST_LIMIT, ROUTES} from '@/lib/config';
+import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT, ROUTES } from '@/lib/config';
+import { AI_MODEL } from '@/lib/genAI/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
 
@@ -31,8 +32,8 @@ export const initialState: ReviewState = {
   error: null,
   createReviewError: null,
   createReviewLoading: false,
-  language: 'js',
-  model: 'gemini-2.5-flash',
+  language: DEFAULT_LANGUAGE,
+  model: AI_MODEL,
   codeSnippet: DEFAULT_EDITOR_VALUE,
   summary: '',
 };
@@ -132,7 +133,7 @@ export const reviewsSlice = createSlice({
     resetCurrentReview: (state) => {
       state.currentReview = null;
       state.language = DEFAULT_LANGUAGE;
-      state.model = DEFAULT_MODEL;
+      state.model = AI_MODEL;
       state.codeSnippet = DEFAULT_EDITOR_VALUE;
       state.summary = '';
     }

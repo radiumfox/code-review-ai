@@ -1,16 +1,14 @@
-import { ContentListUnion } from '@google/genai';
-import { googleGenAI } from './genAI';
+import { getAIClient } from '@/lib/genAI/genAI';
 
-export async function generateContent({ contents, model }: { contents: ContentListUnion, model: string }) {
-  const aiClient = await googleGenAI();
 
-  const response = await aiClient.models.generateContent({
+
+export async function generateContent({ contents, model, userApiKey }: { contents: string, model: string, userApiKey?: string }) {
+  const client = getAIClient(userApiKey);
+  const response = await client.chat.completions.create({
     model,
-    contents,
-    config: {
-      responseMimeType: 'application/json'
-    }
+    messages: [{ role: 'user', content: contents }],
+    response_format: { type: 'json_object' },
   });
 
-  return response.candidates;
+  return response.choices;
 }

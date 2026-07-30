@@ -11,15 +11,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url ?? '');
-
-  const pageToken = searchParams.get('pageToken') ?? undefined;
-
   const rateLimitResponse = await applyRateLimiter(`${session.user.id}.${request.url}`);
   if(rateLimitResponse) return rateLimitResponse;
 
   try {
-    const result = await fetchModels(pageToken);
+    const result = await fetchModels();
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error(error);

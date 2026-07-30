@@ -1,56 +1,49 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 
-class MockGoogleGenAI {
-  static instances: MockGoogleGenAI[] = [];
+const mockOpenAIInstance = {};
 
-  constructor(public init: { apiKey: string }) {
-    MockGoogleGenAI.instances.push(this);
-  }
+function FakeOpenAI() {
+  return mockOpenAIInstance;
 }
 
-vi.mock('@google/genai', () => ({
-  GoogleGenAI: MockGoogleGenAI,
+vi.mock('openai', () => ({
+  default: FakeOpenAI,
 }));
 
-describe('googleGenAI', () => {
-  const originalEnv = process.env.GEMINI_API_KEY;
+describe('getAIClient', () => {
+  const originalEnv = process.env.AI_API_KEY;
 
   beforeEach(() => {
     vi.resetModules();
-    MockGoogleGenAI.instances = [];
   });
 
   afterEach(() => {
-    process.env.GEMINI_API_KEY = originalEnv;
+    process.env.AI_API_KEY = originalEnv;
   });
 
-  test('Throws when GEMINI_API_KEY is missing', async () => {
-    delete process.env.GEMINI_API_KEY;
+  test('Throws when AI_API_KEY is missing', async () => {
+    delete process.env.AI_API_KEY;
 
-    const { googleGenAI } = await import('@/lib/genAI/genAI');
-
-    await expect(googleGenAI()).rejects.toThrow('Missing API key environment variable');
+    const { getAIClient } = await import('@/lib/genAI/genAI');
+    expect(() => getAIClient()).toThrow('Missing API key');
   });
 
-  test('Returns a GoogleGenAI instance with the API key', async () => {
-    process.env.GEMINI_API_KEY = 'test-key';
+  test('Returns an OpenAI instance with the API key', async () => {
+    process.env.AI_API_KEY = 'test-key';
 
-    const { googleGenAI } = await import('@/lib/genAI/genAI');
-    const client = await googleGenAI();
+    const { getAIClient } = await import('@/lib/genAI/genAI');
+    const client = getAIClient();
 
-    expect(MockGoogleGenAI.instances).toHaveLength(1);
-    expect(client).toBeInstanceOf(MockGoogleGenAI);
-    expect(MockGoogleGenAI.instances[0].init).toEqual({ apiKey: 'test-key' });
+    expect(client).toBe(mockOpenAIInstance);
   });
 
-  test('Caches and returns same instance on subsequent calls', async () => {
-    process.env.GEMINI_API_KEY = 'test-key';
+  test('Returns same instance on subsequent calls', async () => {
+    process.env.AI_API_KEY = 'test-key';
 
-    const { googleGenAI } = await import('@/lib/genAI/genAI');
-    const first = await googleGenAI();
-    const second = await googleGenAI();
+    const { getAIClient } = await import('@/lib/genAI/genAI');
+    const first = getAIClient();
+    const second = getAIClient();
 
     expect(first).toBe(second);
-    expect(MockGoogleGenAI.instances).toHaveLength(1);
   });
 });

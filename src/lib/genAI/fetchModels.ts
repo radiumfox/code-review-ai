@@ -1,23 +1,12 @@
-import { MODELS_PAGE_SIZE } from './config';
-import { googleGenAI } from './genAI';
-import { FetchModelReturn } from './types';
+import { getAIClient } from './genAI';
+import { AIModel, FetchModelReturn } from './types';
 
-export async function fetchModels(pageToken?: string): Promise<FetchModelReturn> {
-  const aiClient = await googleGenAI();
-
-  const pager = await aiClient.models.list({
-    config: {
-      pageSize: MODELS_PAGE_SIZE,
-      pageToken
-    }
-  });
-
-  const models = pager.page;
-
-  const nextPageToken = pager.hasNextPage() ? pager.params.config?.pageToken ?? null : null;
+export async function fetchModels(): Promise<FetchModelReturn> {
+  const client = getAIClient();
+  const page = await client.models.list();
 
   return {
-    models,
-    nextPageToken
+    models: page.data as AIModel[],
+    nextPageToken: null,
   };
 }

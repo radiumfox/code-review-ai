@@ -1,6 +1,12 @@
-import { Model } from '@google/genai';
+import OpenAI from 'openai';
+
+export interface AIModel extends OpenAI.Model {
+  name: string;
+}
 
 export interface FetchModelReturn {
-    models: Model[];
-    nextPageToken: string | null
+    models: AIModel[];
+    nextPageToken: string | null;
 }
+
+export type AIChoice = OpenAI.Chat.Completions.ChatCompletion.Choice;

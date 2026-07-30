@@ -25,7 +25,8 @@ import {
   selectSummary,
   selectIsInitialReviewsFetching,
 } from '@/store/reviewsStore';
-import { DEFAULT_LANGUAGE, DEFAULT_MODEL, DEFAULT_EDITOR_VALUE, REVIEWS_LIST_LIMIT } from '@/lib/config';
+import { DEFAULT_LANGUAGE, DEFAULT_EDITOR_VALUE, REVIEWS_LIST_LIMIT } from '@/lib/config';
+import { AI_MODEL } from '@/lib/genAI/config';
 import type { Review, ReviewGenerateRequest } from '@/lib/types';
 
 function createMockReview(overrides: Partial<Review> = {}): Review {
@@ -36,7 +37,7 @@ function createMockReview(overrides: Partial<Review> = {}): Review {
     createdAt: '2025-01-01T00:00:00.000Z',
     language: DEFAULT_LANGUAGE,
     codeSnippet: 'const x = 1;',
-    model: DEFAULT_MODEL,
+    model: AI_MODEL,
     ...overrides,
   };
 }
@@ -67,7 +68,7 @@ describe('Selectors', () => {
     expect(selectCreateReviewLoading(state)).toBe(false);
     expect(selectCreateReviewError(state)).toBeNull();
     expect(selectLang(state)).toBe(DEFAULT_LANGUAGE);
-    expect(selectModel(state)).toBe(DEFAULT_MODEL);
+    expect(selectModel(state)).toBe(AI_MODEL);
     expect(selectCodeSnippet(state)).toBe(DEFAULT_EDITOR_VALUE);
     expect(selectSummary(state)).toBe('');
     expect(selectIsInitialReviewsFetching(state)).toBe(true);
@@ -141,7 +142,7 @@ describe('Synchronous reducers', () => {
 
       expect(selectCurrentReview(root)).toBeNull();
       expect(selectLang(root)).toBe(DEFAULT_LANGUAGE);
-      expect(selectModel(root)).toBe(DEFAULT_MODEL);
+      expect(selectModel(root)).toBe(AI_MODEL);
       expect(selectCodeSnippet(root)).toBe(DEFAULT_EDITOR_VALUE);
       expect(selectSummary(root)).toBe('');
     });
@@ -396,7 +397,7 @@ describe('async thunks', () => {
     const params: ReviewGenerateRequest = {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'const x = 1;',
-      model: DEFAULT_MODEL,
+      model: AI_MODEL,
     };
 
     test('Dispatches fulfilled with created review', async () => {

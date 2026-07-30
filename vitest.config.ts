@@ -7,7 +7,8 @@ export default defineConfig({
         external: ['react', 'zod'],
       },
     },
-    environment: 'jsdom'
+    environment: 'jsdom',
+    exclude: ['tests/**', 'node_modules/**']
   },
   resolve: {
     alias: {
