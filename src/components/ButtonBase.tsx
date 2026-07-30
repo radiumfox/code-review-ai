@@ -44,7 +44,7 @@ export function ButtonBase({
       onClick={onClick}
       disabled={isLoading}
       className={
-        `flex items-center border-2 border-[#dfdfe2]
+        `flex items-center border-2 border-[#dfdfe2] justify-center
         bg-transparent uppercase tracking-[0.15em]
         text-[#dfdfe2] transition-all duration-200
         hover:bg-[#dfdfe2] hover:text-[#0a0a23]
