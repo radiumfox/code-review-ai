@@ -40,7 +40,9 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   const nextPage = currentPage + 1;
 
   useEffect(() => {
-    dispatch(fetchReviews({ page: 0 }));
+    if(!reviews.length) {
+      dispatch(fetchReviews({ page: 0 }));
+    }
   }, [dispatch]);
 
   const loadMore = useCallback(() => {

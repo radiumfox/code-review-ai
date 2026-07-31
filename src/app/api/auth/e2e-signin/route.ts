@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ROUTES } from '@/lib/config';
 
 export async function GET() {
   if (process.env.E2E_TEST !== 'true') {
@@ -19,11 +20,11 @@ export async function GET() {
 
   const encryptedToken = await encode({ token, secret: NEXTAUTH_SECRET });
 
-  const response = NextResponse.redirect(new URL('/', process.env.NEXTAUTH_URL));
+  const response = NextResponse.redirect(new URL(ROUTES.main, process.env.NEXTAUTH_URL));
   response.cookies.set('next-auth.session-token', encryptedToken, {
     httpOnly: true,
     sameSite: 'lax',
-    path: '/',
+    path: ROUTES.main,
     secure: process.env.NODE_ENV === 'production',
   });
 

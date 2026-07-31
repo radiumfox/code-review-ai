@@ -1,7 +1,6 @@
 'use client';
 
-import { signOut } from 'next-auth/react';
-import { ButtonSecondary } from './ButtonSecondary';
+import { HeaderMenu } from './HeaderMenu';
 
 export function HeaderBase() {
   return (
@@ -9,10 +8,7 @@ export function HeaderBase() {
       <span className="text-sm uppercase tracking-[0.2em] text-[#dfdfe2]">
         Code Review AI
       </span>
-      <ButtonSecondary
-        onClick={() => signOut()}
-        text="Sign Out"
-      />
+      <HeaderMenu />
     </header>
   );
 }

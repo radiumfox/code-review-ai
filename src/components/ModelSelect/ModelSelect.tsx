@@ -12,7 +12,7 @@ import {
   ModelsState
 } from '@/components/ModelSelect/types';
 import { mapModels } from '@/components/ModelSelect/helpers';
-import { ROUTES } from '@/lib/config';
+import { API_ROUTES } from '@/lib/config';
 
 function modelsReducer(state: ModelsState, action: ModelsAction): ModelsState {
   switch (action.type) {
@@ -40,7 +40,7 @@ const ModelSelectComponent = function ({
     data,
     loading
   } = useFetch<Record<string, never>, ModelsResponse>(
-    ROUTES.modelsList,
+    API_ROUTES.modelsList,
     'GET'
   );
 

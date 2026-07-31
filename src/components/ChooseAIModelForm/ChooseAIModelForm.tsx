@@ -5,8 +5,9 @@ import { InputBase } from '@/components/InputBase';
 import { ButtonBorder } from '@/components/ButtonBorder';
 import { SelectBase } from '@/components/SelectBase';
 import { useState } from 'react';
-import {ButtonBase} from "@/components/ButtonBase";
+import { ButtonBase } from '@/components/ButtonBase';
 import { redirect } from 'next/navigation';
+import { ROUTES } from '@/lib/config';
 
 type Provider = 'openai' | 'anthropic' | 'google';
 
@@ -42,8 +43,8 @@ export function ChooseAIModelForm() {
   const selectedProviderMeta = PROVIDERS.find((p) => p.id === selectedProvider);
 
   const submitModel = () => {
-      setIsRedirecting(true);
-      redirect('/');
+    setIsRedirecting(true);
+    redirect(ROUTES.main);
   };
 
   return (
@@ -112,9 +113,9 @@ export function ChooseAIModelForm() {
 
           {selectedModel &&
               <ButtonBase
-                  onClick={submitModel}
-                  text="Start coding"
-                  isLoading={isRedirecting}
+                onClick={submitModel}
+                text="Start coding"
+                isLoading={isRedirecting}
               />
           }
         </div>

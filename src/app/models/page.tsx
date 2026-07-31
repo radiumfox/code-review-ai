@@ -1,12 +1,13 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { ChooseAIModelForm } from '@/components/ChooseAIModelForm';
+import { ROUTES } from '@/lib/config';
 
 export default function ChooseModelPage() {
   const session = getServerSession();
 
   if (!session) {
-    redirect('/login');
+    redirect(ROUTES.login);
   }
 
   return (

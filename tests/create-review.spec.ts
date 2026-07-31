@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
 import { mockReview, MOCK_MODELS_LIST } from './helpers';
-import { ROUTES } from '@/lib/config';
+import { API_ROUTES, ROUTES } from '@/lib/config';
 
 test.describe('Create review pipeline', () => {
   test.beforeEach('Log in', async ({ page }) => {
-    await page.route(ROUTES.modelsList, async route => {
+    await page.route(API_ROUTES.modelsList, async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -15,12 +15,12 @@ test.describe('Create review pipeline', () => {
       });
     });
 
-    await page.goto(ROUTES.authE2E);
-    await page.waitForURL('/');
+    await page.goto(API_ROUTES.authE2E);
+    await page.waitForURL(ROUTES.main);
   });
 
   test('Create review', async ({ page }) => {
-    await page.route(ROUTES.createReview, async route => {
+    await page.route(API_ROUTES.createReview, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -29,7 +29,7 @@ test.describe('Create review pipeline', () => {
       });
     });
 
-    await page.route(ROUTES.reviewsList, async route => {
+    await page.route(API_ROUTES.reviewsList, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 200,
@@ -51,7 +51,7 @@ test.describe('Create review pipeline', () => {
     await expect(button).toBeDisabled();
 
     const createResponse = await page.waitForResponse(resp =>
-      resp.url().includes(ROUTES.createReview) && resp.status() === 200
+      resp.url().includes(API_ROUTES.createReview) && resp.status() === 200
     );
 
     const { data } = await createResponse.json();
@@ -59,7 +59,7 @@ test.describe('Create review pipeline', () => {
     expect(data.summary).toBeTruthy();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(ROUTES.reviewsList) && resp.status() === 200
+      resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
     );
 
     const buttonGetReview = page.getByRole('button', { name: 'Get review' });
@@ -69,7 +69,7 @@ test.describe('Create review pipeline', () => {
   });
 
   test('Shows validation error on empty code', async ({ page }) => {
-    await page.route(ROUTES.createReview, async route => {
+    await page.route(API_ROUTES.createReview, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 400,
@@ -84,7 +84,7 @@ test.describe('Create review pipeline', () => {
     await page.getByRole('button', { name: 'Get review' }).click();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(ROUTES.createReview) && resp.status() === 400
+      resp.url().includes(API_ROUTES.createReview) && resp.status() === 400
     );
 
     const button = page.getByRole('button', { name: 'Get review' });
@@ -95,7 +95,7 @@ test.describe('Create review pipeline', () => {
   });
 
   test('Shows validation error on code exceeding max length', async ({ page }) => {
-    await page.route(ROUTES.createReview, async route => {
+    await page.route(API_ROUTES.createReview, async route => {
       await new Promise(f => setTimeout(f, 500));
       await route.fulfill({
         status: 400,
@@ -110,7 +110,7 @@ test.describe('Create review pipeline', () => {
     await page.getByRole('button', { name: 'Get review' }).click();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(ROUTES.createReview) && resp.status() === 400
+      resp.url().includes(API_ROUTES.createReview) && resp.status() === 400
     );
 
     const closeButton = page.getByRole('button', { name: 'Close notification' });

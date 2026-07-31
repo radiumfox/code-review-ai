@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Review, ReviewGenerateRequest } from '@/lib/types';
-import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT, ROUTES } from '@/lib/config';
+import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT, API_ROUTES } from '@/lib/config';
 import { AI_MODEL } from '@/lib/genAI/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
@@ -52,7 +52,7 @@ export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number 
     const fetchId = ++fetchReviewsCounter;
 
     try {
-      const response = await fetch(ROUTES.reviewsList, {
+      const response = await fetch(API_ROUTES.reviewsList, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ page }),
@@ -77,7 +77,7 @@ export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
   'reviews/createReview',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await fetch(ROUTES.createReview, {
+      const response = await fetch(API_ROUTES.createReview, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(params)
