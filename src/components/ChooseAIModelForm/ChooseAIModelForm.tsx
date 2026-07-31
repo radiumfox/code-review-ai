@@ -4,20 +4,14 @@ import { RadioButton } from '@/components/RadioButton';
 import { InputBase } from '@/components/InputBase';
 import { ButtonBorder } from '@/components/ButtonBorder';
 import { SelectBase } from '@/components/SelectBase';
-import { useState } from 'react';
+import {useCallback, useState} from 'react';
 import { ButtonBase } from '@/components/ButtonBase';
 import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/config';
 import { setModel } from "@/store/reviewEditorStore";
-import {useDispatch} from "react-redux";
-
-type Provider = 'openai' | 'anthropic' | 'google';
-
-const PROVIDERS: { id: Provider; label: string; available: boolean }[] = [
-  { id: 'openai', label: 'OpenAI', available: true },
-  { id: 'anthropic', label: 'Anthropic', available: false },
-  { id: 'google', label: 'Google', available: false },
-];
+import { useDispatch } from "react-redux";
+import { Provider } from "./types";
+import { PROVIDERS } from "./config";
 
 const MOCK_MODELS = [
   { value: 'gpt-4o', label: 'GPT-4o' },
@@ -45,7 +39,7 @@ export function ChooseAIModelForm() {
 
   const selectedProviderMeta = PROVIDERS.find((p) => p.id === selectedProvider);
 
-  const submitModel = () => {
+  const submitModel = useCallback(() => {
     if(!selectedModel) {
       throw new Error('No model selected');
     }
@@ -53,7 +47,14 @@ export function ChooseAIModelForm() {
     dispatch(setModel(selectedModel));
     setIsRedirecting(true);
     redirect(ROUTES.main);
-  };
+  }, [selectedModel, dispatch])
+
+  const changeProvider = useCallback((providerId: Provider) => {
+    setSelectedProvider(providerId);
+    setIsVerified(false);
+    setApiKey('');
+    setSelectedModel(null);
+  }, []);
 
   return (
     <>
@@ -68,12 +69,7 @@ export function ChooseAIModelForm() {
               label={provider.label}
               helpText={!provider.available ? 'Coming soon' : ''}
               isActive={isActive}
-              onChange={() => {
-                setSelectedProvider(provider.id);
-                setIsVerified(false);
-                setApiKey('');
-                setSelectedModel(null);
-              }}
+              onChange={() => changeProvider(provider.id)}
               disabled={!provider.available}
             />
           );
@@ -120,11 +116,11 @@ export function ChooseAIModelForm() {
           )}
 
           {selectedModel &&
-              <ButtonBase
-                onClick={submitModel}
-                text="Start coding"
-                isLoading={isRedirecting}
-              />
+            <ButtonBase
+              onClick={submitModel}
+              text="Start coding"
+              isLoading={isRedirecting}
+            />
           }
         </div>
       )}
