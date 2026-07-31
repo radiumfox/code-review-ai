@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { ButtonBase } from '@/components/ButtonBase';
 import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/config';
+import { setModel } from "@/store/reviewEditorStore";
+import {useDispatch} from "react-redux";
 
 type Provider = 'openai' | 'anthropic' | 'google';
 
@@ -30,6 +32,7 @@ export function ChooseAIModelForm() {
   const [isVerified, setIsVerified] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const dispatch = useDispatch();
 
   const handleVerify = async () => {
     if (!apiKey.trim()) return;
@@ -43,6 +46,11 @@ export function ChooseAIModelForm() {
   const selectedProviderMeta = PROVIDERS.find((p) => p.id === selectedProvider);
 
   const submitModel = () => {
+    if(!selectedModel) {
+      throw new Error('No model selected');
+    }
+
+    dispatch(setModel(selectedModel));
     setIsRedirecting(true);
     redirect(ROUTES.main);
   };

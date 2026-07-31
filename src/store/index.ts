@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { reviewsSlice } from './reviewsStore';
+import { reviewsListSlice } from './reviewsListStore';
+import { reviewEditorSlice } from './reviewEditorStore';
 
 export const store = configureStore({
   reducer: {
-    reviews: reviewsSlice.reducer,
+    reviewsList: reviewsListSlice.reducer,
+    reviewEditor: reviewEditorSlice.reducer,
   }
 });
 

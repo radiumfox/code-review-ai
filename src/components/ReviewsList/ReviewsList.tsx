@@ -12,11 +12,13 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
+  selectIsInitialReviewsFetching
+} from '@/store/reviewsListStore';
+import {
   setCurrentReview,
   resetCurrentReview,
-  selectIsInitialReviewsFetching,
   selectCurrentReview
-} from '@/store/reviewsStore';
+} from '@/store/reviewEditorStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';

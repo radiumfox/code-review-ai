@@ -5,9 +5,8 @@ import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-// import { ModelSelect } from '@/components/ModelSelect';
 import { LanguageSelect } from '@/components/LanguageSelect';
-import { LANGUAGES_NAMES_MAP } from '@/lib/config';
+import {LANGUAGES_NAMES_MAP, ROUTES} from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
@@ -34,10 +33,11 @@ import {
   selectSummary,
   setLanguage,
   setModel,
-  setCodeSnippet,
-  fetchReviews
-} from '@/store/reviewsStore';
+  setCodeSnippet
+} from '@/store/reviewEditorStore';
+import { fetchReviews } from '@/store/reviewsListStore';
 import { CodingLanguage } from '@/lib/types';
+import {redirect} from "next/navigation";
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -51,6 +51,10 @@ export function CodeEditor() {
   const reviewLoading = useSelector(selectCreateReviewLoading);
   const reviewError = useSelector(selectCreateReviewError);
   const dispatch = useDispatch<AppDispatch>();
+
+  if(!model) {
+    redirect(ROUTES.models);
+  }
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
 
@@ -171,17 +175,11 @@ export function CodeEditor() {
 
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
-            {/*/!* Model select *!/*/}
-            {/*<div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">*/}
-            {/*  <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>*/}
-            {/*  <ModelSelect*/}
-            {/*    value={model}*/}
-            {/*    onChange={onModelChange}*/}
-            {/*    disabled={reviewLoading}*/}
-            {/*  />*/}
-            {/*</div>*/}
-
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-between">
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
+              <span>{ model }</span>
+            </div>
             {/* Language select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
