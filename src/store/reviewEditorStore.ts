@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { Review, ReviewGenerateRequest } from '@/lib/types';
 import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, API_ROUTES } from '@/lib/config';
-import { AI_MODEL } from '@/lib/genAI/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
 
@@ -21,7 +20,7 @@ export const initialState: ReviewEditorState = {
   createReviewError: null,
   createReviewLoading: false,
   language: DEFAULT_LANGUAGE,
-  model: AI_MODEL,
+  model: null,
   codeSnippet: DEFAULT_EDITOR_VALUE,
   summary: '',
 };
@@ -86,7 +85,6 @@ export const reviewEditorSlice = createSlice({
     resetCurrentReview: (state) => {
       state.currentReview = null;
       state.language = DEFAULT_LANGUAGE;
-      state.model = AI_MODEL;
       state.codeSnippet = DEFAULT_EDITOR_VALUE;
       state.summary = '';
     }

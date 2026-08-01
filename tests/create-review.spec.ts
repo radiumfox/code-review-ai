@@ -1,20 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
-import { mockReview, MOCK_MODELS_LIST } from './helpers';
+import { mockReview } from './helpers';
 import { API_ROUTES, ROUTES } from '@/lib/config';
 
 test.describe('Create review pipeline', () => {
   test.beforeEach('Log in', async ({ page }) => {
-    await page.route(API_ROUTES.modelsList, async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          models: MOCK_MODELS_LIST,
-        }),
-      });
-    });
-
     await page.goto(API_ROUTES.authE2E);
     await page.waitForURL(ROUTES.main);
   });

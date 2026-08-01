@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
+
 interface ButtonBorderProps {
-    theme: 'default' | 'success';
+    theme: 'default' | 'success' | 'error';
     isLoading: boolean;
     disabled: boolean;
     text: string;
@@ -8,6 +10,17 @@ interface ButtonBorderProps {
 }
 
 export function ButtonBorder({ theme, isLoading, disabled, text, loadingText, onClick }: ButtonBorderProps) {
+  const currentClasses = useMemo(() => {
+    switch (theme) {
+    case 'success':
+      return 'border-[#4ade80] text-[#4ade80] bg-[#4ade80]/10';
+    case 'error':
+      return 'border-[#ff5555] text-[#ff5555] bg-[#ff5555]/10';
+    default:
+      return 'border-[#6c6cff] text-[#6c6cff] hover:bg-[#6c6cff] hover:text-[#0a0a23]';
+    }
+  }, [theme]);
+
   return (
     <button
       onClick={onClick}
@@ -15,10 +28,7 @@ export function ButtonBorder({ theme, isLoading, disabled, text, loadingText, on
       className={`
               flex items-center justify-center gap-2 px-6 py-2.5 text-sm
               uppercase tracking-widest rounded-lg border transition-all
-              ${theme === 'success'
-      ? 'border-[#4ade80] text-[#4ade80] bg-[#4ade80]/10'
-      : 'border-[#6c6cff] text-[#6c6cff] hover:bg-[#6c6cff] hover:text-[#0a0a23]'
-    }
+              ${currentClasses}
               disabled:opacity-40 disabled:pointer-events-none cursor-pointer
               focus:outline-none
             `}

@@ -4,38 +4,54 @@ import { RadioButton } from '@/components/RadioButton';
 import { InputBase } from '@/components/InputBase';
 import { ButtonBorder } from '@/components/ButtonBorder';
 import { SelectBase } from '@/components/SelectBase';
-import {useCallback, useState} from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import { ButtonBase } from '@/components/ButtonBase';
 import { redirect } from 'next/navigation';
-import { ROUTES } from '@/lib/config';
-import { setModel } from "@/store/reviewEditorStore";
-import { useDispatch } from "react-redux";
-import { Provider } from "./types";
-import { PROVIDERS } from "./config";
-
-const MOCK_MODELS = [
-  { value: 'gpt-4o', label: 'GPT-4o' },
-  { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-  { value: 'o3-mini', label: 'o3 Mini' },
-];
+import { API_ROUTES, ROUTES } from '@/lib/config';
+import { setModel } from '@/store/reviewEditorStore';
+import { useDispatch } from 'react-redux';
+import { Provider } from './types';
+import { PROVIDERS } from './config';
+import { useFetch } from '@/lib/hooks';
+import { FetchModelReturn } from '@/lib/genAI/types';
 
 export function ChooseAIModelForm() {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [apiKey, setApiKey] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const dispatch = useDispatch();
+
+  const {
+    executeFetch,
+    data,
+    error: fetchModelsError,
+    loading,
+    setError: setFetchModelsError
+  } = useFetch<object, FetchModelReturn>(API_ROUTES.modelsListOpenai, 'GET');
 
   const handleVerify = async () => {
     if (!apiKey.trim()) return;
 
     setIsVerifying(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    await executeFetch();
     setIsVerifying(false);
-    setIsVerified(true);
   };
+
+  const isVerified = useMemo(() => {
+    return !!data?.models;
+  }, [data]);
+
+  const modelsList = useMemo(() => {
+    return data?.models.map((model) => {
+      return {
+        value: model.id,
+        label: model.name,
+      };
+    }) ?? [];
+  }, [data]);
 
   const selectedProviderMeta = PROVIDERS.find((p) => p.id === selectedProvider);
 
@@ -47,14 +63,18 @@ export function ChooseAIModelForm() {
     dispatch(setModel(selectedModel));
     setIsRedirecting(true);
     redirect(ROUTES.main);
-  }, [selectedModel, dispatch])
+  }, [selectedModel, dispatch]);
 
   const changeProvider = useCallback((providerId: Provider) => {
     setSelectedProvider(providerId);
-    setIsVerified(false);
     setApiKey('');
     setSelectedModel(null);
   }, []);
+
+  const handleApiKeyChange = (e: ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
+    setApiKey(e.target.value);
+    setFetchModelsError(null);
+  };
 
   return (
     <>
@@ -81,19 +101,17 @@ export function ChooseAIModelForm() {
           <div className="flex flex-col gap-2">
             <InputBase
               id="api-key"
-              onChange={(e) => {
-                setApiKey(e.target.value);
-                setIsVerified(false);
-              }}
+              onChange={handleApiKeyChange}
               placeholder="sk-..."
               label={'API Key ' + selectedProviderMeta.label}
               type="password"
             />
+            {fetchModelsError && <span className="text-[#ff5555]">{ fetchModelsError }</span>}
           </div>
 
           <ButtonBorder
             onClick={handleVerify}
-            disabled={!apiKey.trim() || isVerifying || isVerified}
+            disabled={!apiKey.trim() || isVerifying || isVerified || !!fetchModelsError}
             theme={isVerified ? 'success' : 'default'}
             loadingText="Verifying…"
             text="Verify Key"
@@ -106,11 +124,12 @@ export function ChooseAIModelForm() {
                 Available Models
               </span>
               <SelectBase
-                items={MOCK_MODELS}
+                items={modelsList}
                 value={selectedModel}
                 onChange={setSelectedModel}
                 placeholder="Select a model…"
                 notFoundText="No models match"
+                isLoading={loading}
               />
             </div>
           )}

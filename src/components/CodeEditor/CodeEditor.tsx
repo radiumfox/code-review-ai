@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { LanguageSelect } from '@/components/LanguageSelect';
-import {LANGUAGES_NAMES_MAP, ROUTES} from '@/lib/config';
+import { LANGUAGES_NAMES_MAP, ROUTES } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import {
@@ -32,12 +32,11 @@ import {
   selectCodeSnippet,
   selectSummary,
   setLanguage,
-  setModel,
   setCodeSnippet
 } from '@/store/reviewEditorStore';
 import { fetchReviews } from '@/store/reviewsListStore';
 import { CodingLanguage } from '@/lib/types';
-import {redirect} from "next/navigation";
+import { redirect } from 'next/navigation';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -126,10 +125,6 @@ export function CodeEditor() {
       dispatch(fetchReviews({ page: 0 }));
     });
   };
-
-  const onModelChange = useCallback((value: string) => {
-    dispatch(setModel(value));
-  }, [dispatch]);
 
   const onLanguageChange = useCallback((value: CodingLanguage) =>
     dispatch(setLanguage(value)),

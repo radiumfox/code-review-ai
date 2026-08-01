@@ -1,20 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { DEFAULT_EDITOR_VALUE, API_ROUTES, ROUTES } from '@/lib/config';
 import { EDITOR_TEST_IDS } from '@/components/CodeEditor/config';
-import { MOCK_MODELS_LIST, mockReview } from './helpers';
+import { mockReview } from './helpers';
 
 test.describe('Review selection', () => {
   test.beforeEach('Log in', async ({ page }) => {
-    await page.route(API_ROUTES.modelsList, async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          models: MOCK_MODELS_LIST,
-        }),
-      });
-    });
-
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto(API_ROUTES.authE2E);
     await page.waitForURL(ROUTES.main);
