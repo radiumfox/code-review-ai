@@ -13,6 +13,7 @@ import { PROVIDERS } from './config';
 import { useFetch } from '@/lib/hooks';
 import { FetchModelReturn } from '@/lib/genAI/types';
 import { NotificationType, useNotification } from '@/lib/notifications';
+import { useSession } from 'next-auth/react';
 
 export function ChooseAIModelForm() {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
@@ -20,6 +21,7 @@ export function ChooseAIModelForm() {
   const dispatch = useDispatch();
   const { showNotification } = useNotification();
   const router = useRouter();
+  const { update: updateSession } = useSession();
 
   const {
     executeFetch: executeFetchModels,
@@ -64,11 +66,31 @@ export function ChooseAIModelForm() {
   }, [saveModelError, showNotification]);
 
   useEffect(() => {
+    let isActive = true;
+
     if(saveModelData) {
       dispatch(setModel(saveModelData.data.model));
-      router.replace(ROUTES.main);
+
+      updateSession({ aiModel: saveModelData.data.model })
+        .then(() => {
+          if(isActive) {
+            router.replace(ROUTES.main);
+          }
+        })
+        .catch(() => {
+          if(isActive) {
+            showNotification({
+              type: NotificationType.Error,
+              message: 'Failed to update session, please sign in again',
+            });
+          }
+        });
     }
-  }, [saveModelData, dispatch, router]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [saveModelData, dispatch, router, updateSession, showNotification]);
 
   const changeProvider = useCallback(async (providerId: Provider) => {
     setSelectedProvider(providerId);

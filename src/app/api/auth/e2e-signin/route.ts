@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { ROUTES } from '@/lib/config';
-import { connectToDatabase } from '@/lib/server';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
 import { AI_MODEL } from '@/lib/genAI/config';
@@ -10,8 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  await connectToDatabase();
-  await UserModel.findOneAndUpdate(
+  const currentUser = await UserModel.findOneAndUpdate(
     { email: 'e2e@test.local' },
     {
       name: 'E2E Test User',
@@ -21,14 +19,19 @@ export async function GET() {
       githubId: 0,
       aiModel: AI_MODEL,
     },
-    { upsert: true }
+    { upsert: true, new: true }
   );
+
+  if(!currentUser) {
+    return NextResponse.json({ error: 'Failed to create e2e user' }, { status: 500 });
+  }
 
   const { encode } = await import('next-auth/jwt');
   const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
 
   const token = {
-    id: 'e2e-test-user',
+    id: currentUser._id.toString(),
+    aiModel: currentUser.aiModel ?? null,
     email: 'e2e@test.local',
     name: 'E2E Test User',
     sub: 'e2e-test-user',

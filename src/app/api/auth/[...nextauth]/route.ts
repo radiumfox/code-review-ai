@@ -17,6 +17,13 @@ declare module 'next-auth' {
     }
 }
 
+declare module 'next-auth/jwt' {
+    interface JWT {
+        id: string;
+        aiModel: string | null;
+    }
+}
+
 if(!GITHUB_ID || !GITHUB_SECRET){
   throw new Error('Missing GitHub ID or GitHub secret environment variable');
 }
@@ -34,14 +41,47 @@ export const authOptions = {
   ],
   secret: NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session }) {
+    async session({ session, token }) {
       if(session.user) {
-        const currentUser = await UserModel.findOne({ email: session.user.email });
-        session.user.aiModel = currentUser?.aiModel ?? null;
-        session.user.id = currentUser._id.toString();
+        session.user.id = token.id;
+        session.user.aiModel = token.aiModel ?? null;
       }
 
       return session;
+    },
+    async jwt({ token, user, trigger, session }) {
+      if(trigger === 'update') {
+        token.aiModel = session?.aiModel ?? null;
+        return token;
+      }
+
+      if(user?.email) {
+        try {
+          const currentUser = await UserModel.findOne({ email: user.email });
+
+          if(currentUser) {
+            token.id = currentUser._id.toString();
+            token.aiModel = currentUser.aiModel ?? null;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else if(!token.id) {
+        try {
+          const currentUser = token.email
+            ? await UserModel.findOne({ email: token.email })
+            : null;
+
+          if(currentUser) {
+            token.id = currentUser._id.toString();
+            token.aiModel = currentUser.aiModel ?? null;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      return token;
     },
     async signIn ({ user, profile }) {
       if(!user.email) return false;
