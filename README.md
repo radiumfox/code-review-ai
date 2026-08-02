@@ -17,7 +17,7 @@ An AI-powered code review application that analyzes source code and provides str
 * TypeScript
 * MongoDB
 * NextAuth
-* Google AI
+* OpenAI
 * CodeMirror
 
 ## Project Status
