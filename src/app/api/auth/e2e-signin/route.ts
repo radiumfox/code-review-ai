@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { ROUTES } from '@/lib/config';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
-import { AI_MODEL } from '@/lib/genAI/config';
+import { AI_MODEL } from '@/lib/genAI/openai/config';
 
 export async function GET() {
   if (process.env.E2E_TEST !== 'true') {

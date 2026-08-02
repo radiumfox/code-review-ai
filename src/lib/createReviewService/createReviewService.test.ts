@@ -1,11 +1,11 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { DEFAULT_LANGUAGE } from '@/lib/config';
-import { AI_MODEL } from '@/lib/genAI/config';
+import { AI_MODEL } from '@/lib/genAI/openai/config';
 
 const mockGenerateContent = vi.fn();
 const mockReviewCreate = vi.fn();
 
-vi.mock('@/lib/genAI', () => ({
+vi.mock('@/lib/genAI/openai', () => ({
   generateContent: mockGenerateContent,
 }));
 

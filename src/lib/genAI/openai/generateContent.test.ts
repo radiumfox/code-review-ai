@@ -4,7 +4,7 @@ import { AI_MODEL } from './config';
 const mockCreate = vi.fn();
 const mockGetAIClient = vi.fn();
 
-vi.mock('@/lib/genAI/genAI', () => ({
+vi.mock('@/lib/genAI/openai/genAI', () => ({
   getAIClient: mockGetAIClient,
 }));
 
@@ -19,7 +19,7 @@ describe('generateContent', () => {
     mockCreate.mockResolvedValue({ choices: mockChoices });
     mockGetAIClient.mockReturnValue({ chat: { completions: { create: mockCreate } } });
 
-    const { generateContent } = await import('@/lib/genAI/generateContent');
+    const { generateContent } = await import('@/lib/genAI/openai/generateContent');
     const result = await generateContent({ contents: 'test prompt', model: AI_MODEL });
 
     expect(mockGetAIClient).toHaveBeenCalled();

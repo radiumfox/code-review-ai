@@ -1,11 +1,11 @@
 import { fillTemplate } from './helpers/fillTemplate';
 import promptTemplate from '@/prompts/code-review-default.json';
-import { generateContent } from '@/lib/genAI';
+import { generateContent } from '@/lib/genAI/openai';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
 
-import { AIChoice } from '@/lib/genAI/types';
+import { AIChoice } from '@/lib/genAI/openai/types';
 
 
 function buildPrompt(input: ReviewGenerateRequest) {

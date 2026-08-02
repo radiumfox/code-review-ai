@@ -1,4 +1,4 @@
-import { getAIClient } from '@/lib/genAI/genAI';
+import { getAIClient } from '@/lib/genAI/openai/genAI';
 
 
 

@@ -17,7 +17,7 @@ import {
 } from '@/store/reviewEditorStore';
 import type { RootState } from '@/store';
 import { DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT } from '@/lib/config';
-import { AI_MODEL } from '@/lib/genAI/config';
+import { AI_MODEL } from '@/lib/genAI/openai/config';
 import type { Review } from '@/lib/types';
 
 function createMockReview(overrides: Partial<Review> = {}): Review {

@@ -1,5 +1,5 @@
 import { DEFAULT_LANGUAGE } from '@/lib/config';
-import { AI_MODEL } from '@/lib/genAI/config';
+import { AI_MODEL } from '@/lib/genAI/openai/config';
 
 export function mockReview(overrides = {}) {
   return {

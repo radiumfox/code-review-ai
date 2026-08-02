@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchModels } from '@/lib/genAI';
+import { fetchModels } from '@/lib/genAI/openai';
 import { applyRateLimiter } from '@/lib/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { isInvalidApiKeyError } from '@/lib/genAI/helpers';
+import { isInvalidApiKeyError } from '@/lib/genAI/openai/helpers';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);

@@ -24,14 +24,14 @@ describe('getAIClient', () => {
   test('Throws when AI_API_KEY is missing', async () => {
     delete process.env.AI_API_KEY;
 
-    const { getAIClient } = await import('@/lib/genAI/genAI');
+    const { getAIClient } = await import('@/lib/genAI/openai/genAI');
     expect(() => getAIClient()).toThrow('Missing API key');
   });
 
   test('Returns an OpenAI instance with the API key', async () => {
     process.env.AI_API_KEY = 'test-key';
 
-    const { getAIClient } = await import('@/lib/genAI/genAI');
+    const { getAIClient } = await import('@/lib/genAI/openai/genAI');
     const client = getAIClient();
 
     expect(client).toBe(mockOpenAIInstance);
@@ -40,7 +40,7 @@ describe('getAIClient', () => {
   test('Returns same instance on subsequent calls', async () => {
     process.env.AI_API_KEY = 'test-key';
 
-    const { getAIClient } = await import('@/lib/genAI/genAI');
+    const { getAIClient } = await import('@/lib/genAI/openai/genAI');
     const first = getAIClient();
     const second = getAIClient();
 

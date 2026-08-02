@@ -3,7 +3,7 @@ import { describe, expect, test, vi, beforeEach } from 'vitest';
 const mockList = vi.fn();
 const mockGetAIClient = vi.fn();
 
-vi.mock('@/lib/genAI/genAI', () => ({
+vi.mock('@/lib/genAI/openai/genAI', () => ({
   getAIClient: mockGetAIClient,
 }));
 
@@ -18,7 +18,7 @@ describe('fetchModels', () => {
     mockList.mockResolvedValue({ data: mockModels });
     mockGetAIClient.mockReturnValue({ models: { list: mockList } });
 
-    const { fetchModels } = await import('@/lib/genAI/fetchModels');
+    const { fetchModels } = await import('@/lib/genAI/openai/fetchModels');
     const result = await fetchModels();
 
     expect(mockGetAIClient).toHaveBeenCalled();
@@ -30,7 +30,7 @@ describe('fetchModels', () => {
     mockList.mockResolvedValue({ data: [] });
     mockGetAIClient.mockReturnValue({ models: { list: mockList } });
 
-    const { fetchModels } = await import('@/lib/genAI/fetchModels');
+    const { fetchModels } = await import('@/lib/genAI/openai/fetchModels');
     await fetchModels();
 
     expect(mockList).toHaveBeenCalledWith();

@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import { Provider } from './types';
 import { PROVIDERS } from './config';
 import { useFetch } from '@/lib/hooks';
-import { FetchModelReturn } from '@/lib/genAI/types';
+import { FetchModelReturn } from '@/lib/genAI/openai/types';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { useSession } from 'next-auth/react';
 
