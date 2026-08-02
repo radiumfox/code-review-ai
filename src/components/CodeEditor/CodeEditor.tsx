@@ -5,7 +5,6 @@ import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { ModelSelect } from '@/components/ModelSelect';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
@@ -14,7 +13,6 @@ import {
   EDITOR_BASIC_SETUP, EDITOR_TEST_IDS,
   THEME_CUSTOM_SETTINGS
 } from './config';
-import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
@@ -33,11 +31,13 @@ import {
   selectCodeSnippet,
   selectSummary,
   setLanguage,
-  setModel,
   setCodeSnippet,
-  fetchReviews
-} from '@/store/reviewsStore';
+  setModel
+} from '@/store/reviewEditorStore';
+import { fetchReviews } from '@/store/reviewsListStore';
 import { CodingLanguage } from '@/lib/types';
+import { ButtonBorder } from '@/components/ButtonBorder';
+import { useSession } from 'next-auth/react';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -51,10 +51,17 @@ export function CodeEditor() {
   const reviewLoading = useSelector(selectCreateReviewLoading);
   const reviewError = useSelector(selectCreateReviewError);
   const dispatch = useDispatch<AppDispatch>();
+  const { data: session } = useSession();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
 
   const issues = useMemo(() => currentReview?.issues ?? [], [currentReview]);
+
+  useEffect(() => {
+    if(!model && session?.user?.aiModel) {
+      dispatch(setModel(session.user.aiModel));
+    }
+  }, [model, session?.user?.aiModel, dispatch]);
 
   useEffect(() => {
     if(reviewError) {
@@ -123,10 +130,6 @@ export function CodeEditor() {
     });
   };
 
-  const onModelChange = useCallback((value: string) => {
-    dispatch(setModel(value));
-  }, [dispatch]);
-
   const onLanguageChange = useCallback((value: CodingLanguage) =>
     dispatch(setLanguage(value)),
   [dispatch]);
@@ -171,17 +174,11 @@ export function CodeEditor() {
 
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6">
-            {/* Model select */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-between">
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
-              <ModelSelect
-                value={model}
-                onChange={onModelChange}
-                disabled={reviewLoading}
-              />
+              <span>{ model }</span>
             </div>
-
             {/* Language select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
@@ -235,12 +232,12 @@ export function CodeEditor() {
 
       {/* Review button */}
       <div className="mt-6 flex justify-center">
-        <ButtonBase
+        <ButtonBorder
           text={reviewLoading ? 'Reviewing...' : 'Get Review'}
           onClick={getReview}
           icon={<StarIcon />}
-          size={ButtonBaseSizes.Md}
           isLoading={reviewLoading}
+          size="lg"
         />
       </div>
 

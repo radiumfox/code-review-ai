@@ -69,6 +69,7 @@ export function useFetch<P extends object, T = unknown>(
     executeFetch,
     loading,
     error,
-    data
+    data,
+    setError
   };
 }

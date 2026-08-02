@@ -13,7 +13,14 @@ declare module 'next-auth' {
         login: string, id: number
     }
     interface Session {
-      user: { id: string } & DefaultSession['user'];
+      user: { id: string; aiModel: string | null } & DefaultSession['user'];
+    }
+}
+
+declare module 'next-auth/jwt' {
+    interface JWT {
+        id: string;
+        aiModel: string | null;
     }
 }
 
@@ -34,31 +41,59 @@ export const authOptions = {
   ],
   secret: NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
-
-      return token;
-    },
     async session({ session, token }) {
       if(session.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.id;
+        session.user.aiModel = token.aiModel ?? null;
       }
 
       return session;
+    },
+    async jwt({ token, user, trigger, session }) {
+      if(trigger === 'update') {
+        token.aiModel = session?.aiModel ?? null;
+        return token;
+      }
+
+      if(user?.email) {
+        try {
+          const currentUser = await UserModel.findOne({ email: user.email });
+
+          if(currentUser) {
+            token.id = currentUser._id.toString();
+            token.aiModel = currentUser.aiModel ?? null;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else if(!token.id) {
+        try {
+          const currentUser = token.email
+            ? await UserModel.findOne({ email: token.email })
+            : null;
+
+          if(currentUser) {
+            token.id = currentUser._id.toString();
+            token.aiModel = currentUser.aiModel ?? null;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      return token;
     },
     async signIn ({ user, profile }) {
       if(!user.email) return false;
 
       try {
-        const currentUser = await UserModel.findOneAndUpdate({ email: user.email }, {
+        await UserModel.findOneAndUpdate({ email: user.email }, {
           name: user.name,
           email: user.email,
           role: UserRole.User,
           githubUsername: profile?.login,
           githubId: profile?.id
         }, { upsert: true });
-
-        user.id = currentUser._id.toString();
 
         return true;
       } catch (error) {

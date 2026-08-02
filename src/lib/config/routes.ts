@@ -1,7 +1,14 @@
-export const ROUTES = {
-    reviewsList: '/api/reviews',
-    createReview: '/api/reviews/create',
-    modelsList: '/api/models',
-    auth: '/api/auth',
-    authE2E: '/api/auth/e2e-signin',
+export const API_ROUTES = {
+  reviewsList: '/api/reviews',
+  createReview: '/api/reviews/create',
+  modelsListOpenai: '/api/models/openai',
+  auth: '/api/auth',
+  authE2E: '/api/auth/e2e-signin',
+  updateUserModel: '/api/users/model',
 } as const;
+
+export const ROUTES = {
+  main: '/',
+  models: '/models',
+  login: '/login',
+};

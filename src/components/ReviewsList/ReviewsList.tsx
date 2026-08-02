@@ -4,6 +4,7 @@ import { ReviewItem } from './ReviewItem';
 import { CreateReviewButton } from './CreateReviewButton';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSession } from 'next-auth/react';
 import type { AppDispatch } from '@/store';
 import {
   fetchReviews,
@@ -12,11 +13,13 @@ import {
   selectReviewsError,
   selectCurrentPage,
   selectHasMore,
+  selectIsInitialReviewsFetching
+} from '@/store/reviewsListStore';
+import {
   setCurrentReview,
   resetCurrentReview,
-  selectIsInitialReviewsFetching,
   selectCurrentReview
-} from '@/store/reviewsStore';
+} from '@/store/reviewEditorStore';
 import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';
@@ -36,12 +39,19 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   const hasMore = useSelector(selectHasMore);
   const isInitialLoading = useSelector(selectIsInitialReviewsFetching);
   const currentReview = useSelector(selectCurrentReview);
+  const { data: session } = useSession();
 
   const nextPage = currentPage + 1;
 
+  const createNewReview = useCallback(() => {
+    dispatch(resetCurrentReview(session?.user?.aiModel ?? null));
+  }, [dispatch, session?.user?.aiModel]);
+
   useEffect(() => {
-    dispatch(fetchReviews({ page: 0 }));
-  }, [dispatch]);
+    if(!reviews.length) {
+      dispatch(fetchReviews({ page: 0 }));
+    }
+  }, [dispatch, reviews.length]);
 
   const loadMore = useCallback(() => {
     if (!hasMore || loading) return;
@@ -84,7 +94,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
           <CreateReviewButton
             isActive={currentReview === null}
-            onClick={() => dispatch(resetCurrentReview())}
+            onClick={createNewReview}
           />
           {reviewsList.map((review) => (
             <ReviewItem
@@ -105,7 +115,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
         <div className="flex-1 flex flex-col">
           <CreateReviewButton
             isActive={currentReview === null}
-            onClick={() => dispatch(resetCurrentReview())}
+            onClick={createNewReview}
           />
           <div className="flex-1 flex items-center justify-center px-3 py-6">
             <p className="text-sm text-gray-500 text-center">No reviews yet</p>

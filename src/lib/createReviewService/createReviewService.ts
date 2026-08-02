@@ -1,11 +1,12 @@
 import { fillTemplate } from './helpers/fillTemplate';
 import promptTemplate from '@/prompts/code-review-default.json';
-import { generateContent } from '@/lib/genAI';
-import { Candidate } from '@google/genai';
+import { generateContent } from '@/lib/genAI/openai';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
-import { DEFAULT_MODEL } from '@/lib/config';
+
+import { AIChoice } from '@/lib/genAI/openai/types';
+
 
 function buildPrompt(input: ReviewGenerateRequest) {
   return fillTemplate(promptTemplate.template, {
@@ -28,19 +29,23 @@ export function isAiError(error: unknown): error is ReturnType<typeof aiError> {
 }
 
 async function callAI(prompt: string, model?: string) {
+  if(!model) {
+    throw new Error('Model is missing');
+  }
+
   try {
-    return await generateContent({ contents: prompt, model: model ?? DEFAULT_MODEL });
+    return await generateContent({ contents: prompt, model: model });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'AI generation failed';
     throw aiError(message, 502);
   }
 }
 
-function extractText(candidates: Candidate[] | undefined): string | null {
-  return candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+function extractText(choices: AIChoice[] | undefined): string | null {
+  return choices?.[0]?.message?.content ?? null;
 }
 
-function parseAIResponse(aiResponse: Candidate[]) {
+function parseAIResponse(aiResponse: AIChoice[]) {
   const text = extractText(aiResponse) ?? '';
 
   try {

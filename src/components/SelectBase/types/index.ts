@@ -11,6 +11,7 @@ export interface SelectBaseProps<T extends string> {
     isLoading?: boolean;
     hasMore?: boolean;
     disabled?: boolean;
+    error?: string
 }
 
 export interface SelectBaseItemProps {
