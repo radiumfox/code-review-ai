@@ -2,11 +2,7 @@
 
 import { type ReactNode } from 'react';
 
-export enum ButtonBaseSizes {
-    Lg = 'lg',
-    Md = 'md',
-    Sm = 'sm',
-}
+type ButtonBaseSizes = 'sm' | 'md' | 'lg';
 
 interface ButtonBaseProps {
   onClick?: () => void;
@@ -18,9 +14,9 @@ interface ButtonBaseProps {
 }
 
 const sizeStyles: Record<ButtonBaseSizes, string> = {
-  [ButtonBaseSizes.Lg]: 'gap-3 px-8 py-4 text-lg',
-  [ButtonBaseSizes.Md]: 'gap-2 px-6 py-3 text-base',
-  [ButtonBaseSizes.Sm]: 'gap-1.5 px-4 py-2 text-sm',
+  lg: 'gap-3 px-8 py-4 text-lg',
+  md: 'gap-2 px-6 py-3 text-base',
+  sm: 'gap-1.5 px-4 py-2 text-sm',
 };
 
 function Spinner() {
@@ -36,7 +32,7 @@ export function ButtonBase({
   icon,
   text,
   className,
-  size = ButtonBaseSizes.Lg,
+  size = 'lg',
   isLoading
 }: ButtonBaseProps) {
   return (

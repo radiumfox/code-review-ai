@@ -13,7 +13,6 @@ import {
   EDITOR_BASIC_SETUP, EDITOR_TEST_IDS,
   THEME_CUSTOM_SETTINGS
 } from './config';
-import { ButtonBase, ButtonBaseSizes } from '@/components/ButtonBase';
 import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
@@ -37,6 +36,7 @@ import {
 import { fetchReviews } from '@/store/reviewsListStore';
 import { CodingLanguage } from '@/lib/types';
 import { redirect } from 'next/navigation';
+import { ButtonBorder } from '@/components/ButtonBorder';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -228,12 +228,12 @@ export function CodeEditor() {
 
       {/* Review button */}
       <div className="mt-6 flex justify-center">
-        <ButtonBase
+        <ButtonBorder
           text={reviewLoading ? 'Reviewing...' : 'Get Review'}
           onClick={getReview}
           icon={<StarIcon />}
-          size={ButtonBaseSizes.Md}
           isLoading={reviewLoading}
+          size="lg"
         />
       </div>
 

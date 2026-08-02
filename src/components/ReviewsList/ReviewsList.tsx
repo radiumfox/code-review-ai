@@ -45,7 +45,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
     if(!reviews.length) {
       dispatch(fetchReviews({ page: 0 }));
     }
-  }, [dispatch]);
+  }, [dispatch, reviews.length]);
 
   const loadMore = useCallback(() => {
     if (!hasMore || loading) return;

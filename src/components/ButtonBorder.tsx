@@ -1,15 +1,25 @@
-import { useMemo } from 'react';
+import { useMemo, ReactNode } from 'react';
+import { SpinnerBase } from '@/components/SpinnerBase';
+
+type ButtonBorderSizes = 'sm' | 'md' | 'lg';
 
 interface ButtonBorderProps {
-    theme: 'default' | 'success' | 'error';
-    isLoading: boolean;
-    disabled: boolean;
+    theme?: 'default' | 'success' | 'error';
+    isLoading?: boolean;
+    disabled?: boolean;
     text: string;
-    loadingText?: string;
     onClick?: () => void;
+    icon?: ReactNode;
+    size?: ButtonBorderSizes;
 }
 
-export function ButtonBorder({ theme, isLoading, disabled, text, loadingText, onClick }: ButtonBorderProps) {
+const sizeStyles: Record<ButtonBorderSizes, string> = {
+  lg: 'gap-3 px-8 py-4 text-lg',
+  md: 'gap-2 px-6 py-2.5 text-sm',
+  sm: 'gap-1.5 px-4 py-2 text-sm',
+};
+
+export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, size = 'md' }: ButtonBorderProps) {
   const currentClasses = useMemo(() => {
     switch (theme) {
     case 'success':
@@ -24,21 +34,19 @@ export function ButtonBorder({ theme, isLoading, disabled, text, loadingText, on
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       className={`
-              flex items-center justify-center gap-2 px-6 py-2.5 text-sm
-              uppercase tracking-widest rounded-lg border transition-all
-              ${currentClasses}
-              disabled:opacity-40 disabled:pointer-events-none cursor-pointer
-              focus:outline-none
-            `}
+          flex items-center justify-center
+          uppercase tracking-widest rounded-lg border transition-all
+          ${sizeStyles[size]}
+          ${currentClasses}
+          disabled:opacity-40 disabled:pointer-events-none cursor-pointer
+          focus:outline-none
+          ${isLoading || disabled ? 'cursor-default pointer-events-none' : ''}
+      `}
     >
-      {isLoading ? (
-        <>
-          <span className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-          { loadingText }
-        </>
-      ) : text}
+      {isLoading ? <SpinnerBase /> : icon}
+      {text}
     </button>
   );
 }
