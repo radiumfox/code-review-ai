@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await fetchModels();
-    console.log(result);
+
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error(error);

@@ -82,9 +82,10 @@ export const reviewEditorSlice = createSlice({
     setSummary: (state, action: PayloadAction<string>) => {
       state.summary = action.payload;
     },
-    resetCurrentReview: (state) => {
+    resetCurrentReview: (state, action: PayloadAction<string | null>) => {
       state.currentReview = null;
       state.language = DEFAULT_LANGUAGE;
+      state.model = action.payload;
       state.codeSnippet = DEFAULT_EDITOR_VALUE;
       state.summary = '';
     }

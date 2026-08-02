@@ -20,6 +20,10 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  aiModel: {
+    type: String,
+    default: null
+  },
   role: {
     type: String,
     enum: UserRole,

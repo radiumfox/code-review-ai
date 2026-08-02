@@ -1,5 +1,5 @@
 import { DEFAULT_LANGUAGE } from '@/lib/config';
-import { AI_MODEL, AI_MODEL_NAME } from '@/lib/genAI/config';
+import { AI_MODEL } from '@/lib/genAI/config';
 
 export function mockReview(overrides = {}) {
   return {
@@ -21,5 +21,3 @@ export function mockReview(overrides = {}) {
     ...overrides,
   };
 }
-
-export const MOCK_MODELS_LIST = [{ name: `models/${AI_MODEL}`, displayName: AI_MODEL_NAME }];

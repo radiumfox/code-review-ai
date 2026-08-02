@@ -63,7 +63,7 @@ describe('Selectors', () => {
     expect(selectCreateReviewLoading(state)).toBe(false);
     expect(selectCreateReviewError(state)).toBeNull();
     expect(selectLang(state)).toBe(DEFAULT_LANGUAGE);
-    expect(selectModel(state)).toBe(AI_MODEL);
+    expect(selectModel(state)).toBeNull();
     expect(selectCodeSnippet(state)).toBe(DEFAULT_EDITOR_VALUE);
     expect(selectSummary(state)).toBe('');
   });
@@ -123,7 +123,7 @@ describe('Synchronous reducers', () => {
   });
 
   describe('resetCurrentReview', () => {
-    test('Reverts all fields to initialState defaults', () => {
+    test('Reverts fields to defaults and sets the passed model', () => {
       state = reviewEditorSlice.reducer(state, setCurrentReview(createMockReview({
         language: 'py',
         model: 'other',
@@ -131,7 +131,7 @@ describe('Synchronous reducers', () => {
         summary: 'Changed',
       })));
 
-      state = reviewEditorSlice.reducer(state, resetCurrentReview());
+      state = reviewEditorSlice.reducer(state, resetCurrentReview(AI_MODEL));
       const root = asRootState(state);
 
       expect(selectCurrentReview(root)).toBeNull();
@@ -139,6 +139,13 @@ describe('Synchronous reducers', () => {
       expect(selectModel(root)).toBe(AI_MODEL);
       expect(selectCodeSnippet(root)).toBe(DEFAULT_EDITOR_VALUE);
       expect(selectSummary(root)).toBe('');
+    });
+
+    test('Sets model to null when passed null', () => {
+      state = reviewEditorSlice.reducer(state, resetCurrentReview(null));
+      const root = asRootState(state);
+
+      expect(selectModel(root)).toBeNull();
     });
   });
 });

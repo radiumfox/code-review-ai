@@ -4,7 +4,6 @@ import { generateContent } from '@/lib/genAI';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
-import { AI_MODEL } from '@/lib/genAI/config';
 
 import { AIChoice } from '@/lib/genAI/types';
 
@@ -30,8 +29,12 @@ export function isAiError(error: unknown): error is ReturnType<typeof aiError> {
 }
 
 async function callAI(prompt: string, model?: string) {
+  if(!model) {
+    throw new Error('Model is missing');
+  }
+
   try {
-    return await generateContent({ contents: prompt, model: model ?? AI_MODEL });
+    return await generateContent({ contents: prompt, model: model });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'AI generation failed';
     throw aiError(message, 502);

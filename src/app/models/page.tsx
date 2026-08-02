@@ -2,9 +2,10 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { ChooseAIModelForm } from '@/components/ChooseAIModelForm';
 import { ROUTES } from '@/lib/config';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-export default function ChooseModelPage() {
-  const session = getServerSession();
+export default async function ChooseModelPage() {
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect(ROUTES.login);

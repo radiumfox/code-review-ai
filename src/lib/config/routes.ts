@@ -4,6 +4,7 @@ export const API_ROUTES = {
   modelsListOpenai: '/api/models/openai',
   auth: '/api/auth',
   authE2E: '/api/auth/e2e-signin',
+  updateUserModel: '/api/users/model',
 } as const;
 
 export const ROUTES = {

@@ -3,8 +3,8 @@
 import { RadioButton } from '@/components/RadioButton';
 import { ButtonBorder } from '@/components/ButtonBorder';
 import { SelectBase } from '@/components/SelectBase';
-import { useCallback, useMemo, useState } from 'react';
-import { redirect } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { API_ROUTES, ROUTES } from '@/lib/config';
 import { setModel } from '@/store/reviewEditorStore';
 import { useDispatch } from 'react-redux';
@@ -12,46 +12,69 @@ import { Provider } from './types';
 import { PROVIDERS } from './config';
 import { useFetch } from '@/lib/hooks';
 import { FetchModelReturn } from '@/lib/genAI/types';
+import { NotificationType, useNotification } from '@/lib/notifications';
 
 export function ChooseAIModelForm() {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const [isRedirecting, setIsRedirecting] = useState(false);
   const dispatch = useDispatch();
+  const { showNotification } = useNotification();
+  const router = useRouter();
 
   const {
-    executeFetch,
-    data,
+    executeFetch: executeFetchModels,
+    data: modelsData,
     error: fetchModelsError,
-    loading
+    loading: fetchModelsLoading,
   } = useFetch<object, FetchModelReturn>(API_ROUTES.modelsListOpenai, 'GET');
 
+  const {
+    executeFetch: executeSaveModel,
+    data: saveModelData,
+    error: saveModelError,
+    loading: saveModelLoading
+  } = useFetch<{ model: string }, { data: { model: string } }>(API_ROUTES.updateUserModel, 'POST');
+
   const modelsList = useMemo(() => {
-    return data?.models.map((model) => {
+    return modelsData?.models.map((model) => {
       return {
         value: model.id,
         label: model.name,
       };
     }) ?? [];
-  }, [data]);
+  }, [modelsData]);
 
   const selectedProviderMeta = PROVIDERS.find((p) => p.id === selectedProvider);
 
   const submitModel = useCallback(() => {
     if(!selectedModel) {
-      throw new Error('No model selected');
+      return;
     }
 
-    dispatch(setModel(selectedModel));
-    setIsRedirecting(true);
-    redirect(ROUTES.main);
-  }, [selectedModel, dispatch]);
+    executeSaveModel({ model: selectedModel });
+  }, [selectedModel, executeSaveModel]);
+
+  useEffect(() => {
+    if(saveModelError) {
+      showNotification({
+        type: NotificationType.Error,
+        message: saveModelError,
+      });
+    }
+  }, [saveModelError, showNotification]);
+
+  useEffect(() => {
+    if(saveModelData) {
+      dispatch(setModel(saveModelData.data.model));
+      router.replace(ROUTES.main);
+    }
+  }, [saveModelData, dispatch, router]);
 
   const changeProvider = useCallback(async (providerId: Provider) => {
     setSelectedProvider(providerId);
     setSelectedModel(null);
-    await executeFetch();
-  }, [executeFetch]);
+    await executeFetchModels();
+  }, [executeFetchModels]);
 
   return (
     <>
@@ -85,7 +108,7 @@ export function ChooseAIModelForm() {
               onChange={setSelectedModel}
               placeholder="Select a model…"
               notFoundText="No models match"
-              isLoading={loading}
+              isLoading={fetchModelsLoading}
               error={fetchModelsError ?? undefined}
             />
           </div>
@@ -94,7 +117,7 @@ export function ChooseAIModelForm() {
             <ButtonBorder
               onClick={submitModel}
               text="Start coding"
-              isLoading={isRedirecting}
+              isLoading={saveModelLoading}
             />
           }
         </div>

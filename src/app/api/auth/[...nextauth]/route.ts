@@ -13,7 +13,7 @@ declare module 'next-auth' {
         login: string, id: number
     }
     interface Session {
-      user: { id: string } & DefaultSession['user'];
+      user: { id: string; aiModel: string | null } & DefaultSession['user'];
     }
 }
 
@@ -34,14 +34,11 @@ export const authOptions = {
   ],
   secret: NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
-
-      return token;
-    },
-    async session({ session, token }) {
+    async session({ session }) {
       if(session.user) {
-        session.user.id = token.id as string;
+        const currentUser = await UserModel.findOne({ email: session.user.email });
+        session.user.aiModel = currentUser?.aiModel ?? null;
+        session.user.id = currentUser._id.toString();
       }
 
       return session;
@@ -50,15 +47,13 @@ export const authOptions = {
       if(!user.email) return false;
 
       try {
-        const currentUser = await UserModel.findOneAndUpdate({ email: user.email }, {
+        await UserModel.findOneAndUpdate({ email: user.email }, {
           name: user.name,
           email: user.email,
           role: UserRole.User,
           githubUsername: profile?.login,
           githubId: profile?.id
         }, { upsert: true });
-
-        user.id = currentUser._id.toString();
 
         return true;
       } catch (error) {

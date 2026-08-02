@@ -1,10 +1,28 @@
 import { NextResponse } from 'next/server';
 import { ROUTES } from '@/lib/config';
+import { connectToDatabase } from '@/lib/server';
+import { UserModel } from '@/models/User';
+import { UserRole } from '@/lib/types';
+import { AI_MODEL } from '@/lib/genAI/config';
 
 export async function GET() {
   if (process.env.E2E_TEST !== 'true') {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
+
+  await connectToDatabase();
+  await UserModel.findOneAndUpdate(
+    { email: 'e2e@test.local' },
+    {
+      name: 'E2E Test User',
+      email: 'e2e@test.local',
+      role: UserRole.User,
+      githubUsername: 'e2e-test-user',
+      githubId: 0,
+      aiModel: AI_MODEL,
+    },
+    { upsert: true }
+  );
 
   const { encode } = await import('next-auth/jwt');
   const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;

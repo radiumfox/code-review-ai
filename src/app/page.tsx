@@ -12,6 +12,10 @@ export default async function Home() {
     redirect(ROUTES.login);
   }
 
+  if(!session.user.aiModel) {
+    redirect(ROUTES.models);
+  }
+
   return (
     <div className="flex h-[calc(100vh-71px)] w-full">
       <ReviewsList className="w-80 shrink-0 hidden lg:block overflow-auto" />

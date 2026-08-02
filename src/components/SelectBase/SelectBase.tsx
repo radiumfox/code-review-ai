@@ -98,7 +98,7 @@ export function SelectBase<T extends string>({
       </div>
       { error && <span className="text-[#ff5555] mt-3">{error}</span>}
 
-      {isOpen && (
+      {isOpen && !isLoading && (
         <div
           className={
             `absolute top-full left-0 right-0 mt-1 z-50 
