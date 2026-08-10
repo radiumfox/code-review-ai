@@ -4,7 +4,6 @@ import CodeMirror from '@uiw/react-codemirror';
 import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
-import { langs } from '@uiw/codemirror-extensions-langs';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
@@ -38,6 +37,8 @@ import { fetchReviews } from '@/store/reviewsListStore';
 import { CodingLanguage } from '@/lib/types';
 import { ButtonBorder } from '@/components/ButtonBorder';
 import { useSession } from 'next-auth/react';
+import { Extension } from '@codemirror/state';
+import { languageLoaders } from '@/components/CodeEditor/plugins/languageLoaders';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -52,6 +53,7 @@ export function CodeEditor() {
   const reviewError = useSelector(selectCreateReviewError);
   const dispatch = useDispatch<AppDispatch>();
   const { data: session } = useSession();
+  const [languageExtension, setLanguageExtension] = useState<Extension | null>(null);
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
 
@@ -92,13 +94,10 @@ export function CodeEditor() {
   }, [language]);
 
   const extensions = useMemo(() => {
-    const extensionsList = [];
-
-    if (language) extensionsList.push(langs[language]());
-    extensionsList.push(hoverIssueTooltip, issueDecorationsField, issuesField);
-
-    return extensionsList;
-  }, [language]);
+    const list: Extension[] = [hoverIssueTooltip, issueDecorationsField, issuesField];
+    if (languageExtension) list.push(languageExtension);
+    return list;
+  }, [languageExtension]);
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
@@ -123,9 +122,18 @@ export function CodeEditor() {
     });
   };
 
-  const onLanguageChange = useCallback((value: CodingLanguage) =>
-    dispatch(setLanguage(value)),
-  [dispatch]);
+  const onLanguageChange = useCallback((value: CodingLanguage) => {
+    dispatch(setLanguage(value));
+
+    const cancelled = false;
+    if (value) {
+      languageLoaders[value]?.().then((ext) => {
+        if (!cancelled) setLanguageExtension(ext);
+      });
+    } else {
+      setLanguageExtension(null);
+    }
+  }, [dispatch]);
 
   const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
 
