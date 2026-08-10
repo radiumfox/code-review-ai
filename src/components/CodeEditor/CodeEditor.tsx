@@ -13,7 +13,7 @@ import {
   EDITOR_BASIC_SETUP, EDITOR_TEST_IDS,
   THEME_CUSTOM_SETTINGS
 } from './config';
-import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
+import { hoverIssueTooltip, issueDecorationsField, issuesField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
@@ -55,8 +55,6 @@ export function CodeEditor() {
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
 
-  const issues = useMemo(() => currentReview?.issues ?? [], [currentReview]);
-
   useEffect(() => {
     if(!model && session?.user?.aiModel) {
       dispatch(setModel(session.user.aiModel));
@@ -73,11 +71,9 @@ export function CodeEditor() {
   }, [reviewError, showNotification]);
 
   useEffect(() => {
-    if(currentReview?.issues && viewRef.current) {
-      viewRef.current.view?.dispatch({
-        effects: setIssuesEffect.of(currentReview.issues)
-      });
-    }
+    viewRef.current?.view?.dispatch({
+      effects: setIssuesEffect.of(currentReview?.issues ?? []),
+    });
   }, [currentReview]);
 
   const onValueChange = useCallback((val: string) => {
@@ -98,14 +94,11 @@ export function CodeEditor() {
   const extensions = useMemo(() => {
     const extensionsList = [];
 
-    extensionsList.push(hoverIssueTooltip(issues), issueDecorationsField);
-
-    if(language) {
-      extensionsList.push(langs[language]());
-    }
+    if (language) extensionsList.push(langs[language]());
+    extensionsList.push(hoverIssueTooltip, issueDecorationsField, issuesField);
 
     return extensionsList;
-  }, [language, issues]);
+  }, [language]);
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);

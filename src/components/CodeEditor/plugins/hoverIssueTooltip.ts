@@ -1,5 +1,6 @@
 import { EditorView, hoverTooltip } from '@uiw/react-codemirror';
-import { Issue } from '@/lib/types';
+
+import { issuesField } from './highlightIssues';
 
 const hoverIssueTooltipTheme = EditorView.baseTheme({
   '.cm-tooltip.cm-tooltip-hover': {
@@ -20,27 +21,27 @@ const hoverIssueTooltipTheme = EditorView.baseTheme({
   }
 });
 
-const hoverIssueTooltipBuild = (issues: Issue[]) => hoverTooltip((view, pos) => {
+const hoverIssueTooltipBuild = hoverTooltip((view, pos) => {
+  const issues = view.state.field(issuesField, false) ?? [];
   const { number } = view.state.doc.lineAt(pos);
-  const issue = issues.find(issue => issue.line === number);
+  const issue = issues.find((item) => item.line === number);
 
-  if(issue) {
+  console.log(view.state);
+
+  if (issue) {
     return {
-      pos: pos,
+      pos,
       end: pos,
       above: true,
       create() {
         const dom = document.createElement('div');
         dom.textContent = issue.message;
-
         return { dom };
-      }
+      },
     };
   }
 
   return null;
 });
 
-export function hoverIssueTooltip(issues: Issue[]) {
-  return [hoverIssueTooltipBuild(issues), hoverIssueTooltipTheme];
-}
+export const hoverIssueTooltip = [hoverIssueTooltipBuild, hoverIssueTooltipTheme];
