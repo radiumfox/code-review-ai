@@ -39,6 +39,8 @@ import { ButtonBorder } from '@/components/ButtonBorder';
 import { useSession } from 'next-auth/react';
 import { Extension } from '@codemirror/state';
 import { languageLoaders } from '@/components/CodeEditor/plugins/languageLoaders';
+import { CommentsList } from '@/components/CommentsList';
+import type { Comment } from '@/components/CommentsList/types';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -102,6 +104,18 @@ export function CodeEditor() {
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
   }, []);
+
+  const comments: Comment[] = useMemo(() => {
+    if (!currentReview?.issues) return [];
+
+    return currentReview.issues.map((issue, index) => ({
+      id: `${currentReview.id}-${index}`,
+      issue: issue.message,
+      suggestedFix: issue.suggestion,
+      category: issue.category,
+      severity: issue.severity
+    }));
+  }, [currentReview]);
 
   const getReview = () => {
     if(!language || !model) {
@@ -217,7 +231,11 @@ export function CodeEditor() {
           <ReviewSummary
             text={summary}
             className="hidden md:flex md:w-50 xl:w-75"
-          />
+          >
+            {comments.length > 0 && (
+              <CommentsList comments={comments} />
+            )}
+          </ReviewSummary>
         </div>
 
         {/* Footer */}
@@ -254,7 +272,11 @@ export function CodeEditor() {
         <ReviewSummary
           text={summary}
           className="flex-1 w-auto!"
-        />
+        >
+          {comments.length > 0 && (
+            <CommentsList comments={comments} />
+          )}
+        </ReviewSummary>
       </SlideOutDrawer>
 
       {/* Mobile reviews history drawer */}
