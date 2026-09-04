@@ -165,12 +165,12 @@ export function CodeEditor() {
           <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-between">
             <div className="flex items-center gap-2">
               <StarIcon className="text-[#6c6cff] w-5 h-5" />
-              <span className="uppercase text-xs sm:text-sm transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
+              <span className="uppercase text-body transition-all duration-300 font-medium text-[#6c6cff]">Code Editor</span>
             </div>
 
             <div className="flex gap-x-5">
               <div className="flex lg:hidden gap-x-3 items-center">
-                <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Reviews history</span>
+                <span className="text-body text-gray-400 font-medium whitespace-nowrap">Reviews history</span>
                 <ButtonIcon
                   onClick={() => setIsReviewsOpen(true)}
                   icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
@@ -178,7 +178,7 @@ export function CodeEditor() {
                 />
               </div>
               <div className="flex md:hidden gap-x-3 items-center">
-                <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Summary</span>
+                <span className="text-body text-gray-400 font-medium whitespace-nowrap">Summary</span>
                 <ButtonIcon
                   onClick={() => setIsSummaryOpen(true)}
                   icon={<ArrowRightIcon className="w-3.5 h-3.5" />}
@@ -191,12 +191,12 @@ export function CodeEditor() {
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-between">
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Model:</span>
+              <span className="text-body text-gray-400 font-medium whitespace-nowrap">Model:</span>
               <span>{ model }</span>
             </div>
             {/* Language select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Language:</span>
+              <span className="text-body text-gray-400 font-medium whitespace-nowrap">Language:</span>
               <LanguageSelect
                 value={language}
                 onChange={onLanguageChange}
@@ -240,10 +240,10 @@ export function CodeEditor() {
 
         {/* Footer */}
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
-          <span className="text-xs text-gray-500 truncate" data-testid={EDITOR_TEST_IDS.languageName}>
+          <span className="text-body text-gray-500 truncate" data-testid={EDITOR_TEST_IDS.languageName}>
             {languageName}
           </span>
-          <span className="text-xs text-gray-500">
+          <span className="text-body text-gray-500">
             {linesCount}
           </span>
         </div>

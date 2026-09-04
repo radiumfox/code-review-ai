@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: "Courier New", "Consolas", monospace;
   --font-mono: "Courier New", "Consolas", monospace;
+  --text-body: 16px;
 }
 
 @custom-variant xl-y (@media (min-height: 1440px));

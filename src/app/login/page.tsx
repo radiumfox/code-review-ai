@@ -19,7 +19,7 @@ export default function LoginPage() {
         <h1 className="text-3xl uppercase tracking-[0.2em] text-[#dfdfe2] sm:text-4xl">
           Code Review AI
         </h1>
-        <p className="mt-4 text-sm uppercase tracking-[0.3em] text-[#8d8d92]">
+        <p className="mt-4 text-body uppercase tracking-[0.3em] text-[#8d8d92]">
           Sign in to start reviewing
         </p>
       </div>

@@ -21,7 +21,7 @@ export function ReviewItem({ review, isActive, onClick, languageTitle }: ReviewI
           {languageTitle}
         </span>
       </div>
-      <p className="text-sm text-gray-400 leading-relaxed line-clamp-2">
+      <p className="text-body text-gray-400 leading-relaxed line-clamp-2">
         {review.summary}
       </p>
     </div>

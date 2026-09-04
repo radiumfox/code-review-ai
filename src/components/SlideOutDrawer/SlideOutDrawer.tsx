@@ -36,7 +36,7 @@ const SlideOutDrawerComponent = function({ children, onClose, isOpen, buttonClos
         <div className="flex items-center justify-between px-4 py-3 bg-[#151540] border-b border-[#1e1e4a]">
           <div className="flex items-center gap-2">
             <StarIcon className="text-[#6c6cff] w-4 h-4" />
-            <span className="uppercase text-xs font-medium text-[#6c6cff]">{ title }</span>
+            <span className="uppercase text-body font-medium text-[#6c6cff]">{ title }</span>
           </div>
           <button
             onClick={onClose}

@@ -76,7 +76,7 @@ export function NotificationBase({
 
   return (
     <div
-      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-[#dfdfe2] text-sm ${typeStyles[type]} ${className}`}
+      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-[#dfdfe2] text-body ${typeStyles[type]} ${className}`}
       style={{ backgroundColor: `${typeBackgrounds[type]}15` }}
     >
       <span>{message}</span>

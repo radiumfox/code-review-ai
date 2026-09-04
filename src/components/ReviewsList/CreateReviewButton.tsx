@@ -20,7 +20,7 @@ export function CreateReviewButton({ isActive, onClick }: CreateReviewItemButton
       <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#6c6cff]/15">
         <PlusIcon className="w-4 h-4 text-[#6c6cff]" />
       </div>
-      <span className="text-sm text-gray-400 ">New review</span>
+      <span className="text-body text-gray-400 ">New review</span>
     </button>
   );
 }

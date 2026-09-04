@@ -82,7 +82,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
 
       {error ? (
         <div className="flex-1 flex items-center justify-center px-3 py-6">
-          <p className="text-xs text-[#ff5555] text-center">{error}</p>
+          <p className="text-body text-[#ff5555] text-center">{error}</p>
         </div>
       ) : isInitialLoading && loading ? (
         <div className="flex flex-col">
@@ -118,7 +118,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
             onClick={createNewReview}
           />
           <div className="flex-1 flex items-center justify-center px-3 py-6">
-            <p className="text-sm text-gray-500 text-center">No reviews yet</p>
+            <p className="text-body text-gray-500 text-center">No reviews yet</p>
           </div>
         </div>
       )}

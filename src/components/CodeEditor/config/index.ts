@@ -9,7 +9,7 @@ export const THEME_CUSTOM_SETTINGS = {
   settings: {
     caret: '#c6c6c6',
     fontFamily: '\'JetBrains Mono\', \'Fira Code\', \'Consolas\', monospace',
-    fontSize: '14px',
+    fontSize: '16px',
   }
 };
 

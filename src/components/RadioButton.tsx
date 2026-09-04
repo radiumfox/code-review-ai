@@ -36,11 +36,11 @@ export function RadioButton({ id, isActive, disabled, label, onChange, helpText 
                   transition-all shrink-0"
       />
       <div className="flex flex-col">
-        <span className="text-sm uppercase tracking-widest text-[#dfdfe2]">
+        <span className="text-body uppercase tracking-widest text-[#dfdfe2]">
           {label}
         </span>
         {helpText && (
-          <span className="text-xs text-[#5a5a8a] mt-0.5">
+          <span className="text-body text-[#5a5a8a] mt-0.5">
             {helpText}
           </span>
         )}

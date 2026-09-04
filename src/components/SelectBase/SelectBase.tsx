@@ -82,7 +82,7 @@ export function SelectBase<T extends string>({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className={
-            `w-full  text-sm rounded-lg border
+            `w-full  text-body rounded-lg border
              px-3 py-2 pr-10 outline-none
              placeholder:text-[#5a5a8a] transition-colors
              ${inputClasses}
@@ -109,7 +109,7 @@ export function SelectBase<T extends string>({
         >
           <div className="max-h-56 overflow-y-auto custom-scrollbar">
             {filteredItems.length === 0 && !isLoading ? (
-              <div className="px-3 py-3 text-sm text-[#5a5a8a] text-center">
+              <div className="px-3 py-3 text-body text-[#5a5a8a] text-center">
                 {notFoundText}
               </div>
             ) : (

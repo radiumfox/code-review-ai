@@ -15,8 +15,8 @@ interface ButtonBorderProps {
 
 const sizeStyles: Record<ButtonBorderSizes, string> = {
   lg: 'gap-3 px-8 py-4 text-lg',
-  md: 'gap-2 px-6 py-2.5 text-sm',
-  sm: 'gap-1.5 px-4 py-2 text-sm',
+  md: 'gap-2 px-6 py-2.5 text-body',
+  sm: 'gap-1.5 px-4 py-2 text-body',
 };
 
 export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, size = 'md' }: ButtonBorderProps) {

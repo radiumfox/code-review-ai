@@ -67,7 +67,7 @@ export function HeaderMenu() {
                 onClick={() => setIsOpen(false)}
                 data-testid={item.testId}
                 className={
-                  `px-4 py-3 text-sm uppercase tracking-[0.15em] transition-colors
+                  `px-4 py-3 text-body uppercase tracking-[0.15em] transition-colors
                   ${isActive ? 'bg-[#1a1a3e] text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}`
                 }
               >
@@ -78,7 +78,7 @@ export function HeaderMenu() {
           <button
             onClick={() => signOut()}
             data-testid={HEADER_MENU_TEST_IDS.logoutButton}
-            className="px-4 py-3 text-sm uppercase tracking-[0.15em] text-[#ff5555] text-left transition-colors hover:bg-[#1a1a3e] focus:outline-none cursor-pointer border-t border-[#1e1e4a]"
+            className="px-4 py-3 text-body uppercase tracking-[0.15em] text-[#ff5555] text-left transition-colors hover:bg-[#1a1a3e] focus:outline-none cursor-pointer border-t border-[#1e1e4a]"
           >
             Log out
           </button>

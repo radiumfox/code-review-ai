@@ -14,7 +14,7 @@ export function InputBase({ label, id, value, onChange, placeholder, type }: Inp
     <div className="flex flex-col gap-2">
       <label
         htmlFor={id}
-        className="text-xs uppercase tracking-widest text-[#8d8d92]"
+        className="text-body uppercase tracking-widest text-[#8d8d92]"
       >
         {label}
       </label>
@@ -24,7 +24,7 @@ export function InputBase({ label, id, value, onChange, placeholder, type }: Inp
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full text-sm rounded-lg border border-[#2a2a5a]
+        className="w-full text-body rounded-lg border border-[#2a2a5a]
                 bg-transparent px-3 py-2.5 outline-none
                 placeholder:text-[#5a5a8a] transition-colors
                 focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40

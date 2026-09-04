@@ -20,6 +20,9 @@ export default async function Home() {
     <div className="flex h-[calc(100vh-71px)] w-full">
       <ReviewsList className="w-80 shrink-0 hidden lg:block overflow-auto" />
       <div className="flex-1 flex flex-col items-center justify-center space-y-6 overflow-y-auto">
+        <h1 className="hidden">
+          Code Review AI
+        </h1>
         <div className="w-full px-3 sm:px-6 md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto">
           <CodeEditor />
         </div>

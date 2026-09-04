@@ -48,9 +48,9 @@ export function CommentsList({ comments }: CommentsListProps) {
 
         return (
           <section key={severity}>
-            <h3 className="text-sm font-semibold text-gray-400 mb-2">
+            <p className="text-body font-semibold text-gray-400 mb-2">
               {SEVERITY_TITLES[severity]}
-            </h3>
+            </p>
             <ol className="flex flex-col list-decimal list-inside">
               {items.map((comment) => (
                 <CommentBase

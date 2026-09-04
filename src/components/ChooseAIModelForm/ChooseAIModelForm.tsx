@@ -121,7 +121,7 @@ export function ChooseAIModelForm() {
       {selectedProviderMeta && (
         <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-col gap-2 pt-2">
-            <span className="text-xs uppercase tracking-widest text-[#8d8d92]">
+            <span className="text-body uppercase tracking-widest text-[#8d8d92]">
               Available Models
             </span>
             <SelectBase

@@ -16,7 +16,7 @@ interface ButtonBaseProps {
 const sizeStyles: Record<ButtonBaseSizes, string> = {
   lg: 'gap-3 px-8 py-4 text-lg',
   md: 'gap-2 px-6 py-3 text-base',
-  sm: 'gap-1.5 px-4 py-2 text-sm',
+  sm: 'gap-1.5 px-4 py-2 text-body',
 };
 
 function Spinner() {
