@@ -49,3 +49,20 @@ function buildIssueDecorations(issues: Issue[], state: EditorState): DecorationS
 
   return Decoration.set(decorations, true);
 }
+
+export const issuesField = StateField.define<Issue[]>({
+  create: () => [],
+  update(issues, transaction) {
+    for (const effect of transaction.effects) {
+      if (effect.is(setIssuesEffect)) {
+        return effect.value;
+      }
+    }
+
+    if (transaction.docChanged) {
+      return [];
+    }
+    return issues;
+  },
+});
+

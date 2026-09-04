@@ -4,7 +4,6 @@ import CodeMirror from '@uiw/react-codemirror';
 import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { auraInit } from '@uiw/codemirror-theme-aura';
-import { langs } from '@uiw/codemirror-extensions-langs';
 import { LanguageSelect } from '@/components/LanguageSelect';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
@@ -13,7 +12,7 @@ import {
   EDITOR_BASIC_SETUP, EDITOR_TEST_IDS,
   THEME_CUSTOM_SETTINGS
 } from './config';
-import { hoverIssueTooltip, issueDecorationsField, setIssuesEffect } from './plugins';
+import { hoverIssueTooltip, issueDecorationsField, issuesField, setIssuesEffect } from './plugins';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
@@ -38,6 +37,8 @@ import { fetchReviews } from '@/store/reviewsListStore';
 import { CodingLanguage } from '@/lib/types';
 import { ButtonBorder } from '@/components/ButtonBorder';
 import { useSession } from 'next-auth/react';
+import { Extension } from '@codemirror/state';
+import { languageLoaders } from '@/components/CodeEditor/plugins/languageLoaders';
 
 export function CodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
@@ -52,10 +53,9 @@ export function CodeEditor() {
   const reviewError = useSelector(selectCreateReviewError);
   const dispatch = useDispatch<AppDispatch>();
   const { data: session } = useSession();
+  const [languageExtension, setLanguageExtension] = useState<Extension | null>(null);
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
-
-  const issues = useMemo(() => currentReview?.issues ?? [], [currentReview]);
 
   useEffect(() => {
     if(!model && session?.user?.aiModel) {
@@ -73,11 +73,9 @@ export function CodeEditor() {
   }, [reviewError, showNotification]);
 
   useEffect(() => {
-    if(currentReview?.issues && viewRef.current) {
-      viewRef.current.view?.dispatch({
-        effects: setIssuesEffect.of(currentReview.issues)
-      });
-    }
+    viewRef.current?.view?.dispatch({
+      effects: setIssuesEffect.of(currentReview?.issues ?? []),
+    });
   }, [currentReview]);
 
   const onValueChange = useCallback((val: string) => {
@@ -96,16 +94,10 @@ export function CodeEditor() {
   }, [language]);
 
   const extensions = useMemo(() => {
-    const extensionsList = [];
-
-    extensionsList.push(hoverIssueTooltip(issues), issueDecorationsField);
-
-    if(language) {
-      extensionsList.push(langs[language]());
-    }
-
-    return extensionsList;
-  }, [language, issues]);
+    const list: Extension[] = [hoverIssueTooltip, issueDecorationsField, issuesField];
+    if (languageExtension) list.push(languageExtension);
+    return list;
+  }, [languageExtension]);
 
   const theme = useMemo(() => {
     return auraInit(THEME_CUSTOM_SETTINGS);
@@ -130,9 +122,18 @@ export function CodeEditor() {
     });
   };
 
-  const onLanguageChange = useCallback((value: CodingLanguage) =>
-    dispatch(setLanguage(value)),
-  [dispatch]);
+  const onLanguageChange = useCallback((value: CodingLanguage) => {
+    dispatch(setLanguage(value));
+
+    const cancelled = false;
+    if (value) {
+      languageLoaders[value]?.().then((ext) => {
+        if (!cancelled) setLanguageExtension(ext);
+      });
+    } else {
+      setLanguageExtension(null);
+    }
+  }, [dispatch]);
 
   const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
 
