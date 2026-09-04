@@ -26,8 +26,6 @@ const hoverIssueTooltipBuild = hoverTooltip((view, pos) => {
   const { number } = view.state.doc.lineAt(pos);
   const issue = issues.find((item) => item.line === number);
 
-  console.log(view.state);
-
   if (issue) {
     return {
       pos,
