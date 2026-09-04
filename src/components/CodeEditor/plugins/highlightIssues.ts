@@ -5,15 +5,10 @@ import {
   StateEffect,
   EditorView, EditorState
 } from '@uiw/react-codemirror';
-import { Issue, IssueSeverity } from '@/lib/types/review';
+import { Issue } from '@/lib/types/review';
+import { ISSUE_SEVERITY_COLOR_MAP } from '@/lib/config';
 
 export const setIssuesEffect = StateEffect.define<Issue[]>();
-
-const ISSUE_SEVERITY_COLOR_MAP = {
-  [IssueSeverity.Error]: '#ff5555',
-  [IssueSeverity.Warning]: '#ffb86c',
-  [IssueSeverity.Suggestion]: '#8be9fd'
-} as const;
 
 export const issueDecorationsField = StateField.define<DecorationSet>({
   create() {
