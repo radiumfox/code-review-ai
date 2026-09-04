@@ -1,3 +1,3 @@
-export * from './genAI';
-export * from './fetchModels';
-export * from './generateContent';
+export { getAIClient } from './genAI';
+export { fetchModels } from './fetchModels';
+export { generateContent } from './generateContent';

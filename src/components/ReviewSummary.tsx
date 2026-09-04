@@ -12,18 +12,18 @@ const ReviewSummaryComponent = function ({ text, className = '', children }: Rev
   return (
     <div className={`flex flex-col w-50 min-w-0 overflow-y-auto min-h-100 wrap-break-word h-full ${className}`}>
       <div className="min-h-0 overflow-y-auto bg-[#0d0d2b] custom-scrollbar p-4 text-xs sm:text-sm space-y-5">
-          <div>
-              {text ? (
-                  <code className="text-gray-200">
-                      {text}
-                  </code>
-              ) : (
-                  <code className="text-gray-500">
-                      {'/** Summary will appear here: */'}
-                  </code>
-              )}
-          </div>
-        
+        <div>
+          {text ? (
+            <code className="text-gray-200">
+              {text}
+            </code>
+          ) : (
+            <code className="text-gray-500">
+              {'/** Summary will appear here: */'}
+            </code>
+          )}
+        </div>
+
         { children }
       </div>
     </div>

@@ -1,1 +1,1 @@
-export * from './ChooseAIModelForm';
+export { ChooseAIModelForm } from './ChooseAIModelForm';

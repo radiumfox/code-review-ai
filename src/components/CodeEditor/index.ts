@@ -1,1 +1,1 @@
-export * from './CodeEditor';
+export { CodeEditor } from './CodeEditor';

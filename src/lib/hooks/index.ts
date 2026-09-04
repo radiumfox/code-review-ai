@@ -1,2 +1,2 @@
-export * from './useFetch';
-export * from './useInfiniteScroll';
+export { useFetch } from './useFetch';
+export { useInfiniteScroll } from './useInfiniteScroll';
