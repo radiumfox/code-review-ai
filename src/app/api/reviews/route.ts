@@ -6,21 +6,22 @@ import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
 import { prettifyError } from 'zod';
+import { apiErrorResponse } from '@/lib/server';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if(!session) {
-      return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
+      return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
     }
 
     const body = await request.json();
     const input = reviewListRequestSchema.safeParse(body);
 
     if(!input.success) {
-      const error = prettifyError(input.error);
-      return NextResponse.json({ error }, { status: 400 });
+      return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
 
     const result = await ReviewModel.aggregate([
@@ -56,6 +57,6 @@ export async function POST(request: NextRequest) {
   } catch(error) {
     console.error(error);
 
-    return NextResponse.json({ error: 'Error fetching reviews list' }, { status: 500 });
+    return apiErrorResponse('Error fetching reviews list', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }

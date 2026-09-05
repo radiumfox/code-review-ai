@@ -3,16 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createReview } from '@/lib/createReviewService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { applyRateLimiter } from '@/lib/server';
+import { applyRateLimiter, apiErrorResponse } from '@/lib/server';
 import { prettifyError } from 'zod';
-import { isApiError } from '@/lib/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE, isApiError } from '@/lib/errors';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if(!session) {
-      return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
+      return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
     }
 
     const rateLimitResponse = await applyRateLimiter(`${session.user.id}.${request.url}`);
@@ -23,8 +23,7 @@ export async function POST(request: NextRequest) {
     const input = reviewGenerateRequest.safeParse(body);
 
     if(!input.success) {
-      const error = prettifyError(input.error);
-      return NextResponse.json({ error }, { status: 400 });
+      return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
 
     const review = await createReview(session.user.id, input.data);
@@ -33,9 +32,9 @@ export async function POST(request: NextRequest) {
     console.error(error);
 
     if(isApiError(error)) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      return apiErrorResponse(error.message, error.code, error.statusCode);
     }
-    
-    return NextResponse.json({ error: 'Error creating review' }, { status: 500 });
+
+    return apiErrorResponse('Error creating review', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }

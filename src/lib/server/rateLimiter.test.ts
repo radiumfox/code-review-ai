@@ -58,6 +58,10 @@ describe('rateLimiter', () => {
     expect(result?.status).toBe(RATE_LIMIT_EXCEEDED_STATUS);
 
     const body = await result?.json();
-    expect(body).toEqual({ error: 'Too many requests' });
+    expect(body).toEqual({
+      message: 'Too many requests',
+      code: 'TOO_MANY_REQUESTS',
+      statusCode: RATE_LIMIT_EXCEEDED_STATUS,
+    });
   });
 });

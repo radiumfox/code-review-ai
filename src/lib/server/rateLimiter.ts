@@ -1,6 +1,8 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
+import { apiErrorResponse } from './apiErrorResponse';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
 
 const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -22,5 +24,5 @@ export const applyRateLimiter = async (
   const { success } = await rateLimit.limit(key);
   if (success) return undefined;
 
-  return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  return apiErrorResponse('Too many requests', ERROR_CODES.TOO_MANY_REQUESTS, STATUS_CODE_BY_CODE[ERROR_CODES.TOO_MANY_REQUESTS]);
 };

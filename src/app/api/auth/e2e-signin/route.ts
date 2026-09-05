@@ -3,10 +3,12 @@ import { ROUTES } from '@/lib/config';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
+import { apiErrorResponse } from '@/lib/server';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
 
 export async function GET() {
   if (process.env.E2E_TEST !== 'true') {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return apiErrorResponse('Not found', ERROR_CODES.NOT_FOUND, STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND]);
   }
 
   const currentUser = await UserModel.findOneAndUpdate(
@@ -23,7 +25,7 @@ export async function GET() {
   );
 
   if(!currentUser) {
-    return NextResponse.json({ error: 'Failed to create e2e user' }, { status: 500 });
+    return apiErrorResponse('Failed to create e2e user', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 
   const { encode } = await import('next-auth/jwt');

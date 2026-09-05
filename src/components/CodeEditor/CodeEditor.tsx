@@ -132,6 +132,7 @@ export function CodeEditor() {
       codeSnippet,
       model
     })).then((result) => {
+      console.log(result);
       dispatch(fetchReviews({ page: 0 }));
     });
   };

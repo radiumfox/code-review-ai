@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
 import { mockReview } from './helpers';
 import { API_ROUTES, ROUTES } from '@/lib/config';
+import { ERROR_CODES } from '@/lib/errors';
 
 test.describe('Create review pipeline', () => {
   test.beforeEach('Log in', async ({ page }) => {
@@ -64,7 +65,11 @@ test.describe('Create review pipeline', () => {
       await route.fulfill({
         status: 400,
         contentType: 'application/json',
-        body: JSON.stringify({ error: `Code length must be more than ${CODE_SNIPPET_MIN_VALUE} character(s) and less than ${CODE_SNIPPET_MAX_VALUE} character(s)` })
+        body: JSON.stringify({
+          message: `Code length must be more than ${CODE_SNIPPET_MIN_VALUE} character(s) and less than ${CODE_SNIPPET_MAX_VALUE} character(s)`,
+          code: ERROR_CODES.VALIDATION,
+          statusCode: 400,
+        })
       });
     });
 
@@ -90,7 +95,11 @@ test.describe('Create review pipeline', () => {
       await route.fulfill({
         status: 400,
         contentType: 'application/json',
-        body: JSON.stringify({ error: `Code length must be more than ${CODE_SNIPPET_MIN_VALUE} character(s) and less than ${CODE_SNIPPET_MAX_VALUE} character(s)` })
+        body: JSON.stringify({
+          message: `Code length must be more than ${CODE_SNIPPET_MIN_VALUE} character(s) and less than ${CODE_SNIPPET_MAX_VALUE} character(s)`,
+          code: ERROR_CODES.VALIDATION,
+          statusCode: 400,
+        })
       });
     });
 
