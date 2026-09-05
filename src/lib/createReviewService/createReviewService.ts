@@ -4,6 +4,7 @@ import { generateContent } from '@/lib/genAI/openai';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
+import { ERROR_CODES, STATUS_CODE_BY_CODE, apiError } from '@/lib/errors';
 
 import { AIChoice } from '@/lib/genAI/openai/types';
 
@@ -15,19 +16,6 @@ function buildPrompt(input: ReviewGenerateRequest) {
   });
 }
 
-function aiError(message: string, statusCode = 502): Error & { success: false; statusCode: number } {
-  return Object.assign(new Error(message), { success: false as const, statusCode });
-}
-
-export function isAiError(error: unknown): error is ReturnType<typeof aiError> {
-  return typeof error === 'object'
-        && error !== null
-        && 'success' in error
-        && 'message' in error
-        && 'statusCode' in error
-        && typeof error.statusCode === 'number';
-}
-
 async function callAI(prompt: string, model?: string) {
   if(!model) {
     throw new Error('Model is missing');
@@ -37,7 +25,7 @@ async function callAI(prompt: string, model?: string) {
     return await generateContent({ contents: prompt, model: model });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'AI generation failed';
-    throw aiError(message, 502);
+    throw apiError(message, ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
   }
 }
 
@@ -51,7 +39,7 @@ function parseAIResponse(aiResponse: AIChoice[]) {
   try {
     return JSON.parse(text);
   } catch {
-    throw aiError('AI returned invalid JSON');
+    throw apiError('AI returned invalid JSON', ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
   }
 }
 
@@ -75,7 +63,7 @@ export async function createReview(userId: string, params: ReviewGenerateRequest
   const aiResponse = await callAI(prompt, params.model);
 
   if(!aiResponse) {
-    throw aiError('AI returned no candidates', 502);
+    throw apiError('AI returned no candidates', ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
   }
 
   const reviewData = parseAIResponse(aiResponse);

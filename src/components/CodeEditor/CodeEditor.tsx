@@ -69,7 +69,7 @@ export function CodeEditor() {
     if(reviewError) {
       showNotification({
         type: NotificationType.Error,
-        message: reviewError,
+        message: reviewError.message,
       });
     }
   }, [reviewError, showNotification]);
@@ -131,7 +131,7 @@ export function CodeEditor() {
       language,
       codeSnippet,
       model
-    })).then(() => {
+    })).then((result) => {
       dispatch(fetchReviews({ page: 0 }));
     });
   };

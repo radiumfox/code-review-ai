@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toApiError } from '@/lib/errors';
+import type { ApiError } from '@/lib/errors';
 
 export function useFetch<P extends object, T = unknown>(
   url: string,
@@ -6,7 +8,7 @@ export function useFetch<P extends object, T = unknown>(
   headers?: Record<string, string>
 ) {
   const [data, setData] = useState<T>();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
   const [loading, setLoading] = useState(false);
 
   const controllerRef = useRef(new AbortController());
@@ -48,7 +50,7 @@ export function useFetch<P extends object, T = unknown>(
       const responseData = await response.json();
 
       if (!response.ok) {
-        setError(`${response.statusText}: ${responseData.error}`);
+        setError(toApiError({ ...responseData, statusCode: response.status }));
 
         console.error(responseData);
         return;
@@ -56,8 +58,7 @@ export function useFetch<P extends object, T = unknown>(
 
       setData(responseData);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error fetching data';
-      setError(errorMessage);
+      setError(toApiError(error));
 
       console.error(error);
     } finally {

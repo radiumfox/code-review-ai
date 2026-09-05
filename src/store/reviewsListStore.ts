@@ -3,6 +3,8 @@ import { Review } from '@/lib/types';
 import { REVIEWS_LIST_LIMIT, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import { createReview } from './reviewEditorStore';
+import { toApiError } from '@/lib/errors';
+import type { ApiError } from '@/lib/errors';
 
 interface ReviewsListState {
   reviews: Review[];
@@ -10,7 +12,7 @@ interface ReviewsListState {
   hasMore: boolean;
   loading: boolean;
   isInitialReviewsFetching: boolean;
-  error: string | null;
+  error: ApiError | null;
 }
 
 export const initialState: ReviewsListState = {
@@ -30,7 +32,7 @@ interface FetchReviewsResult {
 
 let fetchReviewsCounter = 0;
 
-export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number }>(
+export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number }, { rejectValue: ApiError }>(
   'reviews/fetchReviews',
   async ({ page }, { rejectWithValue }) => {
     const fetchId = ++fetchReviewsCounter;
@@ -45,14 +47,12 @@ export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number 
       const result = await response.json();
 
       if (!response.ok) {
-        return rejectWithValue(result.error ?? 'Error fetching reviews');
+        return rejectWithValue(toApiError({ ...result, statusCode: response.status }));
       }
 
       return { reviews: result.data as Review[], fetchId, page };
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error fetching reviews';
-
-      return rejectWithValue(message);
+      return rejectWithValue(toApiError(error));
     }
   },
 );
@@ -84,7 +84,7 @@ export const reviewsListSlice = createSlice({
       })
       .addCase(fetchReviews.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) ?? 'Error fetching reviews';
+        state.error = action.payload ?? null;
       })
       .addCase(createReview.fulfilled, (state) => {
         state.isInitialReviewsFetching = true;

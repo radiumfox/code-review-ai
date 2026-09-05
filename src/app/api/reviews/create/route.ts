@@ -1,10 +1,11 @@
 import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
 import { NextRequest, NextResponse } from 'next/server';
-import { createReview, isAiError } from '@/lib/createReviewService';
+import { createReview } from '@/lib/createReviewService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { applyRateLimiter } from '@/lib/server';
 import { prettifyError } from 'zod';
+import { isApiError } from '@/lib/errors';
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error(error);
 
-    if(isAiError(error)) {
+    if(isApiError(error)) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode });
     }
     

@@ -60,7 +60,7 @@ export function ChooseAIModelForm() {
     if(saveModelError) {
       showNotification({
         type: NotificationType.Error,
-        message: saveModelError,
+        message: saveModelError.message,
       });
     }
   }, [saveModelError, showNotification]);
@@ -131,7 +131,7 @@ export function ChooseAIModelForm() {
               placeholder="Select a model…"
               notFoundText="No models match"
               isLoading={fetchModelsLoading}
-              error={fetchModelsError ?? undefined}
+              error={fetchModelsError?.message}
             />
           </div>
 

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useFetch } from '@/lib/hooks/useFetch';
+import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/errors';
 
 const TEST_ENDPOINT = '/api/data';
 
@@ -72,6 +73,7 @@ describe('useFetch', () => {
     test('Sets error when response is not ok', async () => {
       fetchMock.mockResolvedValue({
         ok: false,
+        status: 404,
         statusText: 'Not Found',
         json: () => Promise.resolve({ error: 'Resource not found' }),
       });
@@ -80,7 +82,11 @@ describe('useFetch', () => {
       await result.current.executeFetch();
 
       await waitFor(() => {
-        expect(result.current.error).toBe('Not Found: Resource not found');
+        expect(result.current.error).toEqual({
+          message: 'Resource not found',
+          code: ERROR_CODES.NOT_FOUND,
+          statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND],
+        });
       });
     });
 
@@ -91,7 +97,11 @@ describe('useFetch', () => {
       await result.current.executeFetch();
 
       await waitFor(() => {
-        expect(result.current.error).toBe('Network failure');
+        expect(result.current.error).toEqual({
+          message: 'Network failure',
+          code: ERROR_CODES.NETWORK,
+          statusCode: FALLBACK_STATUS_CODE,
+        });
       });
     });
 
@@ -102,7 +112,11 @@ describe('useFetch', () => {
       await result.current.executeFetch();
 
       await waitFor(() => {
-        expect(result.current.error).toBe('Error fetching data');
+        expect(result.current.error).toEqual({
+          message: 'Something went wrong',
+          code: ERROR_CODES.UNKNOWN,
+          statusCode: FALLBACK_STATUS_CODE,
+        });
       });
     });
 
@@ -110,6 +124,7 @@ describe('useFetch', () => {
       fetchMock
         .mockResolvedValueOnce({
           ok: false,
+          status: 500,
           statusText: 'Server Error',
           json: () => Promise.resolve({ error: 'fail' }),
         })
@@ -123,7 +138,11 @@ describe('useFetch', () => {
       await result.current.executeFetch();
 
       await waitFor(() => {
-        expect(result.current.error).toBe('Server Error: fail');
+        expect(result.current.error).toEqual({
+          message: 'fail',
+          code: ERROR_CODES.INTERNAL_SERVER,
+          statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
+        });
       });
 
       await result.current.executeFetch();

@@ -13,44 +13,6 @@ vi.mock('@/models/Review', () => ({
   ReviewModel: { create: mockReviewCreate },
 }));
 
-describe('isAiError', () => {
-  test('Returns true for objects with success, message, and statusCode', async () => {
-    const { isAiError } = await import('@/lib/createReviewService/createReviewService');
-
-    expect(isAiError({
-      success: false,
-      statusCode: 502,
-      message: 'AI returned invalid JSON',
-    })).toBe(true);
-  });
-
-  test('Returns false for regular Error', async () => {
-    const { isAiError } = await import('@/lib/createReviewService/createReviewService');
-
-    expect(isAiError(new Error('test'))).toBe(false);
-  });
-
-  test('Returns false for null', async () => {
-    const { isAiError } = await import('@/lib/createReviewService/createReviewService');
-
-    expect(isAiError(null)).toBe(false);
-  });
-
-  test('Returns false for undefined', async () => {
-    const { isAiError } = await import('@/lib/createReviewService/createReviewService');
-
-    expect(isAiError(undefined)).toBe(false);
-  });
-
-  test('Returns false for objects missing required fields', async () => {
-    const { isAiError } = await import('@/lib/createReviewService/createReviewService');
-
-    expect(isAiError({ success: false, message: 'err' })).toBe(false);
-    expect(isAiError({ success: false, statusCode: 502 })).toBe(false);
-    expect(isAiError({ statusCode: 502, message: 'err' })).toBe(false);
-  });
-});
-
 describe('createReview', () => {
   beforeEach(() => {
     mockGenerateContent.mockReset();
@@ -134,10 +96,11 @@ describe('createReview', () => {
     })).rejects.toThrow('AI returned invalid JSON');
   });
 
-  test('Wraps generateContent errors as aiError', async () => {
+  test('Wraps generateContent errors as aiError matching ApiError contract', async () => {
     mockGenerateContent.mockRejectedValue(new Error('Network timeout'));
 
-    const { createReview, isAiError } = await import('@/lib/createReviewService/createReviewService');
+    const { createReview } = await import('@/lib/createReviewService/createReviewService');
+    const { isApiError, ERROR_CODES, STATUS_CODE_BY_CODE } = await import('@/lib/errors');
 
     try {
       await createReview('user-1', {
@@ -147,7 +110,13 @@ describe('createReview', () => {
       });
       expect.unreachable('Should have thrown');
     } catch (error) {
-      expect(isAiError(error)).toBe(true);
+      if (isApiError(error)) {
+        expect(error.message).toBe('Network timeout');
+        expect(error.code).toBe(ERROR_CODES.AI);
+        expect(error.statusCode).toBe(STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
+      } else {
+        expect.unreachable('Expected an ApiError');
+      }
     }
   });
 });

@@ -4,11 +4,13 @@ import { Review, ReviewGenerateRequest } from '@/lib/types';
 import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
+import { toApiError } from '@/lib/errors';
+import type { ApiError } from '@/lib/errors';
 
 interface ReviewEditorState {
   currentReview: Review | null;
   createReviewLoading: boolean;
-  createReviewError: string | null;
+  createReviewError: ApiError | null;
   language: CodingLanguage | null;
   model: string | null;
   codeSnippet: string;
@@ -25,7 +27,7 @@ export const initialState: ReviewEditorState = {
   summary: '',
 };
 
-export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
+export const createReview = createAsyncThunk<Review, ReviewGenerateRequest, { rejectValue: ApiError }>(
   'reviews/createReview',
   async (params, { rejectWithValue }) => {
     try {
@@ -38,14 +40,12 @@ export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
       const result = await response.json();
 
       if (!response.ok) {
-        return rejectWithValue(result.error ?? 'Error creating review');
+        return rejectWithValue(toApiError({ ...result, statusCode: response.status }));
       }
 
       return result.data as Review;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error creating review';
-
-      return rejectWithValue(message);
+      return rejectWithValue(toApiError(error));
     }
   },
   {
@@ -107,7 +107,7 @@ export const reviewEditorSlice = createSlice({
       })
       .addCase(createReview.rejected, (state, action) => {
         state.createReviewLoading = false;
-        state.createReviewError = (action.payload as string) ?? 'Error creating review';
+        state.createReviewError = action.payload ?? null;
       });
   },
 });
