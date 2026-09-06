@@ -1,4 +1,4 @@
-import { connectToDatabase } from '@/lib/server';
+import { connectToDatabase } from '@/lib/api';
 
 export async function register() {
   try {

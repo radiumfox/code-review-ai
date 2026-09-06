@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { createReview } from '@/lib/createReviewService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { applyRateLimiter } from '@/lib/server';
+import { applyRateLimiter } from '@/lib/api';
 import { apiErrorResponse } from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { prettifyError } from 'zod';

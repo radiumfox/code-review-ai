@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { fetchModels } from '@/lib/genAI/openai';
-import { applyRateLimiter } from '@/lib/server';
+import { applyRateLimiter } from '@/lib/api';
 import { apiErrorResponse } from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { getServerSession } from 'next-auth';
