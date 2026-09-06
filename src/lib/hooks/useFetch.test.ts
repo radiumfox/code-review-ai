@@ -36,7 +36,7 @@ describe('useFetch', () => {
     test('Becomes true when executeFetch is called and false after completion', async () => {
       const deferred = createDeferred<{
         ok: boolean;
-        json: () => Promise<{ title: string }>
+        json: () => Promise<{ ok: true; data: { title: string } }>
       }>();
 
       fetchMock.mockReturnValue(deferred.promise);
@@ -54,7 +54,7 @@ describe('useFetch', () => {
       await act(async () => {
         deferred.resolve({
           ok: true,
-          json: () => Promise.resolve({ title: 'test' }),
+          json: () => Promise.resolve({ ok: true, data: { title: 'test' } }),
         });
       });
 
@@ -86,6 +86,31 @@ describe('useFetch', () => {
           message: 'Resource not found',
           code: ERROR_CODES.NOT_FOUND,
           statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND],
+          ok: false,
+        });
+      });
+    });
+
+    test('Sets error when response body is an ApiFailure', async () => {
+      fetchMock.mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({
+          ok: false,
+          message: 'Something failed',
+          code: ERROR_CODES.INTERNAL_SERVER,
+          statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
+        }),
+      });
+
+      const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
+      await result.current.executeFetch();
+
+      await waitFor(() => {
+        expect(result.current.error).toEqual({
+          message: 'Something failed',
+          code: ERROR_CODES.INTERNAL_SERVER,
+          statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
           ok: false,
         });
       });
@@ -133,7 +158,7 @@ describe('useFetch', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ data: 'ok' }),
+          json: () => Promise.resolve({ ok: true, data: 'ok' }),
         });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -162,11 +187,11 @@ describe('useFetch', () => {
       expect(result.current.data).toBeUndefined();
     });
 
-    test('Sets data on successful response', async () => {
+    test('Sets data to the data field of a successful result', async () => {
       const payload = { title: 'test', count: 42 };
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve(payload),
+        json: () => Promise.resolve({ ok: true, data: payload }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -197,7 +222,7 @@ describe('useFetch', () => {
     test('Sends params as JSON body for non-GET requests', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ success: true }),
+        json: () => Promise.resolve({ ok: true, data: { success: true } }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'POST'));
@@ -215,7 +240,7 @@ describe('useFetch', () => {
     test('Does not send body for GET requests', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ items: [] }),
+        json: () => Promise.resolve({ ok: true, data: { items: [] } }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -232,7 +257,7 @@ describe('useFetch', () => {
     test('Appends searchParams to URL', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ results: [] }),
+        json: () => Promise.resolve({ ok: true, data: { results: [] } }),
       });
 
       const { result } = renderHook(() => useFetch('/api/search', 'GET'));
@@ -247,7 +272,7 @@ describe('useFetch', () => {
     test('Works with both params and searchParams on POST', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ created: true }),
+        json: () => Promise.resolve({ ok: true, data: { created: true } }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'POST'));
@@ -268,7 +293,7 @@ describe('useFetch', () => {
     test('Passes the URL directly to fetch', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -282,7 +307,7 @@ describe('useFetch', () => {
     test('Uses the full URL when searchParams are provided', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -299,7 +324,7 @@ describe('useFetch', () => {
     test('Passes GET method to fetch', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -316,7 +341,7 @@ describe('useFetch', () => {
     test('Passes POST method to fetch', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'POST'));
@@ -333,7 +358,7 @@ describe('useFetch', () => {
     test('Passes DELETE method to fetch', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'DELETE'));
@@ -352,7 +377,7 @@ describe('useFetch', () => {
     test('Includes default content-type header', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const { result } = renderHook(() => useFetch(TEST_ENDPOINT, 'GET'));
@@ -373,7 +398,7 @@ describe('useFetch', () => {
     test('Merges custom headers with default content-type', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const customHeaders = { Authorization: 'Bearer token123' };
@@ -400,7 +425,7 @@ describe('useFetch', () => {
     test('Allows overriding default content-type via custom headers', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve({ ok: true, data: {} }),
       });
 
       const customHeaders = { 'content-type': 'text/plain' };

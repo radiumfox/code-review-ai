@@ -35,7 +35,7 @@ export function ChooseAIModelForm() {
     data: saveModelData,
     error: saveModelError,
     loading: saveModelLoading
-  } = useFetch<{ model: string }, { data: { model: string } }>(API_ROUTES.updateUserModel, 'POST');
+  } = useFetch<{ model: string }, { model: string }>(API_ROUTES.updateUserModel, 'POST');
 
   const modelsList = useMemo(() => {
     return modelsData?.models.map((model) => {
@@ -69,9 +69,9 @@ export function ChooseAIModelForm() {
     let isActive = true;
 
     if(saveModelData) {
-      dispatch(setModel(saveModelData.data.model));
+      dispatch(setModel(saveModelData.model));
 
-      updateSession({ aiModel: saveModelData.data.model })
+      updateSession({ aiModel: saveModelData.model })
         .then(() => {
           if(isActive) {
             router.replace(ROUTES.main);

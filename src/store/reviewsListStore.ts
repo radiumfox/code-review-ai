@@ -4,6 +4,7 @@ import { REVIEWS_LIST_LIMIT, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import { createReview } from './reviewEditorStore';
 import { toApiError } from '@/lib/api/errors';
+import { isApiFailure, isApiSuccess } from '@/lib/api/result';
 import type { ApiError } from '@/lib/api/errors';
 
 interface ReviewsListState {
@@ -24,7 +25,18 @@ export const initialState: ReviewsListState = {
   error: null,
 };
 
+interface ReviewsListResponse {
+  metadata: {
+    totalCount: number;
+    page: number;
+    pageSize: number;
+  };
+  data: Review[];
+}
+
 interface FetchReviewsResult {
+  ok: boolean;
+  data: ReviewsListResponse;
   reviews: Review[];
   fetchId: number;
   page: number;
@@ -44,13 +56,26 @@ export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number 
         body: JSON.stringify({ page }),
       });
 
-      const result = await response.json();
+      const responseData: unknown = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        return rejectWithValue(toApiError({ ...result, statusCode: response.status }));
+      if (isApiFailure(responseData)) {
+        return rejectWithValue(responseData);
       }
 
-      return { reviews: result.data as Review[], fetchId, page };
+      if (isApiSuccess<ReviewsListResponse>(responseData)) {
+        return {
+          ok: responseData.ok,
+          data: responseData.data,
+          reviews: responseData.data.data,
+          fetchId,
+          page,
+        };
+      }
+
+      return rejectWithValue(toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      }));
     } catch (error) {
       return rejectWithValue(toApiError(error));
     }

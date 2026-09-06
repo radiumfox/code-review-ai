@@ -230,7 +230,17 @@ describe('async thunks', () => {
       const reviews = [createMockReview({ id: '1' })];
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ data: reviews }),
+        json: () => Promise.resolve({
+          ok: true,
+          data: {
+            metadata: {
+              totalCount: reviews.length,
+              page: 0,
+              pageSize: REVIEWS_LIST_LIMIT,
+            },
+            data: reviews,
+          },
+        }),
       });
 
       const store = createTestStore();

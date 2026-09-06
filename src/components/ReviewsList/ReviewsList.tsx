@@ -50,7 +50,6 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
   useEffect(() => {
     if(!reviews.length) {
       dispatch(fetchReviews({ page: 0 }));
-      console.log('Fetched from scratch');
     }
   }, [dispatch, reviews.length]);
 

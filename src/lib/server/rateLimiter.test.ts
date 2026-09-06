@@ -62,6 +62,7 @@ describe('rateLimiter', () => {
       message: 'Too many requests',
       code: 'TOO_MANY_REQUESTS',
       statusCode: RATE_LIMIT_EXCEEDED_STATUS,
+      ok: false,
     });
   });
 });

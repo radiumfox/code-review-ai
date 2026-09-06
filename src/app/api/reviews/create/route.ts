@@ -1,9 +1,11 @@
 import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createReview } from '@/lib/createReviewService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { applyRateLimiter, apiErrorResponse } from '@/lib/server';
+import { applyRateLimiter } from '@/lib/server';
+import { apiErrorResponse } from '@/lib/api/errors';
+import { apiSuccessResponse } from '@/lib/api/result';
 import { prettifyError } from 'zod';
 import { ERROR_CODES, STATUS_CODE_BY_CODE, isApiError } from '@/lib/api/errors';
 
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const review = await createReview(session.user.id, input.data);
-    return NextResponse.json({ data: { ...review._doc, id: review._id } }, { status: 200 });
+    return apiSuccessResponse({ ...review._doc, id: review._id });
   } catch (error) {
     console.error(error);
 

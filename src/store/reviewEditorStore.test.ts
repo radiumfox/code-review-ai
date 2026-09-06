@@ -174,7 +174,7 @@ describe('extraReducers - createReview', () => {
 
     state = reviewEditorSlice.reducer(state, {
       type: createReview.fulfilled.type,
-      payload: review,
+      payload: { ok: true, data: review },
     });
     const root = asRootState(state);
 
@@ -222,9 +222,9 @@ describe('selector-reducer contract', () => {
 
   test('Selectors reflect state after createReview.fulfilled', () => {
     const review = createMockReview({ summary: 'All good' });
-    const state = reviewEditorSlice.reducer(initialState, {
+    const     state = reviewEditorSlice.reducer(initialState, {
       type: createReview.fulfilled.type,
-      payload: review,
+      payload: { ok: true, data: review },
     });
     const root = asRootState(state);
 
@@ -255,7 +255,7 @@ describe('async thunks', () => {
       const review = createMockReview();
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ data: review }),
+        json: () => Promise.resolve({ ok: true, data: review }),
       });
 
       const store = createTestStore();
@@ -303,7 +303,7 @@ describe('async thunks', () => {
     test('Does not execute when createReviewLoading is true', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ data: createMockReview() }),
+        json: () => Promise.resolve({ ok: true, data: createMockReview() }),
       });
 
       const store = createTestStore();

@@ -1,12 +1,13 @@
 import { ReviewModel } from '@/models/Review';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
 import { prettifyError } from 'zod';
-import { apiErrorResponse } from '@/lib/server';
+import { apiErrorResponse } from '@/lib/api/errors';
+import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 export async function POST(request: NextRequest) {
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
       data: result[0]?.data
     };
 
-    return NextResponse.json(data, { status: 200 });
+    return apiSuccessResponse(data);
   } catch(error) {
     console.error(error);
 

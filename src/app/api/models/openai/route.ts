@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { fetchModels } from '@/lib/genAI/openai';
-import { applyRateLimiter, apiErrorResponse } from '@/lib/server';
+import { applyRateLimiter } from '@/lib/server';
+import { apiErrorResponse } from '@/lib/api/errors';
+import { apiSuccessResponse } from '@/lib/api/result';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { isInvalidApiKeyError } from '@/lib/genAI/openai/helpers';
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
   try {
     const result = await fetchModels();
 
-    return NextResponse.json(result, { status: 200 });
+    return apiSuccessResponse(result);
   } catch (error) {
     console.error(error);
 

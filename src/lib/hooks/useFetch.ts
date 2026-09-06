@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toApiError } from '@/lib/api/errors';
+import { isApiFailure, isApiSuccess } from '@/lib/api/result';
 import type { ApiError } from '@/lib/api/errors';
 
 export function useFetch<P extends object, T = unknown>(
@@ -47,16 +48,28 @@ export function useFetch<P extends object, T = unknown>(
           }
         });
 
-      const responseData = await response.json();
+      const responseData: unknown = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        setError(toApiError({ ...responseData, statusCode: response.status }));
+      if (isApiFailure(responseData)) {
+        setError(responseData);
 
         console.error(responseData);
         return;
       }
 
-      setData(responseData);
+      if (isApiSuccess<T>(responseData)) {
+        setData(responseData.data);
+        return;
+      }
+
+      const apiError = toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      });
+
+      setError(apiError);
+
+      console.error(apiError);
     } catch (error) {
       setError(toApiError(error));
 

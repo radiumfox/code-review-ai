@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { UserModel } from '@/models/User';
 import { userModelRequest } from '@/lib/validations/userModelRequest';
 import { prettifyError } from 'zod';
-import { apiErrorResponse } from '@/lib/server';
+import { apiErrorResponse } from '@/lib/api/errors';
+import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 export async function POST(request: NextRequest) {
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       return apiErrorResponse('User not found', ERROR_CODES.NOT_FOUND, STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND]);
     }
 
-    return NextResponse.json({ data: { model: updatedUser.aiModel } }, { status: 200 });
+    return apiSuccessResponse({ model: updatedUser.aiModel });
   } catch (error) {
     console.error(error);
     return apiErrorResponse('Error saving model', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
