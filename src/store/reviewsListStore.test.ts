@@ -19,7 +19,7 @@ import type { RootState } from '@/store';
 import { DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
 import type { Review } from '@/lib/types';
-import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 function createMockReview(overrides: Partial<Review> = {}): Review {
   return {
@@ -161,6 +161,7 @@ describe('extraReducers - fetchReviews', () => {
         message: 'Network error',
         code: ERROR_CODES.NETWORK,
         statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
       },
     });
 
@@ -171,6 +172,7 @@ describe('extraReducers - fetchReviews', () => {
       message: 'Network error',
       code: ERROR_CODES.NETWORK,
       statusCode: FALLBACK_STATUS_CODE,
+      ok: false,
     });
   });
 });
@@ -254,6 +256,7 @@ describe('async thunks', () => {
         message: 'Server error',
         code: ERROR_CODES.INTERNAL_SERVER,
         statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
+        ok: false,
       });
       expect(selectReviewsLoading(state)).toBe(false);
     });
@@ -269,6 +272,7 @@ describe('async thunks', () => {
         message: 'Network failure',
         code: ERROR_CODES.NETWORK,
         statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
       });
     });
   });

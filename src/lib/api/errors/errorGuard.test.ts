@@ -4,9 +4,14 @@ import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from './config
 
 describe('isApiError', () => {
   test('Returns true for a well-formed ApiError', () => {
-    const error = { message: 'Too many requests', code: 'TOO_MANY_REQUESTS', statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.TOO_MANY_REQUESTS] };
+    const error = { message: 'Too many requests', code: 'TOO_MANY_REQUESTS', statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.TOO_MANY_REQUESTS], ok: false };
 
     expect(isApiError(error)).toBe(true);
+  });
+
+  test('Returns false when ok is missing or not false', () => {
+    expect(isApiError({ message: 'No ok', code: 'NO_OK', statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND] })).toBe(false);
+    expect(isApiError({ message: 'Ok true', code: 'OK_TRUE', statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND], ok: true })).toBe(false);
   });
 
   test('Returns false for null and undefined', () => {
@@ -29,7 +34,7 @@ describe('isApiError', () => {
 
 describe('toApiError', () => {
   test('Passes through an already well-formed ApiError unchanged', () => {
-    const error = { message: 'Rate limited', code: ERROR_CODES.TOO_MANY_REQUESTS, statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.TOO_MANY_REQUESTS] };
+    const error = { message: 'Rate limited', code: ERROR_CODES.TOO_MANY_REQUESTS, statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.TOO_MANY_REQUESTS], ok: false };
 
     const result = toApiError(error);
 
@@ -42,6 +47,7 @@ describe('toApiError', () => {
     expect(result.message).toBe('Failed to fetch');
     expect(result.code).toBe(ERROR_CODES.NETWORK);
     expect(result.statusCode).toBe(FALLBACK_STATUS_CODE);
+    expect(result.ok).toBe(false);
   });
 
   test('Converts the legacy { error } shape, deriving the code from the statusCode', () => {
@@ -96,6 +102,7 @@ describe('toApiError', () => {
     expect(result.message).toBe('Something went wrong');
     expect(result.code).toBe(ERROR_CODES.UNKNOWN);
     expect(result.statusCode).toBe(FALLBACK_STATUS_CODE);
+    expect(result.ok).toBe(false);
   });
 
   test('Falls back to a default error for undefined', () => {
@@ -140,5 +147,6 @@ describe('apiError', () => {
     expect(error.message).toBe('AI failed');
     expect(error.code).toBe(ERROR_CODES.AI);
     expect(error.statusCode).toBe(STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
+    expect(error.ok).toBe(false);
   });
 });

@@ -7,7 +7,7 @@ import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
 import { prettifyError } from 'zod';
 import { apiErrorResponse } from '@/lib/server';
-import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 export async function POST(request: NextRequest) {
   try {

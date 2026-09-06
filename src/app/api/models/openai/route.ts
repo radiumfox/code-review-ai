@@ -4,7 +4,7 @@ import { applyRateLimiter, apiErrorResponse } from '@/lib/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { isInvalidApiKeyError } from '@/lib/genAI/openai/helpers';
-import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);

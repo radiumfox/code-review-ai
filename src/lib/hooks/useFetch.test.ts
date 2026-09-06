@@ -1,7 +1,7 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useFetch } from '@/lib/hooks/useFetch';
-import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 const TEST_ENDPOINT = '/api/data';
 
@@ -86,6 +86,7 @@ describe('useFetch', () => {
           message: 'Resource not found',
           code: ERROR_CODES.NOT_FOUND,
           statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND],
+          ok: false,
         });
       });
     });
@@ -101,6 +102,7 @@ describe('useFetch', () => {
           message: 'Network failure',
           code: ERROR_CODES.NETWORK,
           statusCode: FALLBACK_STATUS_CODE,
+          ok: false,
         });
       });
     });
@@ -116,6 +118,7 @@ describe('useFetch', () => {
           message: 'Something went wrong',
           code: ERROR_CODES.UNKNOWN,
           statusCode: FALLBACK_STATUS_CODE,
+          ok: false,
         });
       });
     });
@@ -142,6 +145,7 @@ describe('useFetch', () => {
           message: 'fail',
           code: ERROR_CODES.INTERNAL_SERVER,
           statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
+          ok: false,
         });
       });
 

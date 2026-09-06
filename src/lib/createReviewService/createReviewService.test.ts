@@ -100,7 +100,7 @@ describe('createReview', () => {
     mockGenerateContent.mockRejectedValue(new Error('Network timeout'));
 
     const { createReview } = await import('@/lib/createReviewService/createReviewService');
-    const { isApiError, ERROR_CODES, STATUS_CODE_BY_CODE } = await import('@/lib/errors');
+    const { isApiError, ERROR_CODES, STATUS_CODE_BY_CODE } = await import('@/lib/api/errors');
 
     try {
       await createReview('user-1', {

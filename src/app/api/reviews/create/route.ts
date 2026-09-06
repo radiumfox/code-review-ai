@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { applyRateLimiter, apiErrorResponse } from '@/lib/server';
 import { prettifyError } from 'zod';
-import { ERROR_CODES, STATUS_CODE_BY_CODE, isApiError } from '@/lib/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE, isApiError } from '@/lib/api/errors';
 
 export async function POST(request: NextRequest) {
   try {

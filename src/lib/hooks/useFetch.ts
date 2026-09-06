@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toApiError } from '@/lib/errors';
-import type { ApiError } from '@/lib/errors';
+import { toApiError } from '@/lib/api/errors';
+import type { ApiError } from '@/lib/api/errors';
 
 export function useFetch<P extends object, T = unknown>(
   url: string,

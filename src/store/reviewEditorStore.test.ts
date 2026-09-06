@@ -23,7 +23,7 @@ import type { RootState } from '@/store';
 import { DEFAULT_LANGUAGE, DEFAULT_EDITOR_VALUE } from '@/lib/config';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
 import type { Review, ReviewGenerateRequest } from '@/lib/types';
-import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 function createMockReview(overrides: Partial<Review> = {}): Review {
   return {
@@ -192,6 +192,7 @@ describe('extraReducers - createReview', () => {
         message: 'AI service unavailable',
         code: ERROR_CODES.INTERNAL_SERVER,
         statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
       },
     });
     const root = asRootState(state);
@@ -201,6 +202,7 @@ describe('extraReducers - createReview', () => {
       message: 'AI service unavailable',
       code: ERROR_CODES.INTERNAL_SERVER,
       statusCode: FALLBACK_STATUS_CODE,
+      ok: false,
     });
   });
 });
@@ -279,6 +281,7 @@ describe('async thunks', () => {
         message: 'Validation failed',
         code: ERROR_CODES.VALIDATION,
         statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION],
+        ok: false,
       });
     });
 
@@ -293,6 +296,7 @@ describe('async thunks', () => {
         message: 'Timeout',
         code: ERROR_CODES.NETWORK,
         statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
       });
     });
 

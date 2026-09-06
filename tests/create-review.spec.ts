@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
 import { mockReview } from './helpers';
 import { API_ROUTES, ROUTES } from '@/lib/config';
-import { ERROR_CODES } from '@/lib/errors';
+import { ERROR_CODES } from '@/lib/api/errors';
 
 test.describe('Create review pipeline', () => {
   test.beforeEach('Log in', async ({ page }) => {

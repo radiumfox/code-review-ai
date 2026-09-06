@@ -3,8 +3,8 @@ import { Review } from '@/lib/types';
 import { REVIEWS_LIST_LIMIT, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import { createReview } from './reviewEditorStore';
-import { toApiError } from '@/lib/errors';
-import type { ApiError } from '@/lib/errors';
+import { toApiError } from '@/lib/api/errors';
+import type { ApiError } from '@/lib/api/errors';
 
 interface ReviewsListState {
   reviews: Review[];

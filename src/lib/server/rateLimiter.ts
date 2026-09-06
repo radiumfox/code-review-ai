@@ -2,7 +2,7 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
 import { apiErrorResponse } from './apiErrorResponse';
-import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;

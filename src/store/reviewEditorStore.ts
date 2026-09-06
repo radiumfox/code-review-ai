@@ -4,8 +4,8 @@ import { Review, ReviewGenerateRequest } from '@/lib/types';
 import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
-import { toApiError } from '@/lib/errors';
-import type { ApiError } from '@/lib/errors';
+import { toApiError } from '@/lib/api/errors';
+import type { ApiError } from '@/lib/api/errors';
 
 interface ReviewEditorState {
   currentReview: Review | null;

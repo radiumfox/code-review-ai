@@ -5,7 +5,7 @@ import { UserModel } from '@/models/User';
 import { userModelRequest } from '@/lib/validations/userModelRequest';
 import { prettifyError } from 'zod';
 import { apiErrorResponse } from '@/lib/server';
-import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 export async function POST(request: NextRequest) {
   try {
