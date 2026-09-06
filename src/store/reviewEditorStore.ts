@@ -32,6 +32,7 @@ export const initialState: ReviewEditorState = {
 export const createReview = createAsyncThunk<ApiSuccess<Review>, ReviewGenerateRequest, { rejectValue: ApiError }>(
   'reviews/createReview',
   async (params, { rejectWithValue }) => {
+    console.log(params);
     try {
       const response = await fetch(API_ROUTES.createReview, {
         method: 'POST',

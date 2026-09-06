@@ -1,155 +1,42 @@
 'use client';
 
 import CodeMirror from '@uiw/react-codemirror';
-import { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { auraInit } from '@uiw/codemirror-theme-aura';
+import { useCallback, useState } from 'react';
 import { LanguageSelect } from '@/components/LanguageSelect';
-import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
-import {
-  EDITOR_BASIC_SETUP, EDITOR_TEST_IDS,
-  THEME_CUSTOM_SETTINGS
-} from './config';
-import { hoverIssueTooltip, issueDecorationsField, issuesField, setIssuesEffect } from './plugins';
+import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
+import { useCodeEditor } from './useCodeEditor';
+import { useGetReview } from './useGetReview';
 import { ReviewSummary } from '@/components/ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
-import { NotificationType, useNotification } from '@/lib/notifications';
 import { ReviewsList } from '@/components/ReviewsList';
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch } from '@/store';
-import {
-  createReview,
-  selectCurrentReview,
-  selectLang,
-  selectModel,
-  selectCreateReviewLoading,
-  selectCreateReviewError,
-  selectCodeSnippet,
-  selectSummary,
-  setLanguage,
-  setCodeSnippet,
-  setModel
-} from '@/store/reviewEditorStore';
-import { fetchReviews } from '@/store/reviewsListStore';
-import { CodingLanguage } from '@/lib/types';
 import { ButtonBorder } from '@/components/ButtonBorder';
-import { useSession } from 'next-auth/react';
-import { Extension } from '@codemirror/state';
-import { languageLoaders } from '@/components/CodeEditor/plugins/languageLoaders';
 import { CommentsList } from '@/components/CommentsList';
-import type { Comment } from '@/components/CommentsList/types';
 
 export function CodeEditor() {
-  const codeSnippet = useSelector(selectCodeSnippet);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
-  const { showNotification } = useNotification();
-  const currentReview = useSelector(selectCurrentReview);
-  const summary = useSelector(selectSummary);
-  const language = useSelector(selectLang);
-  const model = useSelector(selectModel);
-  const reviewLoading = useSelector(selectCreateReviewLoading);
-  const reviewError = useSelector(selectCreateReviewError);
-  const dispatch = useDispatch<AppDispatch>();
-  const { data: session } = useSession();
-  const [languageExtension, setLanguageExtension] = useState<Extension | null>(null);
+  const {
+    codeSnippet,
+    viewRef,
+    language,
+    languageName,
+    model,
+    summary,
+    onLanguageChange,
+    onValueChange,
+    linesCount,
+    extensions,
+    theme,
+    comments,
+  } = useCodeEditor();
 
-  const viewRef = useRef<ReactCodeMirrorRef>(null);
-
-  useEffect(() => {
-    if(!model && session?.user?.aiModel) {
-      dispatch(setModel(session.user.aiModel));
-    }
-  }, [model, session?.user?.aiModel, dispatch]);
-
-  useEffect(() => {
-    if(reviewError) {
-      showNotification({
-        type: NotificationType.Error,
-        message: reviewError.message,
-      });
-    }
-  }, [reviewError, showNotification]);
-
-  useEffect(() => {
-    viewRef.current?.view?.dispatch({
-      effects: setIssuesEffect.of(currentReview?.issues ?? []),
-    });
-  }, [currentReview]);
-
-  const onValueChange = useCallback((val: string) => {
-    dispatch(setCodeSnippet(val));
-  }, [dispatch]);
-
-  const linesCount = useMemo(() => {
-    const valueLength = codeSnippet.split('\n').length;
-    return `${valueLength} line${valueLength !== 1 ? 's' : ''}`;
-  }, [codeSnippet]);
-
-  const languageName = useMemo(() => {
-    if(language && LANGUAGES_NAMES_MAP[language]) return LANGUAGES_NAMES_MAP[language];
-
-    return language ?? 'Unknown language';
-  }, [language]);
-
-  const extensions = useMemo(() => {
-    const list: Extension[] = [hoverIssueTooltip, issueDecorationsField, issuesField];
-    if (languageExtension) list.push(languageExtension);
-    return list;
-  }, [languageExtension]);
-
-  const theme = useMemo(() => {
-    return auraInit(THEME_CUSTOM_SETTINGS);
-  }, []);
-
-  const comments: Comment[] = useMemo(() => {
-    if (!currentReview?.issues) return [];
-
-    return currentReview.issues.map((issue, index) => ({
-      id: `${currentReview.id}-${index}`,
-      issue: issue.message,
-      suggestedFix: issue.suggestion,
-      category: issue.category,
-      severity: issue.severity
-    }));
-  }, [currentReview]);
-
-  const getReview = () => {
-    if(!language || !model) {
-      showNotification({
-        type: NotificationType.Error,
-        message: 'Language or model is missing',
-      });
-
-      return;
-    }
-
-    dispatch(createReview({
-      language,
-      codeSnippet,
-      model
-    })).then((result) => {
-      if(result.payload?.ok) {
-        dispatch(fetchReviews({ page: 0 }));
-      }
-    });
-  };
-
-  const onLanguageChange = useCallback((value: CodingLanguage) => {
-    dispatch(setLanguage(value));
-
-    const cancelled = false;
-    if (value) {
-      languageLoaders[value]?.().then((ext) => {
-        if (!cancelled) setLanguageExtension(ext);
-      });
-    } else {
-      setLanguageExtension(null);
-    }
-  }, [dispatch]);
+  const {
+    reviewLoading,
+    getReview,
+  } = useGetReview();
 
   const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
 
