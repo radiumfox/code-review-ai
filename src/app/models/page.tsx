@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { ChooseAIModelForm } from '@/components/ChooseAIModelForm';
+import { ChooseAIModelForm } from '@/features/chooseAIModel';
 import { ROUTES } from '@/lib/config';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 

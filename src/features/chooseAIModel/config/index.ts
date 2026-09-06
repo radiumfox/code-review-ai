@@ -1,4 +1,4 @@
-import { ProviderItem } from '@/components/ChooseAIModelForm/types';
+import { ProviderItem } from '../types';
 
 export const PROVIDERS: ProviderItem[] = [
   { id: 'openai', label: 'OpenAI', available: true },
