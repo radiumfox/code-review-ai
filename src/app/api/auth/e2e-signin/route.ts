@@ -4,11 +4,14 @@ import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
 import { apiErrorResponse, ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
+import { connectToDatabase } from '@/lib/api';
 
 export async function GET() {
   if (process.env.E2E_TEST !== 'true') {
     return apiErrorResponse('Not found', ERROR_CODES.NOT_FOUND, STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND]);
   }
+
+  await connectToDatabase();
 
   const currentUser = await UserModel.findOneAndUpdate(
     { email: 'e2e@test.local' },

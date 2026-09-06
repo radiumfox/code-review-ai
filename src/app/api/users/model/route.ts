@@ -7,6 +7,7 @@ import { prettifyError } from 'zod';
 import { apiErrorResponse } from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
+import { connectToDatabase } from '@/lib/api';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +24,8 @@ export async function POST(request: NextRequest) {
     if(!input.success) {
       return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
+
+    await connectToDatabase();
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       session.user.id,

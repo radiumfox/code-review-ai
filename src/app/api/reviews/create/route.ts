@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { createReview } from '@/lib/createReviewService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { applyRateLimiter } from '@/lib/api';
+import { applyRateLimiter, connectToDatabase } from '@/lib/api';
 import { apiErrorResponse } from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { prettifyError } from 'zod';
@@ -27,6 +27,8 @@ export async function POST(request: NextRequest) {
     if(!input.success) {
       return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
+
+    await connectToDatabase();
 
     const review = await createReview(session.user.id, input.data);
     return apiSuccessResponse({ ...review._doc, id: review._id });

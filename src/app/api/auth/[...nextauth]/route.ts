@@ -3,6 +3,7 @@ import GithubProvider from 'next-auth/providers/github';
 import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
 import { UserRole } from '@/lib/types';
+import { connectToDatabase } from '@/lib/api';
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
@@ -57,6 +58,8 @@ export const authOptions = {
 
       if(user?.email) {
         try {
+          await connectToDatabase();
+
           const currentUser = await UserModel.findOne({ email: user.email });
 
           if(currentUser) {
@@ -68,6 +71,8 @@ export const authOptions = {
         }
       } else if(!token.id) {
         try {
+          await connectToDatabase();
+
           const currentUser = token.email
             ? await UserModel.findOne({ email: token.email })
             : null;
@@ -87,6 +92,8 @@ export const authOptions = {
       if(!user.email) return false;
 
       try {
+        await connectToDatabase();
+
         await UserModel.findOneAndUpdate({ email: user.email }, {
           name: user.name,
           email: user.email,
