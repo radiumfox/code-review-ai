@@ -20,7 +20,7 @@ import {
   resetCurrentReview,
   selectCurrentReview
 } from '@/store/reviewEditorStore';
-import { ReviewPreloader } from '@/components/ReviewsList/ReviewPreloader';
+import { ReviewPreloader } from './ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';

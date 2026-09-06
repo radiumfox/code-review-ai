@@ -18,7 +18,7 @@ import { useSession } from 'next-auth/react';
 import { THEME_CUSTOM_SETTINGS } from './config';
 import { hoverIssueTooltip, issueDecorationsField, issuesField, setIssuesEffect } from './plugins';
 import { useLanguage } from './useLanguage';
-import type { Comment } from '@/components/CommentsList/types';
+import type { Comment } from './CommentsList/types';
 
 export function useCodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);

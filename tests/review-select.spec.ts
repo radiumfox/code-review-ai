@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { DEFAULT_EDITOR_VALUE, API_ROUTES, ROUTES } from '@/lib/config';
-import { EDITOR_TEST_IDS } from '@/components/CodeEditor/config';
+import { EDITOR_TEST_IDS } from '@/features/codeEditor/config';
 import { mockReview } from './helpers';
 
 test.describe('Review selection', () => {

@@ -8,12 +8,12 @@ import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
 import { useCodeEditor } from './useCodeEditor';
 import { useGetReview } from './useGetReview';
-import { ReviewSummary } from '@/components/ReviewSummary';
+import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
-import { ReviewsList } from '@/components/ReviewsList';
+import { ReviewsList } from './ReviewsList';
 import { ButtonBorder } from '@/components/ButtonBorder';
-import { CommentsList } from '@/components/CommentsList';
+import { CommentsList } from './CommentsList';
 
 export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);

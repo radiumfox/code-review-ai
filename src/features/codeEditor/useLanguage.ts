@@ -7,7 +7,7 @@ import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import type { AppDispatch } from '@/store';
 import type { CodingLanguage } from '@/lib/types';
 import { selectLang, setLanguage } from '@/store/reviewEditorStore';
-import { languageLoaders } from '@/components/CodeEditor/plugins/languageLoaders';
+import { languageLoaders } from './plugins/languageLoaders';
 
 export function useLanguage() {
   const language = useSelector(selectLang);

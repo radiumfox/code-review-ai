@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDate, formatTime } from '@/components/ReviewsList/helpers';
+import { formatDate, formatTime } from './helpers';
 import { Review } from '@/lib/types';
 
 interface ReviewItemProps {

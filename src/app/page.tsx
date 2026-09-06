@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
-import { CodeEditor } from '@/components/CodeEditor';
-import { ReviewsList } from '@/components/ReviewsList';
+import { CodeEditor } from '@/features/codeEditor';
+import { ReviewsList } from '@/features/codeEditor/ReviewsList';
 import { ROUTES } from '@/lib/config';
 
 export default async function Home() {
