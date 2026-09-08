@@ -5,6 +5,7 @@ import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
 import { AuthProvider, UserRole } from '@/lib/types';
 import { connectToDatabase } from '@/lib/api';
+import { ROUTES } from '@/lib/config';
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
@@ -40,6 +41,8 @@ if(!NEXTAUTH_SECRET){
   throw new Error('Missing NEXTAUTH_SECRET environment variable');
 }
 
+class SignInRejectedError extends Error {}
+
 export const authOptions = {
   providers: [
     GithubProvider({
@@ -54,6 +57,9 @@ export const authOptions = {
       : []),
   ],
   secret: NEXTAUTH_SECRET,
+  pages: {
+    error: ROUTES.login,
+  },
   callbacks: {
     async session({ session, token }) {
       if(session.user) {
@@ -112,15 +118,33 @@ export const authOptions = {
           ? { googleId: profile?.sub, provider: AuthProvider.Google }
           : { githubUsername: profile?.login, githubId: profile?.id, provider: AuthProvider.Github };
 
+        const existingUser = await UserModel.findOne({ email: user.email });
+        const existingProvider = existingUser?.provider ?? AuthProvider.Github;
+
+        if (existingUser && existingProvider !== account?.provider) {
+          const originalProvider = existingProvider === AuthProvider.Google ? 'Google' : 'GitHub';
+          throw new SignInRejectedError(
+            `This email is already registered with ${originalProvider}. Please sign in with ${originalProvider} instead.`
+          );
+        }
+
         await UserModel.findOneAndUpdate({ email: user.email }, {
-          name: user.name,
-          email: user.email,
-          role: UserRole.User,
-          ...providerFields
+          $set: {
+            name: user.name,
+            email: user.email,
+            ...providerFields
+          },
+          $setOnInsert: {
+            role: UserRole.User
+          }
         }, { upsert: true });
 
         return true;
       } catch (error) {
+        if (error instanceof SignInRejectedError) {
+          throw error;
+        }
+
         console.error(error);
         return false;
       }
