@@ -10,9 +10,15 @@ import { AIChoice } from '@/lib/genAI/openai/types';
 
 
 function buildPrompt(input: ReviewGenerateRequest) {
+  const normalizedCode = input.codeSnippet.replace(/\r\n?/g, '\n').replace(/\s+$/g, '');
+  const numberedCode = normalizedCode
+    .split('\n')
+    .map((line, index) => `${index + 1}: ${line}`)
+    .join('\n');
+
   return fillTemplate(promptTemplate.template, {
     language: input.language,
-    codeSnippet: input.codeSnippet
+    codeSnippet: numberedCode
   });
 }
 
