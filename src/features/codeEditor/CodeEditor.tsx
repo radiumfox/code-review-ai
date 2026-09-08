@@ -12,7 +12,7 @@ import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { ReviewsList } from './ReviewsList';
-import { ButtonBorder } from '@/components/ButtonBorder';
+import { SpinnerBase } from '@/components/SpinnerBase';
 import { CommentsList } from './CommentsList';
 
 export function CodeEditor() {
@@ -43,8 +43,8 @@ export function CodeEditor() {
   const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
 
   return (
-    <div className="transition-all duration-300">
-      <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden">
+    <div className="transition-all duration-300 h-full flex flex-col">
+      <div className="bg-[#0d0d2b] rounded-xl border border-[#1e1e4a] shadow-2xl shadow-black/50 overflow-hidden flex flex-col flex-1 min-h-0">
         {/* Toolbar */}
         <div className={
           `flex flex-col gap-2 sm:gap-3
@@ -96,7 +96,7 @@ export function CodeEditor() {
         </div>
 
         {/* Editor + Summary */}
-        <div className="flex flex-col md:flex-row h-75 lg-y:h-150 xl-y:h-200">
+        <div className="flex flex-col md:flex-row flex-1 min-h-0">
           {/* Editor */}
           <CodeMirror
             ref={viewRef}
@@ -107,7 +107,7 @@ export function CodeEditor() {
             onChange={onValueChange}
             basicSetup={EDITOR_BASIC_SETUP}
             theme={theme}
-            className="flex-1"
+            className="flex-1 min-w-0 min-h-0"
             aria-description="Code editor"
             placeholder="Write your code here..."
             readOnly={reviewLoading}
@@ -119,7 +119,7 @@ export function CodeEditor() {
           {/* Summary panel */}
           <ReviewSummary
             text={summary}
-            className="hidden md:flex md:w-50 xl:w-75"
+            className="hidden md:flex w-[40%]"
           >
             {comments.length > 0 && (
               <CommentsList comments={comments} />
@@ -128,25 +128,27 @@ export function CodeEditor() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
-          <span className="text-body text-gray-500 truncate" data-testid={EDITOR_TEST_IDS.languageName}>
-            {languageName}
-          </span>
-          <span className="text-body text-gray-500">
-            {linesCount}
-          </span>
+        <div className="flex flex-col gap-2 px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]">
+          <div className="flex items-center justify-between">
+            <span className="text-body text-gray-500 truncate" data-testid={EDITOR_TEST_IDS.languageName}>
+              {languageName}
+            </span>
+            <span className="text-body text-gray-500">
+              {linesCount}
+            </span>
+          </div>
+          <div className="flex w-full justify-end">
+            <button
+                type="button"
+                onClick={getReview}
+                disabled={reviewLoading}
+                className="max-w-[500px] w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
+            >
+              {reviewLoading ? <SpinnerBase /> : <StarIcon className="w-4 h-4" />}
+              {reviewLoading ? 'Reviewing...' : 'Get Review'}
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Review button */}
-      <div className="mt-6 flex justify-center">
-        <ButtonBorder
-          text={reviewLoading ? 'Reviewing...' : 'Get Review'}
-          onClick={getReview}
-          icon={<StarIcon />}
-          isLoading={reviewLoading}
-          size="lg"
-        />
       </div>
 
       {/* Mobile summary drawer */}
