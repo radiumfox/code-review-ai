@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toApiError } from '@/lib/api/errors';
+import { isApiFailure, isApiSuccess } from '@/lib/api/result';
+import type { ApiError } from '@/lib/api/errors';
 
 export function useFetch<P extends object, T = unknown>(
   url: string,
@@ -6,7 +9,7 @@ export function useFetch<P extends object, T = unknown>(
   headers?: Record<string, string>
 ) {
   const [data, setData] = useState<T>();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError | null>(null);
   const [loading, setLoading] = useState(false);
 
   const controllerRef = useRef(new AbortController());
@@ -45,19 +48,30 @@ export function useFetch<P extends object, T = unknown>(
           }
         });
 
-      const responseData = await response.json();
+      const responseData: unknown = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        setError(`${response.statusText}: ${responseData.error}`);
+      if (isApiFailure(responseData)) {
+        setError(responseData);
 
         console.error(responseData);
         return;
       }
 
-      setData(responseData);
+      if (isApiSuccess<T>(responseData)) {
+        setData(responseData.data);
+        return;
+      }
+
+      const apiError = toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      });
+
+      setError(apiError);
+
+      console.error(apiError);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error fetching data';
-      setError(errorMessage);
+      setError(toApiError(error));
 
       console.error(error);
     } finally {

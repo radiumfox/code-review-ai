@@ -13,7 +13,7 @@ interface NotificationBaseProps {
 }
 
 const typeStyles: Record<NotificationType, string> = {
-  [NotificationType.Error]: 'border-l-4 border-[#ff5555]',
+  [NotificationType.Error]: 'border-l-4 border-destructive',
   [NotificationType.Warning]: 'border-l-4 border-[#ffb86c]',
   [NotificationType.Neutral]: 'border-l-4 border-[#6c6cff]',
 };
@@ -76,7 +76,7 @@ export function NotificationBase({
 
   return (
     <div
-      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-[#dfdfe2] text-sm ${typeStyles[type]} ${className}`}
+      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-[#dfdfe2] text-body ${typeStyles[type]} ${className}`}
       style={{ backgroundColor: `${typeBackgrounds[type]}15` }}
     >
       <span>{message}</span>

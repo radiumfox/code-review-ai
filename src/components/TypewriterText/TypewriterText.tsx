@@ -7,9 +7,10 @@ interface TypewriterTextProps {
   text: string;
   speed?: number;
   className?: string;
+  onComplete?: () => void;
 }
 
-export function TypewriterText({ text, speed = 30, className = '' }: TypewriterTextProps) {
+export function TypewriterText({ text, speed = 30, className = '', onComplete }: TypewriterTextProps) {
   const [displayedCount, setDisplayedCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
@@ -25,11 +26,12 @@ export function TypewriterText({ text, speed = 30, className = '' }: TypewriterT
       if (index >= text.length) {
         setIsComplete(true);
         clearInterval(timer);
+        onComplete?.();
       }
     }, speed);
 
     return () => clearInterval(timer);
-  }, [text, speed]);
+  }, [text, speed, onComplete]);
 
   return (
     <span className={className} data-testid={TYPEWRITER_TEST_IDS.typewriterText}>

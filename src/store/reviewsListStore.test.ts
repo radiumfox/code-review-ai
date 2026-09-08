@@ -19,6 +19,7 @@ import type { RootState } from '@/store';
 import { DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
 import type { Review } from '@/lib/types';
+import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 function createMockReview(overrides: Partial<Review> = {}): Review {
   return {
@@ -156,13 +157,23 @@ describe('extraReducers - fetchReviews', () => {
   test('rejected sets error and loading false', () => {
     state = reviewsListSlice.reducer(state, {
       type: fetchReviews.rejected.type,
-      payload: 'Network error',
+      payload: {
+        message: 'Network error',
+        code: ERROR_CODES.NETWORK,
+        statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
+      },
     });
 
     const root = asRootState(state);
 
     expect(selectReviewsLoading(root)).toBe(false);
-    expect(selectReviewsError(root)).toBe('Network error');
+    expect(selectReviewsError(root)).toEqual({
+      message: 'Network error',
+      code: ERROR_CODES.NETWORK,
+      statusCode: FALLBACK_STATUS_CODE,
+      ok: false,
+    });
   });
 });
 
@@ -219,7 +230,17 @@ describe('async thunks', () => {
       const reviews = [createMockReview({ id: '1' })];
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ data: reviews }),
+        json: () => Promise.resolve({
+          ok: true,
+          data: {
+            metadata: {
+              totalCount: reviews.length,
+              page: 0,
+              pageSize: REVIEWS_LIST_LIMIT,
+            },
+            data: reviews,
+          },
+        }),
       });
 
       const store = createTestStore();
@@ -233,6 +254,7 @@ describe('async thunks', () => {
     test('Dispatches rejected on API error response', async () => {
       fetchMock.mockResolvedValue({
         ok: false,
+        status: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
         json: () => Promise.resolve({ error: 'Server error' }),
       });
 
@@ -240,7 +262,12 @@ describe('async thunks', () => {
       await store.dispatch(fetchReviews({ page: 0 }));
 
       const state = store.getState();
-      expect(selectReviewsError(state)).toBe('Server error');
+      expect(selectReviewsError(state)).toEqual({
+        message: 'Server error',
+        code: ERROR_CODES.INTERNAL_SERVER,
+        statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER],
+        ok: false,
+      });
       expect(selectReviewsLoading(state)).toBe(false);
     });
 
@@ -251,7 +278,12 @@ describe('async thunks', () => {
       await store.dispatch(fetchReviews({ page: 0 }));
 
       const state = store.getState();
-      expect(selectReviewsError(state)).toBe('Network failure');
+      expect(selectReviewsError(state)).toEqual({
+        message: 'Network failure',
+        code: ERROR_CODES.NETWORK,
+        statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
+      });
     });
   });
 });

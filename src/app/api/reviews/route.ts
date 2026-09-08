@@ -1,27 +1,32 @@
 import { ReviewModel } from '@/models/Review';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
 import { prettifyError } from 'zod';
+import { apiErrorResponse } from '@/lib/api/errors';
+import { apiSuccessResponse } from '@/lib/api/result';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
+import { connectToDatabase } from '@/lib/api';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if(!session) {
-      return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
+      return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
     }
 
     const body = await request.json();
     const input = reviewListRequestSchema.safeParse(body);
 
     if(!input.success) {
-      const error = prettifyError(input.error);
-      return NextResponse.json({ error }, { status: 400 });
+      return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
+
+    await connectToDatabase();
 
     const result = await ReviewModel.aggregate([
       { $match: { userId: { $eq: new ObjectId(session.user.id) } }, },
@@ -52,10 +57,10 @@ export async function POST(request: NextRequest) {
       data: result[0]?.data
     };
 
-    return NextResponse.json(data, { status: 200 });
+    return apiSuccessResponse(data);
   } catch(error) {
     console.error(error);
 
-    return NextResponse.json({ error: 'Error fetching reviews list' }, { status: 500 });
+    return apiErrorResponse('Error fetching reviews list', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }

@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { UserModel } from '@/models/User';
 import { userModelRequest } from '@/lib/validations/userModelRequest';
 import { prettifyError } from 'zod';
+import { apiErrorResponse } from '@/lib/api/errors';
+import { apiSuccessResponse } from '@/lib/api/result';
+import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
+import { connectToDatabase } from '@/lib/api';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if(!session) {
-      return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
+      return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
     }
 
     const body = await request.json();
@@ -18,9 +22,10 @@ export async function POST(request: NextRequest) {
     const input = userModelRequest.safeParse(body);
 
     if(!input.success) {
-      const error = prettifyError(input.error);
-      return NextResponse.json({ error }, { status: 400 });
+      return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
+
+    await connectToDatabase();
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       session.user.id,
@@ -29,12 +34,12 @@ export async function POST(request: NextRequest) {
     );
 
     if(!updatedUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return apiErrorResponse('User not found', ERROR_CODES.NOT_FOUND, STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND]);
     }
 
-    return NextResponse.json({ data: { model: updatedUser.aiModel } }, { status: 200 });
+    return apiSuccessResponse({ model: updatedUser.aiModel });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Error saving model' }, { status: 500 });
+    return apiErrorResponse('Error saving model', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }

@@ -9,6 +9,5 @@ export const API_ROUTES = {
 
 export const ROUTES = {
   main: '/',
-  models: '/models',
   login: '/login',
 };

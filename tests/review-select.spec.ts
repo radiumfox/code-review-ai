@@ -1,29 +1,37 @@
 import { test, expect } from '@playwright/test';
 import { DEFAULT_EDITOR_VALUE, API_ROUTES, ROUTES } from '@/lib/config';
-import { EDITOR_TEST_IDS } from '@/components/CodeEditor/config';
+import { EDITOR_TEST_IDS } from '@/features/codeEditor/config';
 import { mockReview } from './helpers';
 
-test.describe('Review selection', () => {
-  test.beforeEach('Log in', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto(API_ROUTES.authE2E);
-    await page.waitForURL(ROUTES.main);
+async function mockReviewsList(page: import('@playwright/test').Page, reviews: ReturnType<typeof mockReview>[]): Promise<void> {
+  await page.route(API_ROUTES.reviewsList, async route => {
+    await new Promise(f => setTimeout(f, 500));
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: true,
+        data: {
+          metadata: { totalCount: reviews.length, page: 0, pageSize: 20 },
+          data: reviews,
+        },
+      }),
+    });
   });
+}
 
+async function logIn(page: import('@playwright/test').Page): Promise<void> {
+  await page.goto(API_ROUTES.authE2E);
+  await page.waitForURL(ROUTES.main);
+}
+
+test.describe('Review selection', () => {
   test('Review list is fetched and displayed', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
     const review = mockReview();
 
-    await page.route(API_ROUTES.reviewsList, async route => {
-      await new Promise(f => setTimeout(f, 500));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          metadata: { totalCount: 1, page: 0, pageSize: 20 },
-          data: [review],
-        }),
-      });
-    });
+    await mockReviewsList(page, [review]);
+    await logIn(page);
 
     await page.waitForResponse(resp =>
       resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
@@ -33,6 +41,7 @@ test.describe('Review selection', () => {
   });
 
   test('User can click a review to see it in the code editor and summary', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
     const pyReview = mockReview({
       id: 'py-review-id',
       language: 'py',
@@ -40,17 +49,8 @@ test.describe('Review selection', () => {
       summary: 'This is a review for a Python script.',
     });
 
-    await page.route(API_ROUTES.reviewsList, async route => {
-      await new Promise(f => setTimeout(f, 500));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          metadata: { totalCount: 1, page: 0, pageSize: 20 },
-          data: [pyReview],
-        }),
-      });
-    });
+    await mockReviewsList(page, [pyReview]);
+    await logIn(page);
 
     await page.waitForResponse(resp =>
       resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
@@ -69,6 +69,7 @@ test.describe('Review selection', () => {
   });
 
   test('New Review button resets editor to default state', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
     const pyReview = mockReview({
       id: 'py-review-id',
       language: 'py',
@@ -76,17 +77,8 @@ test.describe('Review selection', () => {
       summary: 'This is a review for a Python script.',
     });
 
-    await page.route(API_ROUTES.reviewsList, async route => {
-      await new Promise(f => setTimeout(f, 500));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          metadata: { totalCount: 1, page: 0, pageSize: 20 },
-          data: [pyReview],
-        }),
-      });
-    });
+    await mockReviewsList(page, [pyReview]);
+    await logIn(page);
 
     await page.waitForResponse(resp =>
       resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200

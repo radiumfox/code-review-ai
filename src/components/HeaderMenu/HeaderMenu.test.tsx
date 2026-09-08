@@ -51,24 +51,22 @@ describe('HeaderMenu', () => {
 
     expect(screen.getByTestId(HEADER_MENU_TEST_IDS.menuPanel)).toBeDefined();
     expect(screen.getByText('Main page')).toBeDefined();
-    expect(screen.getByText('Select model')).toBeDefined();
     expect(screen.getByText('Log out')).toBeDefined();
   });
 
-  test('Renders links to main and select model pages', () => {
+  test('Renders link to main page', () => {
     render(<HeaderMenu />);
 
     fireEvent.click(screen.getByTestId(HEADER_MENU_TEST_IDS.menuButton));
 
     expect(screen.getByTestId(HEADER_MENU_TEST_IDS.mainPageLink).getAttribute('href')).toBe('/');
-    expect(screen.getByTestId(HEADER_MENU_TEST_IDS.selectModelLink).getAttribute('href')).toBe('/models');
   });
 
   test('Closes menu when a link is clicked', () => {
     render(<HeaderMenu />);
 
     fireEvent.click(screen.getByTestId(HEADER_MENU_TEST_IDS.menuButton));
-    fireEvent.click(screen.getByTestId(HEADER_MENU_TEST_IDS.selectModelLink));
+    fireEvent.click(screen.getByTestId(HEADER_MENU_TEST_IDS.mainPageLink));
 
     expect(screen.queryByTestId(HEADER_MENU_TEST_IDS.menuPanel)).toBeNull();
   });
@@ -107,14 +105,5 @@ describe('HeaderMenu', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(screen.queryByTestId(HEADER_MENU_TEST_IDS.menuPanel)).toBeNull();
-  });
-
-  test('Highlights active link based on pathname', () => {
-    usePathnameMock.mockReturnValue(ROUTES.models);
-    render(<HeaderMenu />);
-
-    fireEvent.click(screen.getByTestId(HEADER_MENU_TEST_IDS.menuButton));
-
-    expect(screen.getByTestId(HEADER_MENU_TEST_IDS.selectModelLink).className).toContain('text-[#6c6cff]');
   });
 });

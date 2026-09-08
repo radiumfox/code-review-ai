@@ -1,1 +1,1 @@
-export * from './SlideOutDrawer';
+export { SlideOutDrawer } from './SlideOutDrawer';

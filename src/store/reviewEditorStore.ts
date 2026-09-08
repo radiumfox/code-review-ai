@@ -4,11 +4,15 @@ import { Review, ReviewGenerateRequest } from '@/lib/types';
 import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
+import { toApiError } from '@/lib/api/errors';
+import { isApiFailure, isApiSuccess } from '@/lib/api/result';
+import type { ApiError } from '@/lib/api/errors';
+import type { ApiSuccess } from '@/lib/api/result';
 
 interface ReviewEditorState {
   currentReview: Review | null;
   createReviewLoading: boolean;
-  createReviewError: string | null;
+  createReviewError: ApiError | null;
   language: CodingLanguage | null;
   model: string | null;
   codeSnippet: string;
@@ -25,7 +29,7 @@ export const initialState: ReviewEditorState = {
   summary: '',
 };
 
-export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
+export const createReview = createAsyncThunk<ApiSuccess<Review>, ReviewGenerateRequest, { rejectValue: ApiError }>(
   'reviews/createReview',
   async (params, { rejectWithValue }) => {
     try {
@@ -35,17 +39,22 @@ export const createReview = createAsyncThunk<Review, ReviewGenerateRequest>(
         body: JSON.stringify(params)
       });
 
-      const result = await response.json();
+      const responseData: unknown = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        return rejectWithValue(result.error ?? 'Error creating review');
+      if (isApiFailure(responseData)) {
+        return rejectWithValue(responseData);
       }
 
-      return result.data as Review;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error creating review';
+      if (isApiSuccess<Review>(responseData)) {
+        return responseData;
+      }
 
-      return rejectWithValue(message);
+      return rejectWithValue(toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      }));
+    } catch (error) {
+      return rejectWithValue(toApiError(error));
     }
   },
   {
@@ -99,15 +108,15 @@ export const reviewEditorSlice = createSlice({
       })
       .addCase(createReview.fulfilled, (state, action) => {
         state.createReviewLoading = false;
-        state.currentReview = action.payload;
-        state.codeSnippet = action.payload?.codeSnippet ?? DEFAULT_EDITOR_VALUE;
-        state.summary = action.payload?.summary ?? '';
-        state.language = action.payload?.language ?? null;
-        state.model = action.payload?.model ?? null;
+        state.currentReview = action.payload.data;
+        state.codeSnippet = action.payload.data?.codeSnippet ?? DEFAULT_EDITOR_VALUE;
+        state.summary = action.payload.data?.summary ?? '';
+        state.language = action.payload.data?.language ?? null;
+        state.model = action.payload.data?.model ?? null;
       })
       .addCase(createReview.rejected, (state, action) => {
         state.createReviewLoading = false;
-        state.createReviewError = (action.payload as string) ?? 'Error creating review';
+        state.createReviewError = action.payload ?? null;
       });
   },
 });

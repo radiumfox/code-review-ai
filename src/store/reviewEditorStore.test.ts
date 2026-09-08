@@ -23,6 +23,7 @@ import type { RootState } from '@/store';
 import { DEFAULT_LANGUAGE, DEFAULT_EDITOR_VALUE } from '@/lib/config';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
 import type { Review, ReviewGenerateRequest } from '@/lib/types';
+import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 
 function createMockReview(overrides: Partial<Review> = {}): Review {
   return {
@@ -173,7 +174,7 @@ describe('extraReducers - createReview', () => {
 
     state = reviewEditorSlice.reducer(state, {
       type: createReview.fulfilled.type,
-      payload: review,
+      payload: { ok: true, data: review },
     });
     const root = asRootState(state);
 
@@ -187,12 +188,22 @@ describe('extraReducers - createReview', () => {
   test('rejected sets error and loading false', () => {
     state = reviewEditorSlice.reducer(state, {
       type: createReview.rejected.type,
-      payload: 'AI service unavailable',
+      payload: {
+        message: 'AI service unavailable',
+        code: ERROR_CODES.INTERNAL_SERVER,
+        statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
+      },
     });
     const root = asRootState(state);
 
     expect(selectCreateReviewLoading(root)).toBe(false);
-    expect(selectCreateReviewError(root)).toBe('AI service unavailable');
+    expect(selectCreateReviewError(root)).toEqual({
+      message: 'AI service unavailable',
+      code: ERROR_CODES.INTERNAL_SERVER,
+      statusCode: FALLBACK_STATUS_CODE,
+      ok: false,
+    });
   });
 });
 
@@ -211,9 +222,9 @@ describe('selector-reducer contract', () => {
 
   test('Selectors reflect state after createReview.fulfilled', () => {
     const review = createMockReview({ summary: 'All good' });
-    const state = reviewEditorSlice.reducer(initialState, {
+    const     state = reviewEditorSlice.reducer(initialState, {
       type: createReview.fulfilled.type,
-      payload: review,
+      payload: { ok: true, data: review },
     });
     const root = asRootState(state);
 
@@ -244,7 +255,7 @@ describe('async thunks', () => {
       const review = createMockReview();
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ data: review }),
+        json: () => Promise.resolve({ ok: true, data: review }),
       });
 
       const store = createTestStore();
@@ -258,6 +269,7 @@ describe('async thunks', () => {
     test('Dispatches rejected on API error', async () => {
       fetchMock.mockResolvedValue({
         ok: false,
+        status: STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION],
         json: () => Promise.resolve({ error: 'Validation failed' }),
       });
 
@@ -265,7 +277,12 @@ describe('async thunks', () => {
       await store.dispatch(createReview(params));
 
       const state = store.getState();
-      expect(selectCreateReviewError(state)).toBe('Validation failed');
+      expect(selectCreateReviewError(state)).toEqual({
+        message: 'Validation failed',
+        code: ERROR_CODES.VALIDATION,
+        statusCode: STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION],
+        ok: false,
+      });
     });
 
     test('Dispatches rejected on network failure', async () => {
@@ -275,13 +292,18 @@ describe('async thunks', () => {
       await store.dispatch(createReview(params));
 
       const state = store.getState();
-      expect(selectCreateReviewError(state)).toBe('Timeout');
+      expect(selectCreateReviewError(state)).toEqual({
+        message: 'Timeout',
+        code: ERROR_CODES.NETWORK,
+        statusCode: FALLBACK_STATUS_CODE,
+        ok: false,
+      });
     });
 
     test('Does not execute when createReviewLoading is true', async () => {
       fetchMock.mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve({ data: createMockReview() }),
+        json: () => Promise.resolve({ ok: true, data: createMockReview() }),
       });
 
       const store = createTestStore();

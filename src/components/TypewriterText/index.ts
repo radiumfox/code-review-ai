@@ -1,1 +1,1 @@
-export * from './TypewriterText';
+export { TypewriterText } from './TypewriterText';
