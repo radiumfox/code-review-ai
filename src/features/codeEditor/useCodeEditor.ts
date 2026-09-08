@@ -84,6 +84,7 @@ export function useCodeEditor() {
     languageName,
     model,
     models,
+    currentReview,
     summary,
     onLanguageChange,
     onModelChange,

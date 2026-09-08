@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { UserRole } from '@/lib/types';
+import { AuthProvider, UserRole } from '@/lib/types';
 
 const { Schema } = mongoose;
 
@@ -12,13 +12,19 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
-  githubId: {
+  provider: {
     type: String,
-    required: true
+    enum: AuthProvider,
+    default: AuthProvider.Github
+  },
+  githubId: {
+    type: String
   },
   githubUsername: {
-    type: String,
-    required: true
+    type: String
+  },
+  googleId: {
+    type: String
   },
   aiModel: {
     type: String,

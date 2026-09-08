@@ -62,7 +62,7 @@ export function SelectBase<T extends string>({
   const displayed = isOpen ? search : activeLabel;
 
   const inputClasses = useMemo(() => {
-    if(error) return 'border-[#ff5555] cursor-pointer';
+    if(error) return 'border-destructive cursor-pointer';
     if(disabled) return 'cursor-default text-[#dfdfe2]/50';
 
     const colorClasses = 'border-[#2a2a5a] focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40 text-[#dfdfe2]';
@@ -96,7 +96,7 @@ export function SelectBase<T extends string>({
         )}
         <ChevronIcon className={`${isOpen ? 'rotate-180' : ''} transition-transform duration-150`} />
       </div>
-      { error && <span className="text-[#ff5555] mt-3">{error}</span>}
+      { error && <span className="text-destructive">{error}</span>}
 
       {isOpen && !isLoading && (
         <div

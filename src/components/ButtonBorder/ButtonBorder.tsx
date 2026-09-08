@@ -25,7 +25,7 @@ export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, 
     case 'success':
       return 'border-[#4ade80] text-[#4ade80] bg-[#4ade80]/10';
     case 'error':
-      return 'border-[#ff5555] text-[#ff5555] bg-[#ff5555]/10';
+      return 'border-destructive text-destructive bg-destructive/10';
     default:
       return 'border-[#6c6cff] text-[#6c6cff] hover:bg-[#6c6cff] hover:text-[#0a0a23]';
     }

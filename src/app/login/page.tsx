@@ -2,6 +2,7 @@
 
 import { ButtonBase } from '@/components/ButtonBase';
 import { GithubIcon } from '@/components/icons/GithubIcon';
+import { GoogleIcon } from '@/components/icons/GoogleIcon';
 import { signIn, useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/config';
@@ -23,11 +24,20 @@ export default function LoginPage() {
           Sign in to start reviewing
         </p>
       </div>
-      <ButtonBase
-        onClick={ signIn }
-        text={ 'Sign in with GitHub' }
-        icon={ <GithubIcon /> }
-      />
+      <div className="flex flex-col items-center gap-4">
+        <ButtonBase
+          className="w-full"
+          onClick={ () => signIn('github') }
+          text={ 'Sign in with GitHub' }
+          icon={ <GithubIcon /> }
+        />
+        <ButtonBase
+          className="w-full"
+          onClick={ () => signIn('google') }
+          text={ 'Sign in with Google' }
+          icon={ <GoogleIcon /> }
+        />
+      </div>
     </div>
   );
 }

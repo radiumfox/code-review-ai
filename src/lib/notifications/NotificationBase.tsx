@@ -13,7 +13,7 @@ interface NotificationBaseProps {
 }
 
 const typeStyles: Record<NotificationType, string> = {
-  [NotificationType.Error]: 'border-l-4 border-[#ff5555]',
+  [NotificationType.Error]: 'border-l-4 border-destructive',
   [NotificationType.Warning]: 'border-l-4 border-[#ffb86c]',
   [NotificationType.Neutral]: 'border-l-4 border-[#6c6cff]',
 };

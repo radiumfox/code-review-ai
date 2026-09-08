@@ -82,7 +82,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
 
       {error ? (
         <div className="flex-1 flex items-center justify-center px-3 py-6">
-          <p className="text-body text-[#ff5555] text-center">{error.message}</p>
+          <p className="text-body text-destructive text-center">{error.message}</p>
         </div>
       ) : isInitialLoading && loading ? (
         <div className="flex flex-col">
