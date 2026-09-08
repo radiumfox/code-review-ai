@@ -9,38 +9,35 @@ import type { AppDispatch } from '@/store';
 import {
   selectCodeSnippet,
   selectCurrentReview,
-  selectModel,
   selectSummary,
-  setCodeSnippet,
-  setModel
+  setCodeSnippet
 } from '@/store/reviewEditorStore';
-import { useSession } from 'next-auth/react';
 import { THEME_CUSTOM_SETTINGS } from './config';
 import { hoverIssueTooltip, issueDecorationsField, issuesField, setIssuesEffect } from './plugins';
 import { useLanguage } from './useLanguage';
+import { useAIModel } from './useAIModel';
 import type { Comment } from './CommentsList/types';
 
 export function useCodeEditor() {
   const codeSnippet = useSelector(selectCodeSnippet);
   const currentReview = useSelector(selectCurrentReview);
   const summary = useSelector(selectSummary);
-  const model = useSelector(selectModel);
   const dispatch = useDispatch<AppDispatch>();
-  const { data: session } = useSession();
   const {
     language,
     languageName,
     languageExtension,
     onLanguageChange,
   } = useLanguage();
+  const {
+    model,
+    models,
+    onModelChange,
+    fetchingModels,
+    fetchModelsError,
+  } = useAIModel();
 
   const viewRef = useRef<ReactCodeMirrorRef>(null);
-
-  useEffect(() => {
-    if(!model && session?.user?.aiModel) {
-      dispatch(setModel(session.user.aiModel));
-    }
-  }, [model, session?.user?.aiModel, dispatch]);
 
   useEffect(() => {
     viewRef.current?.view?.dispatch({
@@ -85,9 +82,13 @@ export function useCodeEditor() {
     language,
     languageName,
     model,
+    models,
     summary,
     onLanguageChange,
+    onModelChange,
     onValueChange,
+    fetchingModels,
+    fetchModelsError,
     linesCount,
     extensions,
     theme,

@@ -54,7 +54,7 @@ export function HeaderMenu() {
         <nav
           aria-label="Navigation menu"
           data-testid={HEADER_MENU_TEST_IDS.menuPanel}
-          className="absolute right-0 top-full mt-2 flex flex-col border border-[#1e1e4a] bg-[#0d0d2b] shadow-2xl min-w-52"
+          className="absolute right-0 top-full mt-2 flex flex-col border border-[#1e1e4a] bg-[#0d0d2b] shadow-2xl min-w-52 z-60"
         >
           {MENU_ITEMS.map((item) => {
             const isActive =

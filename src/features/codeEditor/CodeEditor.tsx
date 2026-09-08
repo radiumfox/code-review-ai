@@ -2,7 +2,7 @@
 
 import CodeMirror from '@uiw/react-codemirror';
 import { useCallback, useState } from 'react';
-import { LanguageSelect } from '@/components/LanguageSelect';
+import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
@@ -14,6 +14,7 @@ import { ButtonIcon } from '@/components/ButtonIcon';
 import { ReviewsList } from './ReviewsList';
 import { SpinnerBase } from '@/components/SpinnerBase';
 import { CommentsList } from './CommentsList';
+import { AIModelSelect } from './AIModelSelect';
 
 export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
@@ -24,9 +25,13 @@ export function CodeEditor() {
     language,
     languageName,
     model,
+    models,
     summary,
     onLanguageChange,
+    onModelChange,
     onValueChange,
+    fetchingModels,
+    fetchModelsError,
     linesCount,
     extensions,
     theme,
@@ -78,10 +83,18 @@ export function CodeEditor() {
 
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-between">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-start">
+            {/* AI model select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <span className="text-body text-gray-400 font-medium whitespace-nowrap">Model:</span>
-              <span>{ model }</span>
+              <AIModelSelect
+                value={model}
+                models={models}
+                onChange={onModelChange}
+                disabled={reviewLoading}
+                isLoading={fetchingModels}
+                error={fetchModelsError}
+              />
             </div>
             {/* Language select */}
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
@@ -139,10 +152,10 @@ export function CodeEditor() {
           </div>
           <div className="flex w-full justify-end">
             <button
-                type="button"
-                onClick={getReview}
-                disabled={reviewLoading}
-                className="max-w-[500px] w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
+              type="button"
+              onClick={getReview}
+              disabled={reviewLoading}
+              className="max-w-[500px] w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
             >
               {reviewLoading ? <SpinnerBase /> : <StarIcon className="w-4 h-4" />}
               {reviewLoading ? 'Reviewing...' : 'Get Review'}
