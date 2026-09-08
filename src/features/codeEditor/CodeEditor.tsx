@@ -1,6 +1,6 @@
 'use client';
 
-import CodeMirror from '@uiw/react-codemirror';
+import CodeMirror, { EditorView } from '@uiw/react-codemirror';
 import { useCallback, useState } from 'react';
 import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
@@ -47,6 +47,19 @@ export function CodeEditor() {
   const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
 
   const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
+
+  const handleCommentClick = useCallback((line: number) => {
+    const view = viewRef.current?.view;
+    if (!view) return;
+    view.dispatch({
+      selection: { anchor: view.state.doc.line(line).from },
+      effects: EditorView.scrollIntoView(view.state.doc.line(line).from, { y: 'center' }),
+      scrollIntoView: true
+    });
+    view.focus();
+
+    closeSummary();
+  }, [viewRef]);
 
   return (
     <div className="transition-all duration-300 h-full flex flex-col">
@@ -136,7 +149,7 @@ export function CodeEditor() {
             className="hidden md:flex w-[40%] h-[calc(100%+50px)]"
           >
             {comments.length > 0 && (
-              <CommentsList comments={comments} />
+              <CommentsList comments={comments} onCommentClick={handleCommentClick} />
             )}
           </ReviewSummary>
         </div>
@@ -145,7 +158,7 @@ export function CodeEditor() {
         <div className="px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]  md:w-[60%]">
           <div className="flex gap-2 items-center">
             <p className="flex w-full text-body text-gray-500" data-testid={EDITOR_TEST_IDS.languageName}>
-              {`${languageName} · ${linesCount}`}
+              {`${languageName} • ${linesCount}`}
             </p>
             <div className="flex w-full justify-end">
               <button
@@ -176,7 +189,7 @@ export function CodeEditor() {
           className="flex-1 w-auto! h-full"
         >
           {comments.length > 0 && (
-            <CommentsList comments={comments} />
+            <CommentsList comments={comments} onCommentClick={handleCommentClick} />
           )}
         </ReviewSummary>
       </SlideOutDrawer>
@@ -193,6 +206,7 @@ export function CodeEditor() {
         <ReviewsList
           showTitle={false}
           className="w-full"
+          onReviewClick={closeReviewList}
         />
       </SlideOutDrawer>
     </div>

@@ -14,8 +14,10 @@ export interface CommentBaseProps {
   issue: string;
   suggestedFix: string;
   category: IssueCategory;
+  onClick?: (line: number) => void;
 }
 
 export interface CommentsListProps {
   comments: Comment[];
+  onCommentClick?: (line: number) => void;
 }

@@ -43,7 +43,7 @@ function groupBySeverity(comments: Comment[]): GroupedComments {
   );
 }
 
-export function CommentsList({ comments }: CommentsListProps) {
+export function CommentsList({ comments, onCommentClick }: CommentsListProps) {
   const groupedComments = useMemo(() => groupBySeverity(comments), [comments]);
 
   return (
@@ -65,6 +65,7 @@ export function CommentsList({ comments }: CommentsListProps) {
                   issue={comment.issue}
                   suggestedFix={comment.suggestedFix}
                   category={comment.category}
+                  onClick={onCommentClick}
                 />
               ))}
             </ol>

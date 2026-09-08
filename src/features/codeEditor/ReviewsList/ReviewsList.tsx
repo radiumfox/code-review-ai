@@ -24,13 +24,15 @@ import { ReviewPreloader } from './ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
+import { Review } from '@/lib/types';
 
 interface ReviewsListProps {
   className?: string;
   showTitle?: boolean;
+  onReviewClick?: () => void;
 }
 
-export function ReviewsList({ className = '', showTitle = true }: ReviewsListProps) {
+export function ReviewsList({ className = '', showTitle = true, onReviewClick = () => {} }: ReviewsListProps) {
   const dispatch = useDispatch<AppDispatch>();
   const reviews = useSelector(selectReviews);
   const loading = useSelector(selectReviewsLoading);
@@ -70,6 +72,11 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
     });
   }, [reviews]);
 
+  const onReviewItemClick = useCallback((review: Review) => {
+    dispatch(setCurrentReview(review));
+    onReviewClick();
+  }, [dispatch]);
+
   useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
   return (
@@ -98,7 +105,7 @@ export function ReviewsList({ className = '', showTitle = true }: ReviewsListPro
           />
           {reviewsList.map((review) => (
             <ReviewItem
-              onClick={() => dispatch(setCurrentReview(review))}
+              onClick={() => onReviewItemClick(review)}
               key={review.id}
               review={review}
               isActive={review.id === currentReview?.id}

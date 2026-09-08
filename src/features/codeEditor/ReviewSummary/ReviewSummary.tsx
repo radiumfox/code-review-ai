@@ -21,9 +21,11 @@ const ReviewSummaryComponent = function ({ text, className = '', children }: Rev
               </code>
             </div>
           ) : (
-            <code className="text-gray-500 font-mono">
-              {'/** Summary will appear here: */'}
-            </code>
+            <div className="w-full flex justify-center items-center">
+              <code className="text-gray-500 font-mono uppercase">
+                {'/** Summary will appear here: */'}
+              </code>
+            </div>
           )}
         </div>
 
