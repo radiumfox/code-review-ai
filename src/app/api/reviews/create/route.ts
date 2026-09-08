@@ -1,6 +1,6 @@
 import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
 import { NextRequest } from 'next/server';
-import { createReview } from '@/lib/createReviewService';
+import { createReview } from '@/server/reviews';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { applyRateLimiter, connectToDatabase } from '@/lib/api';

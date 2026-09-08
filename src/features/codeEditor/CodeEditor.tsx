@@ -172,7 +172,7 @@ export function CodeEditor() {
       >
         <ReviewSummary
           text={summary}
-          className="flex-1 w-auto!"
+          className="flex-1 w-auto! h-full"
         >
           {comments.length > 0 && (
             <CommentsList comments={comments} />

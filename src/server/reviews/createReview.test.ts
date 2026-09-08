@@ -39,7 +39,7 @@ describe('createReview', () => {
 
     mockReviewCreate.mockResolvedValue(created);
 
-    const { createReview } = await import('@/lib/createReviewService/createReviewService');
+    const { createReview } = await import('@/server/reviews/createReview');
     const result = await createReview('user-1', {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
@@ -61,7 +61,7 @@ describe('createReview', () => {
   test('Throws when AI returns no candidates', async () => {
     mockGenerateContent.mockResolvedValue(undefined);
 
-    const { createReview } = await import('@/lib/createReviewService/createReviewService');
+    const { createReview } = await import('@/server/reviews/createReview');
 
     await expect(createReview('user-1', {
       language: DEFAULT_LANGUAGE,
@@ -73,7 +73,7 @@ describe('createReview', () => {
   test('Throws when AI returns empty candidates array', async () => {
     mockGenerateContent.mockResolvedValue([]);
 
-    const { createReview } = await import('@/lib/createReviewService/createReviewService');
+    const { createReview } = await import('@/server/reviews/createReview');
 
     await expect(createReview('user-1', {
       language: DEFAULT_LANGUAGE,
@@ -87,7 +87,7 @@ describe('createReview', () => {
       message: { content: 'not valid json' },
     }]);
 
-    const { createReview } = await import('@/lib/createReviewService/createReviewService');
+    const { createReview } = await import('@/server/reviews/createReview');
 
     await expect(createReview('user-1', {
       language: DEFAULT_LANGUAGE,
@@ -99,7 +99,7 @@ describe('createReview', () => {
   test('Wraps generateContent errors as aiError matching ApiError contract', async () => {
     mockGenerateContent.mockRejectedValue(new Error('Network timeout'));
 
-    const { createReview } = await import('@/lib/createReviewService/createReviewService');
+    const { createReview } = await import('@/server/reviews/createReview');
     const { isApiError, ERROR_CODES, STATUS_CODE_BY_CODE } = await import('@/lib/api/errors');
 
     try {

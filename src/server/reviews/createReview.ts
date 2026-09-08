@@ -1,26 +1,12 @@
-import { fillTemplate } from './helpers/fillTemplate';
-import promptTemplate from '@/prompts/code-review-default.json';
 import { generateContent } from '@/lib/genAI/openai';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
 import { ERROR_CODES, STATUS_CODE_BY_CODE, apiError } from '@/lib/api/errors';
+import { buildPrompt } from './helpers/buildPrompt';
 
 import { AIChoice } from '@/lib/genAI/openai/types';
 
-
-function buildPrompt(input: ReviewGenerateRequest) {
-  const normalizedCode = input.codeSnippet.replace(/\r\n?/g, '\n').replace(/\s+$/g, '');
-  const numberedCode = normalizedCode
-    .split('\n')
-    .map((line, index) => `${index + 1}: ${line}`)
-    .join('\n');
-
-  return fillTemplate(promptTemplate.template, {
-    language: input.language,
-    codeSnippet: numberedCode
-  });
-}
 
 async function callAI(prompt: string, model?: string) {
   if(!model) {
