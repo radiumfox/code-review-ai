@@ -14,9 +14,12 @@ const ReviewSummaryComponent = function ({ text, className = '', children }: Rev
       <div className="min-h-0 overflow-y-auto bg-[#0d0d2b] custom-scrollbar p-4 text-body space-y-5">
         <div>
           {text ? (
-            <code className="text-gray-200 font-mono">
-              {text}
-            </code>
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">Overall</h3>
+              <code className="text-gray-200 font-mono">
+                {text}
+              </code>
+            </div>
           ) : (
             <code className="text-gray-500 font-mono">
               {'/** Summary will appear here: */'}

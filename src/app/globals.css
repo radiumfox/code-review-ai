@@ -8,6 +8,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-destructive: #ff5555;
+  --color-warning: #ffb86c;
+  --color-suggestion: #8be9fd;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
   --text-body: 16px;

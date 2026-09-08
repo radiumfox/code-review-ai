@@ -11,10 +11,16 @@ interface GroupedComments {
   [IssueSeverity.Suggestion]: Comment[];
 }
 
-const SEVERITY_TITLES: Record<IssueSeverity, string> = {
-  [IssueSeverity.Error]: 'Errors',
-  [IssueSeverity.Warning]: 'Warnings',
-  [IssueSeverity.Suggestion]: 'Suggestions'
+const SEVERITY_TITLES: Record<IssueSeverity, (count: number) => string> = {
+  [IssueSeverity.Error]: (count) => `${count} Issue${count === 1 ? '' : 's'}:`,
+  [IssueSeverity.Warning]: (count) => `${count} Warning${count === 1 ? '' : 's'}:`,
+  [IssueSeverity.Suggestion]: (count) => `${count} Suggestion${count === 1 ? '' : 's'}:`
+};
+
+const SEVERITY_TITLE_COLORS: Record<IssueSeverity, string> = {
+  [IssueSeverity.Error]: 'text-destructive',
+  [IssueSeverity.Warning]: 'text-warning',
+  [IssueSeverity.Suggestion]: 'text-suggestion'
 };
 
 const SEVERITY_ORDER: IssueSeverity[] = [
@@ -48,13 +54,14 @@ export function CommentsList({ comments }: CommentsListProps) {
 
         return (
           <section key={severity}>
-            <p className="text-body font-semibold text-gray-400 mb-2">
-              {SEVERITY_TITLES[severity]}
-            </p>
-            <ol className="flex flex-col list-decimal list-inside">
+            <h4 className={`text-md font-semibold mb-2 uppercase ${SEVERITY_TITLE_COLORS[severity]}`}>
+              {SEVERITY_TITLES[severity](items.length)}
+            </h4>
+            <ol className="flex flex-col">
               {items.map((comment) => (
                 <CommentBase
                   key={comment.id}
+                  line={comment.line}
                   issue={comment.issue}
                   suggestedFix={comment.suggestedFix}
                   category={comment.category}

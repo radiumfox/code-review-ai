@@ -69,6 +69,7 @@ export function useCodeEditor() {
 
     return currentReview.issues.map((issue, index) => ({
       id: `${currentReview.id}-${index}`,
+      line: issue.line,
       issue: issue.message,
       suggestedFix: issue.suggestion,
       category: issue.category,

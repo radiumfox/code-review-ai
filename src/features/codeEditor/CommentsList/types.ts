@@ -2,6 +2,7 @@ import { IssueCategory, IssueSeverity } from '@/lib/types/review';
 
 export interface Comment {
   id: string;
+  line: number;
   issue: string;
   suggestedFix: string;
   category: IssueCategory;
@@ -9,6 +10,7 @@ export interface Comment {
 }
 
 export interface CommentBaseProps {
+  line: number;
   issue: string;
   suggestedFix: string;
   category: IssueCategory;

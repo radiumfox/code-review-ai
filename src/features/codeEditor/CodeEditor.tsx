@@ -148,12 +148,12 @@ export function CodeEditor() {
             </p>
             <div className="flex w-full justify-end">
               <button
-                  type="button"
-                  onClick={getReview}
-                  disabled={reviewLoading}
-                  className="max-w-100 w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
+                type="button"
+                onClick={getReview}
+                disabled={reviewLoading}
+                className="max-w-100 w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
               >
-                {reviewLoading ? <SpinnerBase /> : <StarIcon className="w-4 h-4" />}
+                {reviewLoading ? <SpinnerBase className="border-[#0a0a23]" /> : <StarIcon className="w-4 h-4" />}
                 {reviewLoading ? 'Reviewing...' : 'Review Code'}
               </button>
             </div>
