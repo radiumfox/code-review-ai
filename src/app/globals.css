@@ -7,6 +7,8 @@
 
 @theme inline {
   --breakpoint-xs: 500px;
+  --breakpoint-2xl: 1350px;
+  --breakpoint-3xl: 1536px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-destructive: #ff5555;
@@ -15,6 +17,13 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
   --text-body: 16px;
+  --text-body-xs: 15px;
+}
+
+@media (max-width: 499px) {
+  .text-body {
+    font-size: var(--text-body-xs);
+  }
 }
 
 body {
