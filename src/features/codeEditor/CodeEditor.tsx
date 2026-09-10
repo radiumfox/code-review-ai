@@ -2,9 +2,12 @@
 
 import CodeMirror, { EditorView } from '@uiw/react-codemirror';
 import { useCallback, useState } from 'react';
+import { undo, redo } from '@codemirror/commands';
 import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
+import { UndoIcon } from '@/components/icons/UndoIcon';
+import { RedoIcon } from '@/components/icons/RedoIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
 import { useCodeEditor } from './useCodeEditor';
 import { useGetReview } from './useGetReview';
@@ -47,6 +50,18 @@ export function CodeEditor() {
   const closeSummary = useCallback(() => setIsSummaryOpen(false), []);
 
   const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
+
+  const handleUndo = useCallback(() => {
+    const view = viewRef.current?.view;
+    if (!view) return;
+    undo({ state: view.state, dispatch: view.dispatch });
+  }, [viewRef]);
+
+  const handleRedo = useCallback(() => {
+    const view = viewRef.current?.view;
+    if (!view) return;
+    redo({ state: view.state, dispatch: view.dispatch });
+  }, [viewRef]);
 
   const handleCommentClick = useCallback((line: number) => {
     const view = viewRef.current?.view;
@@ -97,26 +112,42 @@ export function CodeEditor() {
 
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-start">
+          <div className="flex justify-between">
             {/* AI model select */}
-            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <span className="text-body text-gray-400 font-medium whitespace-nowrap">Model:</span>
-              <AIModelSelect
-                value={model}
-                models={models}
-                onChange={onModelChange}
-                disabled={reviewLoading}
-                isLoading={fetchingModels}
-                error={fetchModelsError}
-              />
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 justify-start">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <span className="text-body text-gray-400 font-medium whitespace-nowrap">Model:</span>
+                <AIModelSelect
+                  value={model}
+                  models={models}
+                  onChange={onModelChange}
+                  disabled={reviewLoading}
+                  isLoading={fetchingModels}
+                  error={fetchModelsError}
+                />
+              </div>
+              {/* Language select */}
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <span className="text-body text-gray-400 font-medium whitespace-nowrap">Language:</span>
+                <LanguageSelect
+                  value={language}
+                  onChange={onLanguageChange}
+                  disabled={reviewLoading}
+                />
+              </div>
             </div>
-            {/* Language select */}
-            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <span className="text-body text-gray-400 font-medium whitespace-nowrap">Language:</span>
-              <LanguageSelect
-                value={language}
-                onChange={onLanguageChange}
-                disabled={reviewLoading}
+            <div className="flex items-center gap-2">
+              <ButtonIcon
+                onClick={handleUndo}
+                icon={<UndoIcon className="w-5 h-5" />}
+                ariaLabel="Undo"
+                size="md"
+              />
+              <ButtonIcon
+                onClick={handleRedo}
+                icon={<RedoIcon className="w-5 h-5" />}
+                ariaLabel="Redo"
+                size="md"
               />
             </div>
           </div>
@@ -126,6 +157,7 @@ export function CodeEditor() {
         <div className="flex flex-col md:flex-row flex-1 min-h-0">
           {/* Editor */}
           <CodeMirror
+            key={currentReview?.id}
             ref={viewRef}
             value={codeSnippet}
             height="100%"
