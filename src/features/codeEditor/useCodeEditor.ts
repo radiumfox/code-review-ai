@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import type { Extension } from '@codemirror/state';
+import { history } from '@codemirror/commands';
 import type { AppDispatch } from '@/store';
 import {
   selectCodeSnippet,
@@ -55,7 +56,12 @@ export function useCodeEditor() {
   }, [codeSnippet]);
 
   const extensions = useMemo(() => {
-    const list: Extension[] = [hoverIssueTooltip, issueDecorationsField, issuesField];
+    const list: Extension[] = [
+      history({ minDepth: 100, newGroupDelay: 500 }),
+      hoverIssueTooltip,
+      issueDecorationsField,
+      issuesField,
+    ];
     if (languageExtension) list.push(languageExtension);
     return list;
   }, [languageExtension]);
