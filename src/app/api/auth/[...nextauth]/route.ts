@@ -5,7 +5,7 @@ import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
 import { AuthProvider, UserRole } from '@/lib/types';
 import { connectToDatabase } from '@/lib/api';
-import { ROUTES } from '@/lib/config';
+import { ROUTES, DEFAULT_AI_MODEL } from '@/lib/config';
 
 const GITHUB_ID = process.env.GITHUB_ID;
 const GITHUB_SECRET = process.env.GITHUB_SECRET;
@@ -135,7 +135,8 @@ export const authOptions = {
             ...providerFields
           },
           $setOnInsert: {
-            role: UserRole.User
+            role: UserRole.User,
+            aiModel: DEFAULT_AI_MODEL
           }
         }, { upsert: true });
 

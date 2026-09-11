@@ -1,4 +1,4 @@
-export type SelectItem<T extends string> = { value: T; label: string };
+export type SelectItem<T extends string> = { value: T; label: string; description?: string };
 
 export interface SelectBaseProps<T extends string> {
     items: readonly SelectItem<T>[];
@@ -16,6 +16,7 @@ export interface SelectBaseProps<T extends string> {
 
 export interface SelectBaseItemProps {
     text: string;
+    description?: string;
     isCurrent: boolean;
     onClick?: () => void
 }

@@ -4,18 +4,20 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSession } from 'next-auth/react';
 import { useFetch } from '@/lib/hooks';
-import { API_ROUTES } from '@/lib/config';
+import { API_ROUTES, MODEL_TO_DESCRIPTION_MAP } from '@/lib/config';
 import { selectModel, setModel } from '@/store/reviewEditorStore';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { FetchModelReturn } from '@/lib/genAI/openai/types';
 
 interface UseAIModelReturn {
   model: string | null;
-  models: { value: string; label: string }[];
+  models: { value: string; label: string; description: string }[];
   onModelChange(modelId: string): void;
   fetchingModels: boolean;
   fetchModelsError: string | undefined;
 }
+
+const descriptionByModelId: Readonly<Record<string, string | undefined>> = MODEL_TO_DESCRIPTION_MAP;
 
 export function useAIModel(): UseAIModelReturn {
   const dispatch = useDispatch();
@@ -40,6 +42,7 @@ export function useAIModel(): UseAIModelReturn {
     return modelsData?.models.map((model) => ({
       value: model.id,
       label: model.name,
+      description: descriptionByModelId[model.id] ?? '',
     })) ?? [];
   }, [modelsData]);
 

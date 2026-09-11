@@ -120,6 +120,7 @@ export function SelectBase<T extends string>({
                     onClick={() => handleSelect(item)}
                     isCurrent={item.value === value}
                     text={item.label}
+                    description={item.description}
                   />
                 ))}
                 {hasMore && (
