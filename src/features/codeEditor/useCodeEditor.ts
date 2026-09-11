@@ -2,21 +2,20 @@
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import { ExternalChange, type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import type { Extension } from '@codemirror/state';
-import { history } from '@codemirror/commands';
 import type { AppDispatch } from '@/store';
 import {
   selectCodeSnippet,
   selectCurrentReview,
-  selectSummary,
-  setCodeSnippet
+  selectSummary
 } from '@/store/reviewEditorStore';
 import { THEME_CUSTOM_SETTINGS } from './config';
 import { hoverIssueTooltip, issueDecorationsField, issuesField, setIssuesEffect } from './plugins';
 import { useLanguage } from './useLanguage';
 import { useAIModel } from './useAIModel';
+import { useEditorHistory } from './useEditorHistory';
 import type { Comment } from './CommentsList/types';
 
 export function useCodeEditor() {
@@ -24,6 +23,8 @@ export function useCodeEditor() {
   const currentReview = useSelector(selectCurrentReview);
   const summary = useSelector(selectSummary);
   const dispatch = useDispatch<AppDispatch>();
+  const viewRef = useRef<ReactCodeMirrorRef>(null);
+
   const {
     language,
     languageName,
@@ -38,17 +39,36 @@ export function useCodeEditor() {
     fetchModelsError,
   } = useAIModel();
 
-  const viewRef = useRef<ReactCodeMirrorRef>(null);
+  const { onValueChange, undo, redo, clearHistory, undoAll } = useEditorHistory(codeSnippet, dispatch);
 
-  useEffect(() => {
+  const highlightIssues = useCallback(() => {
     viewRef.current?.view?.dispatch({
       effects: setIssuesEffect.of(currentReview?.issues ?? []),
     });
   }, [currentReview]);
 
-  const onValueChange = useCallback((val: string) => {
-    dispatch(setCodeSnippet(val));
-  }, [dispatch]);
+  const resetEditor = useCallback(() => {
+    const initial = undoAll();
+    const view = viewRef.current?.view;
+    if (initial === undefined || !view) return;
+    view.dispatch({
+      changes: {
+        from: 0,
+        to: view.state.doc.toString().length,
+        insert: initial,
+      },
+      effects: setIssuesEffect.of(currentReview?.issues ?? []),
+      annotations: [ExternalChange.of(true)],
+    });
+  }, [undoAll, currentReview]);
+
+  useEffect(() => {
+    clearHistory();
+  }, [currentReview, clearHistory]);
+
+  useEffect(() => {
+    highlightIssues();
+  }, [currentReview]);
 
   const linesCount = useMemo(() => {
     const valueLength = codeSnippet.split('\n').length;
@@ -57,7 +77,6 @@ export function useCodeEditor() {
 
   const extensions = useMemo(() => {
     const list: Extension[] = [
-      history({ minDepth: 100, newGroupDelay: 500 }),
       hoverIssueTooltip,
       issueDecorationsField,
       issuesField,
@@ -101,5 +120,8 @@ export function useCodeEditor() {
     extensions,
     theme,
     comments,
+    undo,
+    redo,
+    resetEditor,
   };
 }

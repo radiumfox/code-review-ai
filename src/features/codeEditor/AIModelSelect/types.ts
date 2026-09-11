@@ -1,6 +1,6 @@
 export interface AIModelSelectProps {
   value: string | null;
-  models: readonly { value: string; label: string }[];
+  models: readonly { value: string; label: string; description?: string }[];
   onChange(value: string): void;
   disabled?: boolean;
   isLoading?: boolean;

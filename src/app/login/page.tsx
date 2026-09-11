@@ -9,14 +9,24 @@ import { signIn, useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/config';
 
+const ERROR_DESCRIPTIONS: Record<string, string> = {
+  AccessDenied: 'You do not have permission to sign in.',
+  Configuration: 'There is a problem with the server configuration.',
+  CredentialsSignin: 'Invalid credentials. Please try again.',
+  Default: 'An unexpected error occurred.',
+  Verification: 'The verification link may have expired or already been used.',
+};
+
 function SignInError() {
   const error = useSearchParams().get('error');
 
   if (!error) return null;
 
+  const description = ERROR_DESCRIPTIONS[error] ?? ERROR_DESCRIPTIONS.Default;
+
   return (
     <div className="w-full max-w-sm rounded-lg border-l-4 border-destructive bg-[#ff5555]15 px-4 py-3 text-body text-[#dfdfe2]">
-      {error}
+      {description}
     </div>
   );
 }

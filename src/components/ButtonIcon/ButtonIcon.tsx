@@ -10,6 +10,7 @@ interface ButtonIconProps {
     ariaLabel: string;
     className?: string;
     size?: ButtonIconSize;
+    disabled?: boolean;
 }
 
 const BUTTON_ICON_SIZE_CLASSES: Record<ButtonIconSize, string> = {
@@ -17,12 +18,13 @@ const BUTTON_ICON_SIZE_CLASSES: Record<ButtonIconSize, string> = {
   md: 'w-[42px] h-[42px]',
 };
 
-export function ButtonIcon({ icon, onClick, ariaLabel, className, size = 'sm' }: ButtonIconProps) {
+export function ButtonIcon({ icon, onClick, ariaLabel, className, size = 'sm', disabled }: ButtonIconProps) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-center rounded border border-[#2a2a5a] text-[#6c6cff] hover:bg-[#1a1a3e] transition-colors cursor-pointer ${BUTTON_ICON_SIZE_CLASSES[size]} ${className}`}
+      className={`flex items-center justify-center rounded border border-[#2a2a5a] text-[#6c6cff] hover:bg-[#1a1a3e] transition-colors cursor-pointer ${BUTTON_ICON_SIZE_CLASSES[size]} ${className} ${disabled && 'pointer-events-none'}`}
       aria-label={ariaLabel}
+      disabled={disabled}
     >
       {icon}
     </button>

@@ -1,13 +1,13 @@
 'use client';
 
 import CodeMirror, { EditorView } from '@uiw/react-codemirror';
-import { useCallback, useEffect, useState } from 'react';
-import { undo, redo } from '@codemirror/commands';
+import { useCallback, useEffect, useState, type KeyboardEvent } from 'react';
 import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { UndoIcon } from '@/components/icons/UndoIcon';
 import { RedoIcon } from '@/components/icons/RedoIcon';
+import { ResetIcon } from '@/components/icons/ResetIcon';
 import { CopyIcon } from '@/components/icons/CopyIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
 import { useCodeEditor } from './useCodeEditor';
@@ -20,11 +20,14 @@ import { SpinnerBase } from '@/components/SpinnerBase';
 import { CommentsList } from './CommentsList';
 import { AIModelSelect } from './AIModelSelect';
 import { TooltipBase } from '@/components/TooltipBase';
+import { ButtonSecondary } from '@/components/ButtonSecondary';
+import { ButtonBorder } from '@/components/ButtonBorder';
 
 export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isResetTooltipOpen, setIsResetTooltipOpen] = useState(false);
   const {
     codeSnippet,
     viewRef,
@@ -43,6 +46,9 @@ export function CodeEditor() {
     extensions,
     theme,
     comments,
+    undo,
+    redo,
+    resetEditor
   } = useCodeEditor();
 
   const {
@@ -55,16 +61,31 @@ export function CodeEditor() {
   const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
 
   const handleUndo = useCallback(() => {
-    const view = viewRef.current?.view;
-    if (!view) return;
-    undo({ state: view.state, dispatch: view.dispatch });
-  }, [viewRef]);
+    undo();
+  }, [undo]);
 
   const handleRedo = useCallback(() => {
-    const view = viewRef.current?.view;
-    if (!view) return;
-    redo({ state: view.state, dispatch: view.dispatch });
-  }, [viewRef]);
+    redo();
+  }, [redo]);
+
+  const handleUndoAll = useCallback(() => {
+    resetEditor();
+  }, [resetEditor]);
+
+  const handleEditorKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+    if (!(event.metaKey || event.ctrlKey)) return;
+    if (event.key === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) {
+        redo();
+      } else {
+        undo();
+      }
+    } else if (event.key === 'y') {
+      event.preventDefault();
+      redo();
+    }
+  }, [undo, redo]);
 
   const handleCopy = useCallback(() => {
     if (!navigator.clipboard) return;
@@ -141,6 +162,19 @@ export function CodeEditor() {
                 ariaLabel="Redo"
                 size="md"
               />
+              <div
+                onMouseEnter={() => setIsResetTooltipOpen(true)}
+                onMouseLeave={() => setIsResetTooltipOpen(false)}
+              >
+                <TooltipBase text="Restore the original code and highlights" position="top" hasArrow={false} isOpen={isResetTooltipOpen}>
+                  <ButtonIcon
+                    onClick={handleUndoAll}
+                    icon={<ResetIcon className="w-5 h-5" />}
+                    ariaLabel="Reset changes"
+                    size="md"
+                  />
+                </TooltipBase>
+              </div>
               <TooltipBase text="Copied!" position="top" hasArrow={false} isOpen={isCopied}>
                 <ButtonIcon
                   onClick={handleCopy}
@@ -179,21 +213,22 @@ export function CodeEditor() {
         {/* Editor + Summary */}
         <div className="flex flex-col md:flex-row flex-1 min-h-0">
           {/* Editor */}
-          <CodeMirror
-            key={currentReview?.id}
-            ref={viewRef}
-            value={codeSnippet}
-            height="100%"
-            width="100%"
-            extensions={extensions}
-            onChange={onValueChange}
-            basicSetup={EDITOR_BASIC_SETUP}
-            theme={theme}
-            className="flex-1 min-w-0 min-h-0"
-            aria-description="Code editor"
-            placeholder="Write your code here..."
-            readOnly={reviewLoading}
-          />
+          <div className="flex-1 min-w-0 min-h-0" onKeyDown={handleEditorKeyDown}>
+            <CodeMirror
+              ref={viewRef}
+              value={codeSnippet}
+              height="100%"
+              width="100%"
+              extensions={extensions}
+              onChange={onValueChange}
+              basicSetup={EDITOR_BASIC_SETUP}
+              theme={theme}
+              className="flex-1 min-w-0 min-h-0 h-full"
+              aria-description="Code editor"
+              placeholder="Write your code here..."
+              readOnly={reviewLoading}
+            />
+          </div>
 
           {/* Divider */}
           <div className="hidden md:block w-px bg-[#1e1e4a]" />
@@ -212,7 +247,7 @@ export function CodeEditor() {
         {/* Footer */}
         <div className="px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]  md:w-[60%]">
           <div className="flex flex-col gap-2 xs:flex-row-reverse xs:items-center">
-            <div className="flex w-full justify-end">
+            <div className="flex w-full justify-end gap-x-4">
               <button
                 type="button"
                 onClick={getReview}
