@@ -42,12 +42,14 @@ export function useCodeEditor() {
   const viewRef = useRef<ReactCodeMirrorRef>(null);
 
   useEffect(() => {
+    clearHistory();
+  }, [currentReview, clearHistory]);
+
+  useEffect(() => {
     viewRef.current?.view?.dispatch({
       effects: setIssuesEffect.of(currentReview?.issues ?? []),
     });
-
-    clearHistory();
-  }, [currentReview, clearHistory]);
+  }, [codeSnippet, currentReview]);
 
   const linesCount = useMemo(() => {
     const valueLength = codeSnippet.split('\n').length;
