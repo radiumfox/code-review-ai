@@ -33,6 +33,8 @@ interface ReviewsListProps {
 }
 
 export function ReviewsList({ className = '', showTitle = true, onReviewClick = () => {} }: ReviewsListProps) {
+  const { data: session } = useSession();
+
   const dispatch = useDispatch<AppDispatch>();
   const reviews = useSelector(selectReviews);
   const loading = useSelector(selectReviewsLoading);
@@ -41,27 +43,10 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
   const hasMore = useSelector(selectHasMore);
   const isInitialLoading = useSelector(selectIsInitialReviewsFetching);
   const currentReview = useSelector(selectCurrentReview);
-  const { data: session } = useSession();
-
-  const nextPage = currentPage + 1;
-
-  const createNewReview = useCallback(() => {
-    dispatch(resetCurrentReview(session?.user?.aiModel ?? null));
-  }, [dispatch, session?.user?.aiModel]);
-
-  useEffect(() => {
-    if(!reviews.length) {
-      dispatch(fetchReviews({ page: 0 }));
-    }
-  }, [dispatch, reviews.length]);
-
-  const loadMore = useCallback(() => {
-    if (!hasMore || loading) return;
-
-    dispatch(fetchReviews({ page: nextPage }));
-  }, [dispatch, hasMore, loading, nextPage]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const nextPage = currentPage + 1;
 
   const reviewsList = useMemo(() => {
     return reviews.map((review) => {
@@ -72,10 +57,26 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
     });
   }, [reviews]);
 
+  const createNewReview = useCallback(() => {
+    dispatch(resetCurrentReview(session?.user?.aiModel ?? null));
+  }, [dispatch, session?.user?.aiModel]);
+
+  const loadMore = useCallback(() => {
+    if (!hasMore || loading) return;
+
+    dispatch(fetchReviews({ page: nextPage }));
+  }, [dispatch, hasMore, loading, nextPage]);
+
   const onReviewItemClick = useCallback((review: Review) => {
     dispatch(setCurrentReview(review));
     onReviewClick();
   }, [dispatch]);
+
+  useEffect(() => {
+    if(!reviews.length) {
+      dispatch(fetchReviews({ page: 0 }));
+    }
+  }, [dispatch, reviews.length]);
 
   useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
@@ -83,7 +84,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
     <div className={`flex flex-col w-50 min-w-0 border-r border-[#1e1e4a] overflow-hidden ${className}`}>
       {showTitle && (
         <div className="px-3 py-3 border-b border-[#1e1e4a] sticky top-0 left-0 bg-[#0a0a23]">
-          <span className="uppercase text-md font-semibold tracking-wide text-[#6c6cff]">Reviews history</span>
+          <span className="uppercase text-md font-semibold tracking-wide text-accent">Reviews history</span>
         </div>
       )}
 

@@ -65,7 +65,7 @@ export function SelectBase<T extends string>({
     if(error) return 'border-destructive cursor-pointer';
     if(disabled) return 'cursor-default text-[#dfdfe2]/50';
 
-    const colorClasses = 'border-[#2a2a5a] focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40 text-[#dfdfe2]';
+    const colorClasses = 'border-[#2a2a5a] focus:border-accent focus:ring-1 focus:ring-accent/40 text-[#dfdfe2]';
     if(isOpen) return `cursor-text ${colorClasses}`;
 
     return `cursor-pointer ${colorClasses}`;
@@ -92,7 +92,7 @@ export function SelectBase<T extends string>({
           disabled={disabled}
         />
         {isLoading && items.length === 0 && (
-          <div className="absolute right-9 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border-2 border-[#6c6cff] border-t-transparent animate-spin" />
+          <div className="absolute right-9 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full border-2 border-accent border-t-transparent animate-spin" />
         )}
         <ChevronIcon className={`${isOpen ? 'rotate-180' : ''} transition-transform duration-150`} />
       </div>

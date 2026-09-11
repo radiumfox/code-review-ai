@@ -68,7 +68,7 @@ export function HeaderMenu() {
                 data-testid={item.testId}
                 className={
                   `px-4 py-3 text-body uppercase tracking-[0.15em] transition-colors
-                  ${isActive ? 'bg-[#1a1a3e] text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}`
+                  ${isActive ? 'bg-[#1a1a3e] text-accent' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}`
                 }
               >
                 {item.label}

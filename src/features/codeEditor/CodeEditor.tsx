@@ -122,9 +122,9 @@ export function CodeEditor() {
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
           <div className="flex flex-col gap-2 flex-1 justify-between xs:flex-row xs:items-center xs:gap-2">
-            <div className="flex items-center gap-2 hidden xs:flex">
-              <StarIcon className="text-[#6c6cff] w-5 h-5" />
-              <span className="uppercase text-body transition-all duration-300 font-mono font-medium text-[#6c6cff]">Code Editor</span>
+            <div className="items-center gap-2 hidden xs:flex">
+              <StarIcon className="text-accent w-5 h-5" />
+              <span className="uppercase text-body transition-all duration-300 font-mono font-medium text-accent">Code Editor</span>
             </div>
 
             <div className="flex items-start gap-2">
@@ -252,7 +252,7 @@ export function CodeEditor() {
                 type="button"
                 onClick={getReview}
                 disabled={reviewLoading}
-                className="max-w-100 w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
+                className="max-w-100 w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-accent text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
               >
                 {reviewLoading ? <SpinnerBase className="border-[#0a0a23]" /> : <StarIcon className="w-4 h-4" />}
                 {reviewLoading ? 'Reviewing...' : (currentReview ? 'Review again' : 'Review Code')}

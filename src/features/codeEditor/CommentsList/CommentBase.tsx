@@ -15,7 +15,7 @@ export function CommentBase({ line, issue, suggestedFix, category, onClick }: Co
           <span>Line {line} · {issue}</span>
         </p>
       </div>
-      <span className="text-body text-[#6c6cff] leading-relaxed">
+      <span className="text-body text-accent leading-relaxed">
         {suggestedFix}
       </span>
     </li>

@@ -27,7 +27,7 @@ export function InputBase({ label, id, value, onChange, placeholder, type }: Inp
         className="w-full text-body rounded-lg border border-[#2a2a5a]
                 bg-transparent px-3 py-2.5 outline-none
                 placeholder:text-[#5a5a8a] transition-colors
-                focus:border-[#6c6cff] focus:ring-1 focus:ring-[#6c6cff]/40
+                focus:border-accent focus:ring-1 focus:ring-accent/40
                 text-[#dfdfe2]"
       />
     </div>

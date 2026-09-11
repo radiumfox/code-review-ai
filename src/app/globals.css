@@ -14,6 +14,7 @@
   --color-destructive: #ff5555;
   --color-warning: #ffb86c;
   --color-suggestion: #8be9fd;
+  --color-accent: #6c6cff;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
   --text-body: 16px;
@@ -48,5 +49,5 @@ body {
 
 @keyframes blink-caret {
   from, to { border-color: transparent }
-  50% { border-color: #6c6cff; }
+  50% { border-color: var(--accent); }
 }

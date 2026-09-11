@@ -9,7 +9,7 @@ export function SelectBaseItem({ onClick, text, description, isCurrent }: Select
       onClick={onClick}
       className={
         `w-full text-left px-3 py-2 text-body transition-colors
-                ${isCurrent ? 'bg-[#6c6cff]/20 text-[#6c6cff]' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}
+                ${isCurrent ? 'bg-accent/20 text-accent' : 'text-[#dfdfe2] hover:bg-[#1a1a3e]'}
             `}
     >
       <div className="flex items-center justify-between gap-2">
