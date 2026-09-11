@@ -3,6 +3,8 @@ export const EDITOR_BASIC_SETUP = {
   foldGutter: true,
   indentOnInput: true,
   autocompletion: true,
+  history: false,
+  historyKeymap: false,
 };
 
 export const THEME_CUSTOM_SETTINGS = {

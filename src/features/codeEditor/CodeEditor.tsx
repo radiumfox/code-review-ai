@@ -1,8 +1,7 @@
 'use client';
 
 import CodeMirror, { EditorView } from '@uiw/react-codemirror';
-import { useCallback, useEffect, useState } from 'react';
-import { undo, redo } from '@codemirror/commands';
+import { useCallback, useEffect, useState, type KeyboardEvent } from 'react';
 import { LanguageSelect } from './LanguageSelect';
 import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
@@ -43,6 +42,8 @@ export function CodeEditor() {
     extensions,
     theme,
     comments,
+    undo,
+    redo,
   } = useCodeEditor();
 
   const {
@@ -55,16 +56,27 @@ export function CodeEditor() {
   const closeReviewList = useCallback(() => setIsReviewsOpen(false), []);
 
   const handleUndo = useCallback(() => {
-    const view = viewRef.current?.view;
-    if (!view) return;
-    undo({ state: view.state, dispatch: view.dispatch });
-  }, [viewRef]);
+    undo();
+  }, [undo]);
 
   const handleRedo = useCallback(() => {
-    const view = viewRef.current?.view;
-    if (!view) return;
-    redo({ state: view.state, dispatch: view.dispatch });
-  }, [viewRef]);
+    redo();
+  }, [redo]);
+
+  const handleEditorKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+    if (!(event.metaKey || event.ctrlKey)) return;
+    if (event.key === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) {
+        redo();
+      } else {
+        undo();
+      }
+    } else if (event.key === 'y') {
+      event.preventDefault();
+      redo();
+    }
+  }, [undo, redo]);
 
   const handleCopy = useCallback(() => {
     if (!navigator.clipboard) return;
@@ -179,21 +191,22 @@ export function CodeEditor() {
         {/* Editor + Summary */}
         <div className="flex flex-col md:flex-row flex-1 min-h-0">
           {/* Editor */}
-          <CodeMirror
-            key={currentReview?.id}
-            ref={viewRef}
-            value={codeSnippet}
-            height="100%"
-            width="100%"
-            extensions={extensions}
-            onChange={onValueChange}
-            basicSetup={EDITOR_BASIC_SETUP}
-            theme={theme}
-            className="flex-1 min-w-0 min-h-0"
-            aria-description="Code editor"
-            placeholder="Write your code here..."
-            readOnly={reviewLoading}
-          />
+          <div className="flex-1 min-w-0 min-h-0" onKeyDown={handleEditorKeyDown}>
+            <CodeMirror
+              ref={viewRef}
+              value={codeSnippet}
+              height="100%"
+              width="100%"
+              extensions={extensions}
+              onChange={onValueChange}
+              basicSetup={EDITOR_BASIC_SETUP}
+              theme={theme}
+              className="flex-1 min-w-0 min-h-0"
+              aria-description="Code editor"
+              placeholder="Write your code here..."
+              readOnly={reviewLoading}
+            />
+          </div>
 
           {/* Divider */}
           <div className="hidden md:block w-px bg-[#1e1e4a]" />
