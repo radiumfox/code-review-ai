@@ -23,6 +23,7 @@ import {
 import { ReviewPreloader } from './ReviewPreloader';
 import { useInfiniteScroll } from '@/lib/hooks';
 import { SpinnerBase } from '@/components/SpinnerBase';
+import { CheckboxBase } from '@/components/CheckboxBase';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
@@ -36,6 +37,7 @@ interface ReviewsListProps {
 
 export function ReviewsList({ className = '', showTitle = true, onReviewClick = () => {} }: ReviewsListProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [checkedReviewIds, setCheckedReviewIds] = useState<string[]>([]);
 
   const { data: session } = useSession();
 
@@ -75,6 +77,15 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
     dispatch(setCurrentReview(review));
     onReviewClick();
   }, [dispatch]);
+
+  const onCheckboxChange = useCallback((reviewId: string) => {
+    setCheckedReviewIds(prevCheckedReviewIds => {
+      if (prevCheckedReviewIds.includes(reviewId)) {
+        return prevCheckedReviewIds.filter(id => id !== reviewId);
+      }
+      return [...prevCheckedReviewIds, reviewId];
+    });
+  }, []);
 
   useEffect(() => {
     if(!reviews.length) {
@@ -121,7 +132,13 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
                 review={review}
                 isActive={review.id === currentReview?.id}
                 languageTitle={review.languageTitle}
-              />
+              >
+                <CheckboxBase
+                  id={`review-check-${review.id}`}
+                  isChecked={checkedReviewIds.includes(review.id)}
+                  onChange={() => onCheckboxChange(review.id)}
+                />
+              </ReviewItem>
             ))}
             {hasMore && (
               <div ref={sentinelRef}>
