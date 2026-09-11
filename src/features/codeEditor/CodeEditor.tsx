@@ -7,6 +7,7 @@ import { StarIcon } from '@/components/icons/StarIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { UndoIcon } from '@/components/icons/UndoIcon';
 import { RedoIcon } from '@/components/icons/RedoIcon';
+import { ResetIcon } from '@/components/icons/ResetIcon';
 import { CopyIcon } from '@/components/icons/CopyIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
 import { useCodeEditor } from './useCodeEditor';
@@ -19,11 +20,14 @@ import { SpinnerBase } from '@/components/SpinnerBase';
 import { CommentsList } from './CommentsList';
 import { AIModelSelect } from './AIModelSelect';
 import { TooltipBase } from '@/components/TooltipBase';
+import { ButtonSecondary } from '@/components/ButtonSecondary';
+import { ButtonBorder } from '@/components/ButtonBorder';
 
 export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [isResetTooltipOpen, setIsResetTooltipOpen] = useState(false);
   const {
     codeSnippet,
     viewRef,
@@ -44,6 +48,7 @@ export function CodeEditor() {
     comments,
     undo,
     redo,
+    resetEditor
   } = useCodeEditor();
 
   const {
@@ -62,6 +67,10 @@ export function CodeEditor() {
   const handleRedo = useCallback(() => {
     redo();
   }, [redo]);
+
+  const handleUndoAll = useCallback(() => {
+    resetEditor();
+  }, [resetEditor]);
 
   const handleEditorKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (!(event.metaKey || event.ctrlKey)) return;
@@ -153,6 +162,19 @@ export function CodeEditor() {
                 ariaLabel="Redo"
                 size="md"
               />
+              <div
+                onMouseEnter={() => setIsResetTooltipOpen(true)}
+                onMouseLeave={() => setIsResetTooltipOpen(false)}
+              >
+                <TooltipBase text="Restore the original code and highlights" position="top" hasArrow={false} isOpen={isResetTooltipOpen}>
+                  <ButtonIcon
+                    onClick={handleUndoAll}
+                    icon={<ResetIcon className="w-5 h-5" />}
+                    ariaLabel="Reset changes"
+                    size="md"
+                  />
+                </TooltipBase>
+              </div>
               <TooltipBase text="Copied!" position="top" hasArrow={false} isOpen={isCopied}>
                 <ButtonIcon
                   onClick={handleCopy}
@@ -201,7 +223,7 @@ export function CodeEditor() {
               onChange={onValueChange}
               basicSetup={EDITOR_BASIC_SETUP}
               theme={theme}
-              className="flex-1 min-w-0 min-h-0"
+              className="flex-1 min-w-0 min-h-0 h-full"
               aria-description="Code editor"
               placeholder="Write your code here..."
               readOnly={reviewLoading}
@@ -225,7 +247,7 @@ export function CodeEditor() {
         {/* Footer */}
         <div className="px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]  md:w-[60%]">
           <div className="flex flex-col gap-2 xs:flex-row-reverse xs:items-center">
-            <div className="flex w-full justify-end">
+            <div className="flex w-full justify-end gap-x-4">
               <button
                 type="button"
                 onClick={getReview}

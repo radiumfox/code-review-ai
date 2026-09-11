@@ -11,6 +11,7 @@ interface ButtonBorderProps {
     onClick?: () => void;
     icon?: ReactNode;
     size?: ButtonBorderSizes;
+    className?: string;
 }
 
 const sizeStyles: Record<ButtonBorderSizes, string> = {
@@ -19,7 +20,7 @@ const sizeStyles: Record<ButtonBorderSizes, string> = {
   sm: 'gap-1.5 px-4 py-2 text-body',
 };
 
-export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, size = 'md' }: ButtonBorderProps) {
+export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, size = 'md', className = '' }: ButtonBorderProps) {
   const currentClasses = useMemo(() => {
     switch (theme) {
     case 'success':
@@ -43,6 +44,7 @@ export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, 
           disabled:opacity-40 disabled:pointer-events-none cursor-pointer
           focus:outline-none
           ${isLoading || disabled ? 'cursor-default pointer-events-none' : ''}
+          ${className}
       `}
     >
       {isLoading ? <SpinnerBase /> : icon}

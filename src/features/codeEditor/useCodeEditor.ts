@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import { ExternalChange, type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { auraInit } from '@uiw/codemirror-theme-aura';
 import type { Extension } from '@codemirror/state';
 import type { AppDispatch } from '@/store';
@@ -23,6 +23,8 @@ export function useCodeEditor() {
   const currentReview = useSelector(selectCurrentReview);
   const summary = useSelector(selectSummary);
   const dispatch = useDispatch<AppDispatch>();
+  const viewRef = useRef<ReactCodeMirrorRef>(null);
+
   const {
     language,
     languageName,
@@ -37,19 +39,36 @@ export function useCodeEditor() {
     fetchModelsError,
   } = useAIModel();
 
-  const { onValueChange, undo, redo, clearHistory } = useEditorHistory(codeSnippet, dispatch);
+  const { onValueChange, undo, redo, clearHistory, undoAll } = useEditorHistory(codeSnippet, dispatch);
 
-  const viewRef = useRef<ReactCodeMirrorRef>(null);
+  const highlightIssues = useCallback(() => {
+    viewRef.current?.view?.dispatch({
+      effects: setIssuesEffect.of(currentReview?.issues ?? []),
+    });
+  }, [currentReview]);
+
+  const resetEditor = useCallback(() => {
+    const initial = undoAll();
+    const view = viewRef.current?.view;
+    if (initial === undefined || !view) return;
+    view.dispatch({
+      changes: {
+        from: 0,
+        to: view.state.doc.toString().length,
+        insert: initial,
+      },
+      effects: setIssuesEffect.of(currentReview?.issues ?? []),
+      annotations: [ExternalChange.of(true)],
+    });
+  }, [undoAll, currentReview]);
 
   useEffect(() => {
     clearHistory();
   }, [currentReview, clearHistory]);
 
   useEffect(() => {
-    viewRef.current?.view?.dispatch({
-      effects: setIssuesEffect.of(currentReview?.issues ?? []),
-    });
-  }, [codeSnippet, currentReview]);
+    highlightIssues();
+  }, [currentReview]);
 
   const linesCount = useMemo(() => {
     const valueLength = codeSnippet.split('\n').length;
@@ -103,5 +122,6 @@ export function useCodeEditor() {
     comments,
     undo,
     redo,
+    resetEditor,
   };
 }

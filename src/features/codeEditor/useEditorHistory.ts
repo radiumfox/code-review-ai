@@ -7,6 +7,7 @@ import { setCodeSnippet } from '@/store/reviewEditorStore';
 interface UseEditorHistoryReturn {
   onValueChange: (val: string) => void;
   undo: () => void;
+  undoAll: () => string | undefined;
   redo: () => void;
   clearHistory: () => void;
 }
@@ -33,6 +34,15 @@ export function useEditorHistory(codeSnippet: string, dispatch: AppDispatch): Us
     dispatch(setCodeSnippet(previous));
   }, [dispatch]);
 
+  const undoAll = useCallback((): string | undefined => {
+    const initial = undoStackRef.current.shift();
+    if (initial === undefined) return undefined;
+    undoStackRef.current = [];
+    redoStackRef.current = [];
+    dispatch(setCodeSnippet(initial));
+    return initial;
+  }, [dispatch]);
+
   const redo = useCallback(() => {
     const next = redoStackRef.current.pop();
     if (next === undefined) return;
@@ -48,6 +58,7 @@ export function useEditorHistory(codeSnippet: string, dispatch: AppDispatch): Us
   return {
     onValueChange,
     undo,
+    undoAll,
     redo,
     clearHistory,
   };
