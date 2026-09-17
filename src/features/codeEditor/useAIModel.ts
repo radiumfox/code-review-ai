@@ -38,7 +38,7 @@ export function useAIModel(): UseAIModelReturn {
     executeFetch: executeSaveModel,
     data: saveModelData,
     error: saveModelError,
-  } = useFetch<{ model: string }, User>(API_ROUTES.users, 'PATCH');
+  } = useFetch<{ aiModel: string }, User>(API_ROUTES.users, 'PATCH');
 
   const models = useMemo(() => {
     return modelsData?.models.map((model) => ({
@@ -94,7 +94,7 @@ export function useAIModel(): UseAIModelReturn {
   }, [saveModelData, dispatch, updateSession, showNotification]);
 
   const onModelChange = useCallback((modelId: string) => {
-    executeSaveModel({ model: modelId });
+    executeSaveModel({ aiModel: modelId });
   }, [executeSaveModel]);
 
   return {

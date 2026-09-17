@@ -23,10 +23,6 @@ function setGlobalCache(value: CachedConnection) {
   (globalThis as Record<symbol, CachedConnection>)[MONGOOSE_CACHE] = value;
 }
 
-import { setServers } from "node:dns/promises";
-
-setServers(["1.1.1.1", "8.8.8.8"]);
-
 export const connectToDatabase = async() => {
   let cached = getGlobalCache();
 
