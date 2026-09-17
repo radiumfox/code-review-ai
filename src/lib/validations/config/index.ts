@@ -17,3 +17,12 @@ export const ISSUE_LINE_MIN_VALUE = 1;
 export const ISSUE_SUGGESTION_MIN_VALUE = 1;
 
 export const ISSUE_MESSAGE_MIN_VALUE = 1;
+
+export const NAME_MIN_VALUE = 1;
+export const NAME_MAX_VALUE = 100;
+
+export const EMAIL_MIN_VALUE = 5;
+export const EMAIL_MAX_VALUE = 254;
+
+export const PROVIDER_ID_MIN_VALUE = 1;
+export const PROVIDER_ID_MAX_VALUE = 100;

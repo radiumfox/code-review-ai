@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     if(!input.success) {
       return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
-    console.log(input.data.page);
+
     await connectToDatabase();
 
     const result = await ReviewModel.aggregate([

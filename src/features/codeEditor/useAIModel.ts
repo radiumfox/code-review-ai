@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSession } from 'next-auth/react';
 import { useFetch } from '@/lib/hooks';
@@ -8,6 +8,7 @@ import { API_ROUTES, MODEL_TO_DESCRIPTION_MAP } from '@/lib/config';
 import { selectModel, setModel } from '@/store/reviewEditorStore';
 import { NotificationType, useNotification } from '@/lib/notifications';
 import { FetchModelReturn } from '@/lib/genAI/openai/types';
+import { type User } from '@/lib/types';
 
 interface UseAIModelReturn {
   model: string | null;
@@ -24,6 +25,7 @@ export function useAIModel(): UseAIModelReturn {
   const model = useSelector(selectModel);
   const { showNotification } = useNotification();
   const { data: session, update: updateSession } = useSession();
+  const handledSaveDataRef = useRef<User | null>(null);
 
   const {
     executeFetch: executeFetchModels,
@@ -36,7 +38,7 @@ export function useAIModel(): UseAIModelReturn {
     executeFetch: executeSaveModel,
     data: saveModelData,
     error: saveModelError,
-  } = useFetch<{ model: string }, { model: string }>(API_ROUTES.updateUserModel, 'POST');
+  } = useFetch<{ model: string }, User>(API_ROUTES.users, 'PATCH');
 
   const models = useMemo(() => {
     return modelsData?.models.map((model) => ({
@@ -68,10 +70,14 @@ export function useAIModel(): UseAIModelReturn {
   useEffect(() => {
     let isActive = true;
 
-    if (saveModelData) {
-      dispatch(setModel(saveModelData.model));
+    if (saveModelData && handledSaveDataRef.current !== saveModelData) {
+      handledSaveDataRef.current = saveModelData;
 
-      updateSession({ aiModel: saveModelData.model })
+      if (saveModelData.aiModel) {
+        dispatch(setModel(saveModelData.aiModel));
+      }
+
+      updateSession({ aiModel: saveModelData.aiModel })
         .catch(() => {
           if (isActive) {
             showNotification({
