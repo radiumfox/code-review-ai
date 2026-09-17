@@ -158,6 +158,10 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
           </div>
         )
       )}
+
+      {isOpen && (
+        <div className="mt-auto h-[60px] border-t border-[#1e1e4a]"></div>
+      )}
     </div>
   );
 }
