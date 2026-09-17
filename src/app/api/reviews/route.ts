@@ -6,12 +6,14 @@ import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
 import { prettifyError } from 'zod';
-import { apiErrorResponse } from '@/lib/api/errors';
+import {apiErrorResponse, isApiError} from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
-import { connectToDatabase } from '@/lib/api';
+import {applyRateLimiter, connectToDatabase} from '@/lib/api';
+import {reviewGenerateRequest} from "@/lib/validations/reviewGenerateRequest";
+import {createReview} from "@/server/reviews";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -19,13 +21,13 @@ export async function POST(request: NextRequest) {
       return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
     }
 
-    const body = await request.json();
-    const input = reviewListRequestSchema.safeParse(body);
+    const searchParams = request.nextUrl.searchParams;
+    const input = reviewListRequestSchema.safeParse(Object.fromEntries(searchParams));
 
     if(!input.success) {
       return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
     }
-
+    console.log(input.data.page);
     await connectToDatabase();
 
     const result = await ReviewModel.aggregate([
@@ -62,5 +64,39 @@ export async function POST(request: NextRequest) {
     console.error(error);
 
     return apiErrorResponse('Error fetching reviews list', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if(!session) {
+      return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
+    }
+
+    const rateLimitResponse = await applyRateLimiter(`${session.user.id}.${request.url}`);
+    if(rateLimitResponse) return rateLimitResponse;
+
+    const body = await request.json();
+
+    const input = reviewGenerateRequest.safeParse(body);
+
+    if(!input.success) {
+      return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
+    }
+
+    await connectToDatabase();
+
+    const review = await createReview(session.user.id, input.data);
+    return apiSuccessResponse({ ...review._doc, id: review._id });
+  } catch (error) {
+    console.error(error);
+
+    if(isApiError(error)) {
+      return apiErrorResponse(error.message, error.code, error.statusCode);
+    }
+
+    return apiErrorResponse('Error creating review', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }
