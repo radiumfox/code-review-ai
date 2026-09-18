@@ -9,7 +9,7 @@ const REVIEW_BUTTON_NAME = 'Review Code';
 const REVIEW_AGAIN_BUTTON_NAME = 'Review Again';
 
 async function mockCreateReview(page: Page, status: number, body: object): Promise<void> {
-  await page.route(API_ROUTES.createReview, async route => {
+  await page.route(API_ROUTES.reviews, async route => {
     await new Promise(f => setTimeout(f, 500));
     await route.fulfill({
       status,
@@ -20,7 +20,7 @@ async function mockCreateReview(page: Page, status: number, body: object): Promi
 }
 
 async function mockReviewsList(page: Page): Promise<void> {
-  await page.route(API_ROUTES.reviewsList, async route => {
+  await page.route(`${API_ROUTES.reviews}?page=${page}`, async route => {
     await new Promise(f => setTimeout(f, 500));
     await route.fulfill({
       status: 200,
@@ -59,7 +59,7 @@ test.describe('Create review pipeline', () => {
     await expect(button).toBeDisabled();
 
     const createResponse = await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.createReview) && resp.status() === 200
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     const { data } = await createResponse.json();
@@ -67,7 +67,7 @@ test.describe('Create review pipeline', () => {
     expect(data.summary).toBeTruthy();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     const buttonGetReview = page.getByRole('button', { name: REVIEW_AGAIN_BUTTON_NAME });
@@ -93,7 +93,7 @@ test.describe('Create review pipeline', () => {
     await page.getByRole('button', { name: REVIEW_BUTTON_NAME }).click();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.createReview) && resp.status() === 400
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 400
     );
 
     const button = page.getByRole('button', { name: REVIEW_BUTTON_NAME });
@@ -120,7 +120,7 @@ test.describe('Create review pipeline', () => {
     await page.getByRole('button', { name: REVIEW_BUTTON_NAME }).click();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.createReview) && resp.status() === 400
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 400
     );
 
     const closeButton = page.getByRole('button', { name: 'Close notification' });

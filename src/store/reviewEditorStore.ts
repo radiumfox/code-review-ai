@@ -33,7 +33,7 @@ export const createReview = createAsyncThunk<ApiSuccess<Review>, ReviewGenerateR
   'reviews/createReview',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await fetch(API_ROUTES.createReview, {
+      const response = await fetch(API_ROUTES.reviews, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(params)
