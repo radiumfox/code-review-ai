@@ -1,10 +1,12 @@
-import { type ReactNode } from 'react';
+'use client';
+
+import { type ReactNode, useState } from 'react';
 
 interface TooltipBaseProps {
   text: string;
   position: 'top' | 'bottom';
   hasArrow: boolean;
-  isOpen: boolean;
+  isOpen?: boolean;
   children: ReactNode;
 }
 
@@ -19,10 +21,18 @@ const TOOLTIP_ARROW_CLASSES: Record<TooltipBaseProps['position'], string> = {
 };
 
 export function TooltipBase({ text, position, hasArrow, isOpen, children }: TooltipBaseProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isVisible = isOpen ?? isHovered;
+
   return (
-    <div className="relative inline-flex">
+    <div
+      className="relative inline-flex"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {children}
-      {isOpen && (
+      {isVisible && (
         <div
           role="tooltip"
           className={`absolute left-1/2 -translate-x-1/2 z-50 pointer-events-none whitespace-nowrap px-2 py-1 rounded border border-[#2a2a5a] bg-[#1a1a3e] text-xs text-gray-300 ${TOOLTIP_POSITION_CLASSES[position]} ${hasArrow ? TOOLTIP_ARROW_CLASSES[position] : ''}`}

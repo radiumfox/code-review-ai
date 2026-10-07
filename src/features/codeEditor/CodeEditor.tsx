@@ -27,7 +27,6 @@ export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [isResetTooltipOpen, setIsResetTooltipOpen] = useState(false);
   const {
     codeSnippet,
     viewRef,
@@ -162,19 +161,14 @@ export function CodeEditor() {
                 ariaLabel="Redo"
                 size="md"
               />
-              <div
-                onMouseEnter={() => setIsResetTooltipOpen(true)}
-                onMouseLeave={() => setIsResetTooltipOpen(false)}
-              >
-                <TooltipBase text="Restore the original code and highlights" position="top" hasArrow={false} isOpen={isResetTooltipOpen}>
-                  <ButtonIcon
-                    onClick={handleUndoAll}
-                    icon={<ResetIcon className="w-5 h-5" />}
-                    ariaLabel="Reset changes"
-                    size="md"
-                  />
-                </TooltipBase>
-              </div>
+              <TooltipBase text="Restore the original code and highlights" position="top" hasArrow={false}>
+                <ButtonIcon
+                  onClick={handleUndoAll}
+                  icon={<ResetIcon className="w-5 h-5" />}
+                  ariaLabel="Reset changes"
+                  size="md"
+                />
+              </TooltipBase>
               <TooltipBase text="Copied!" position="top" hasArrow={false} isOpen={isCopied}>
                 <ButtonIcon
                   onClick={handleCopy}
