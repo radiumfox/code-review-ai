@@ -16,10 +16,10 @@ import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { ReviewsList } from './ReviewsList';
-import { SpinnerBase } from '@/components/SpinnerBase';
 import { CommentsList } from './CommentsList';
 import { AIModelSelect } from './AIModelSelect';
 import { TooltipBase } from '@/components/TooltipBase';
+import { ButtonPrimary } from '@/components/ButtonPrimary';
 import { ButtonSecondary } from '@/components/ButtonSecondary';
 import { ButtonBorder } from '@/components/ButtonBorder';
 
@@ -242,15 +242,13 @@ export function CodeEditor() {
         <div className="px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]  md:w-[60%]">
           <div className="flex flex-col gap-2 xs:flex-row-reverse xs:items-center">
             <div className="flex w-full justify-end gap-x-4">
-              <button
-                type="button"
+              <ButtonPrimary
                 onClick={getReview}
                 disabled={reviewLoading}
-                className="max-w-100 w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-accent text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
-              >
-                {reviewLoading ? <SpinnerBase className="border-[#0a0a23]" /> : <StarIcon className="w-4 h-4" />}
-                {reviewLoading ? 'Reviewing...' : (currentReview ? 'Review again' : 'Review Code')}
-              </button>
+                isLoading={reviewLoading}
+                icon={<StarIcon className="w-4 h-4" />}
+                text={reviewLoading ? 'Reviewing...' : (currentReview ? 'Review again' : 'Review Code')}
+              />
             </div>
             <p className="flex w-full text-body text-gray-500" data-testid={EDITOR_TEST_IDS.languageName}>
               {`${languageName} • ${linesCount}`}
