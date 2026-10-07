@@ -2,6 +2,7 @@
 
 import { ReviewItem } from './ReviewItem';
 import { CreateReviewButton } from './CreateReviewButton';
+import { ReviewsListMenu } from './ReviewsListMenu';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSession } from 'next-auth/react';
@@ -101,11 +102,14 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
         {isOpen && showTitle && (
           <span className="uppercase text-md font-semibold tracking-wide text-accent">Reviews history</span>
         )}
-        <ButtonIcon
-          icon={<ArrowRightIcon className={`w-4 h-4 ${isOpen ? 'rotate-180' : ''}`} />}
-          onClick={() => setIsOpen(prevIsOpen => !prevIsOpen)}
-          ariaLabel={isOpen ? 'Collapse reviews list' : 'Expand reviews list'}
-        />
+        <div className="flex gap-x-4">
+          <ReviewsListMenu />
+          <ButtonIcon
+              icon={<ArrowRightIcon className={`w-4 h-4 ${isOpen ? 'rotate-180' : ''}`} />}
+              onClick={() => setIsOpen(prevIsOpen => !prevIsOpen)}
+              ariaLabel={isOpen ? 'Collapse reviews list' : 'Expand reviews list'}
+          />
+        </div>
       </div>
 
       {isOpen && (
@@ -121,6 +125,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
           </div>
         ) : reviewsList.length > 0 ? (
           <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col h-[calc(100%-49px)]">
+
             <CreateReviewButton
               isActive={currentReview === null}
               onClick={createNewReview}
@@ -148,6 +153,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
           </div>
         ) : (
           <div className="flex-1 flex flex-col">
+            <ReviewsListMenu />
             <CreateReviewButton
               isActive={currentReview === null}
               onClick={createNewReview}
