@@ -10,6 +10,9 @@ export const MODEL_MAX_VALUE = 100;
 export const REVIEWS_PAGE_MIN_VALUE = 0;
 export const REVIEWS_PAGE_MAX_VALUE = 999;
 
+export const REVIEWS_DELETE_MIN_VALUE = 1;
+export const REVIEWS_DELETE_MAX_VALUE = 100;
+
 export const SUMMARY_MIN_VALUE = 1;
 
 export const ISSUE_LINE_MIN_VALUE = 1;

@@ -11,6 +11,7 @@ import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 import { applyRateLimiter, connectToDatabase } from '@/lib/api';
 import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
+import { reviewDeleteRequestSchema } from '@/lib/validations/reviewDeleteRequest';
 import { createReview } from '@/server/reviews';
 
 export async function GET(request: NextRequest) {
@@ -98,5 +99,46 @@ export async function POST(request: NextRequest) {
     }
 
     return apiErrorResponse('Error creating review', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if(!session) {
+      return apiErrorResponse('Authentication failed', ERROR_CODES.AUTH, STATUS_CODE_BY_CODE[ERROR_CODES.AUTH]);
+    }
+
+    const body = await request.json().catch(() => null);
+    const input = reviewDeleteRequestSchema.safeParse(body);
+
+    if(!input.success) {
+      return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
+    }
+
+    await connectToDatabase();
+
+    const objectIds = [...new Set(input.data.ids)].map(id => new ObjectId(id));
+
+    const reviewsToDelete = await ReviewModel.find(
+      { _id: { $in: objectIds }, userId: new ObjectId(session.user.id) },
+      { _id: 1 }
+    );
+
+    const deletedIds = reviewsToDelete.map(review => String(review._id));
+
+    if(deletedIds.length) {
+      await ReviewModel.deleteMany({
+        _id: { $in: reviewsToDelete.map(review => review._id) },
+        userId: new ObjectId(session.user.id)
+      });
+    }
+
+    return apiSuccessResponse({ deletedCount: deletedIds.length, deletedIds });
+  } catch(error) {
+    console.error(error);
+
+    return apiErrorResponse('Error deleting reviews', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }
