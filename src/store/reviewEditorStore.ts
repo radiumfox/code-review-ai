@@ -68,6 +68,35 @@ export const createReview = createAsyncThunk<ApiSuccess<Review>, ReviewGenerateR
   },
 );
 
+export const deleteReview = createAsyncThunk<ApiSuccess<{ id: string }>, string, { rejectValue: ApiError }>(
+  'reviews/deleteReview',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_ROUTES.reviews}/${id}`, {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const responseData: unknown = await response.json().catch(() => null);
+
+      if (isApiFailure(responseData)) {
+        return rejectWithValue(responseData);
+      }
+
+      if (isApiSuccess<{ id: string }>(responseData)) {
+        return responseData;
+      }
+
+      return rejectWithValue(toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      }));
+    } catch (error) {
+      return rejectWithValue(toApiError(error));
+    }
+  },
+);
+
 export const reviewEditorSlice = createSlice({
   name: 'reviewEditor',
   initialState,
