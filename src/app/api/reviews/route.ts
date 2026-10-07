@@ -6,12 +6,12 @@ import { reviewListRequestSchema } from '@/lib/validations/reviewListRequest';
 import { REVIEWS_LIST_LIMIT } from '@/lib/config';
 import { ObjectId } from 'mongodb';
 import { prettifyError } from 'zod';
-import {apiErrorResponse, isApiError} from '@/lib/api/errors';
+import { apiErrorResponse, isApiError } from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
-import {applyRateLimiter, connectToDatabase} from '@/lib/api';
-import {reviewGenerateRequest} from "@/lib/validations/reviewGenerateRequest";
-import {createReview} from "@/server/reviews";
+import { applyRateLimiter, connectToDatabase } from '@/lib/api';
+import { reviewGenerateRequest } from '@/lib/validations/reviewGenerateRequest';
+import { createReview } from '@/server/reviews';
 
 export async function GET(request: NextRequest) {
   try {

@@ -2,7 +2,8 @@
 
 import { ReviewItem } from './ReviewItem';
 import { CreateReviewButton } from './CreateReviewButton';
-import { ReviewsListMenu } from './ReviewsListMenu';
+import { SelectModeButton } from './SelectModeButton';
+import { SelectModeActions } from './SelectModeActions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSession } from 'next-auth/react';
@@ -38,6 +39,7 @@ interface ReviewsListProps {
 
 export function ReviewsList({ className = '', showTitle = true, onReviewClick = () => {} }: ReviewsListProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [isSelectMode, setIsSelectMode] = useState(false);
   const [checkedReviewIds, setCheckedReviewIds] = useState<string[]>([]);
 
   const { data: session } = useSession();
@@ -79,6 +81,10 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
     onReviewClick();
   }, [dispatch]);
 
+  const toggleSelectMode = useCallback(() => {
+    setIsSelectMode(prevIsSelectMode => !prevIsSelectMode);
+  }, []);
+
   const onCheckboxChange = useCallback((reviewId: string) => {
     setCheckedReviewIds(prevCheckedReviewIds => {
       if (prevCheckedReviewIds.includes(reviewId)) {
@@ -86,6 +92,14 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
       }
       return [...prevCheckedReviewIds, reviewId];
     });
+  }, []);
+
+  const onSelectAll = useCallback(() => {
+    setCheckedReviewIds(reviews.map(review => review.id));
+  }, [reviews]);
+
+  const onDeselectAll = useCallback(() => {
+    setCheckedReviewIds([]);
   }, []);
 
   useEffect(() => {
@@ -103,11 +117,11 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
           <span className="uppercase text-md font-semibold tracking-wide text-accent">Reviews history</span>
         )}
         <div className="flex gap-x-4">
-          <ReviewsListMenu />
+          <SelectModeButton isActive={isSelectMode} onToggle={toggleSelectMode} />
           <ButtonIcon
-              icon={<ArrowRightIcon className={`w-4 h-4 ${isOpen ? 'rotate-180' : ''}`} />}
-              onClick={() => setIsOpen(prevIsOpen => !prevIsOpen)}
-              ariaLabel={isOpen ? 'Collapse reviews list' : 'Expand reviews list'}
+            icon={<ArrowRightIcon className={`w-4 h-4 ${isOpen ? 'rotate-180' : ''}`} />}
+            onClick={() => setIsOpen(prevIsOpen => !prevIsOpen)}
+            ariaLabel={isOpen ? 'Collapse reviews list' : 'Expand reviews list'}
           />
         </div>
       </div>
@@ -130,6 +144,14 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
               isActive={currentReview === null}
               onClick={createNewReview}
             />
+            {isSelectMode && (
+              <SelectModeActions
+                selectedCount={checkedReviewIds.length}
+                onSelectAll={onSelectAll}
+                onDeselectAll={onDeselectAll}
+                onDeleteSelected={() => {}}
+              />
+            )}
             {reviewsList.map((review) => (
               <ReviewItem
                 onClick={() => onReviewItemClick(review)}
@@ -138,11 +160,13 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
                 isActive={review.id === currentReview?.id}
                 languageTitle={review.languageTitle}
               >
-                <CheckboxBase
-                  id={`review-check-${review.id}`}
-                  isChecked={checkedReviewIds.includes(review.id)}
-                  onChange={() => onCheckboxChange(review.id)}
-                />
+                {isSelectMode && (
+                  <CheckboxBase
+                    id={`review-check-${review.id}`}
+                    isChecked={checkedReviewIds.includes(review.id)}
+                    onChange={() => onCheckboxChange(review.id)}
+                  />
+                )}
               </ReviewItem>
             ))}
             {hasMore && (
@@ -153,7 +177,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
           </div>
         ) : (
           <div className="flex-1 flex flex-col">
-            <ReviewsListMenu />
+            <SelectModeButton isActive={isSelectMode} onToggle={toggleSelectMode} />
             <CreateReviewButton
               isActive={currentReview === null}
               onClick={createNewReview}
