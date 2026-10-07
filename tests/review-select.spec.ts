@@ -4,7 +4,7 @@ import { EDITOR_TEST_IDS } from '@/features/codeEditor/config';
 import { mockReview } from './helpers';
 
 async function mockReviewsList(page: import('@playwright/test').Page, reviews: ReturnType<typeof mockReview>[]): Promise<void> {
-  await page.route(API_ROUTES.reviewsList, async route => {
+  await page.route(`${API_ROUTES.reviews}*`, async route => {
     await new Promise(f => setTimeout(f, 500));
     await route.fulfill({
       status: 200,
@@ -34,7 +34,7 @@ test.describe('Review selection', () => {
     await logIn(page);
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     await expect(page.getByText(review.summary).first()).toBeVisible();
@@ -53,7 +53,7 @@ test.describe('Review selection', () => {
     await logIn(page);
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     await page.getByText(pyReview.summary).first().click();
@@ -81,7 +81,7 @@ test.describe('Review selection', () => {
     await logIn(page);
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.reviewsList) && resp.status() === 200
+      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     await page.getByText(pyReview.summary).first().click();

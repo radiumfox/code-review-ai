@@ -2,14 +2,15 @@ import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { UserModel } from '@/models/User';
-import { userModelRequest } from '@/lib/validations/userModelRequest';
+import { userUpdateRequest } from '@/lib/validations/userUpdateRequest';
 import { prettifyError } from 'zod';
 import { apiErrorResponse } from '@/lib/api/errors';
 import { apiSuccessResponse } from '@/lib/api/result';
 import { ERROR_CODES, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
 import { connectToDatabase } from '@/lib/api';
+import { type User } from '@/lib/types';
 
-export async function POST(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const input = userModelRequest.safeParse(body);
+    const input = userUpdateRequest.safeParse(body);
 
     if(!input.success) {
       return apiErrorResponse(prettifyError(input.error), ERROR_CODES.VALIDATION, STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION]);
@@ -29,17 +30,31 @@ export async function POST(request: NextRequest) {
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       session.user.id,
-      { aiModel: input.data.model },
-      { new: true }
+      input.data,
+      { new: true, runValidators: true }
     );
 
     if(!updatedUser) {
       return apiErrorResponse('User not found', ERROR_CODES.NOT_FOUND, STATUS_CODE_BY_CODE[ERROR_CODES.NOT_FOUND]);
     }
 
-    return apiSuccessResponse({ model: updatedUser.aiModel });
+    const user = updatedUser.toObject();
+
+    return apiSuccessResponse<User>({
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      provider: user.provider,
+      githubId: user.githubId,
+      githubUsername: user.githubUsername,
+      googleId: user.googleId,
+      aiModel: user.aiModel ?? null,
+      role: user.role,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    });
   } catch (error) {
     console.error(error);
-    return apiErrorResponse('Error saving model', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
+    return apiErrorResponse('Error updating user', ERROR_CODES.INTERNAL_SERVER, STATUS_CODE_BY_CODE[ERROR_CODES.INTERNAL_SERVER]);
   }
 }

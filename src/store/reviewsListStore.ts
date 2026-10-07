@@ -50,10 +50,9 @@ export const fetchReviews = createAsyncThunk<FetchReviewsResult, { page: number 
     const fetchId = ++fetchReviewsCounter;
 
     try {
-      const response = await fetch(API_ROUTES.reviewsList, {
-        method: 'POST',
+      const response = await fetch(`${API_ROUTES.reviews}?page=${page}`, {
+        method: 'GET',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ page }),
       });
 
       const responseData: unknown = await response.json().catch(() => null);
