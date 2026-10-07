@@ -16,8 +16,8 @@ interface ButtonPrimaryProps {
 }
 
 const modeStyles: Record<ButtonPrimaryMode, string> = {
-  primary: 'bg-accent hover:bg-[#8282ff]',
-  destructive: 'bg-destructive hover:bg-[#ff6b6b]',
+  primary: 'bg-accent hover:bg-accent-hover',
+  destructive: 'bg-destructive hover:bg-destructive-hover',
 };
 
 export function ButtonPrimary({ onClick, disabled, isLoading, icon, text, mode = 'primary', className = '' }: ButtonPrimaryProps) {
