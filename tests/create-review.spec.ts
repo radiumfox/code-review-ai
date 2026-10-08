@@ -20,7 +20,7 @@ async function mockCreateReview(page: Page, status: number, body: object): Promi
 }
 
 async function mockReviewsList(page: Page): Promise<void> {
-  await page.route(`${API_ROUTES.reviews}?page=${page}`, async route => {
+  await page.route(`${API_ROUTES.reviews}?page=*`, async route => {
     await new Promise(f => setTimeout(f, 500));
     await route.fulfill({
       status: 200,
