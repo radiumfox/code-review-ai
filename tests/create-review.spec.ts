@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { CODE_SNIPPET_MAX_VALUE, CODE_SNIPPET_MIN_VALUE } from '@/lib/validations/config';
-import { mockReview } from './helpers';
+import { mockModelsResponse, mockReview } from './helpers';
 import { API_ROUTES, ROUTES } from '@/lib/config';
 import { ERROR_CODES } from '@/lib/api/errors';
 import type { Page } from '@playwright/test';
@@ -45,6 +45,7 @@ test.describe('Create review pipeline', () => {
   test('Create review', async ({ page }) => {
     await mockReviewsList(page);
     await mockCreateReview(page, 200, { ok: true, data: mockReview() });
+    await mockModelsResponse(page);
     await logIn(page);
 
     const codeEditor = page.locator('[contenteditable=true]');
@@ -59,7 +60,7 @@ test.describe('Create review pipeline', () => {
     await expect(button).toBeDisabled();
 
     const createResponse = await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
+      resp.request().method() === 'POST' && resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     const { data } = await createResponse.json();
@@ -67,7 +68,7 @@ test.describe('Create review pipeline', () => {
     expect(data.summary).toBeTruthy();
 
     await page.waitForResponse(resp =>
-      resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
+      resp.request().method() === 'GET' && resp.url().includes(API_ROUTES.reviews) && resp.status() === 200
     );
 
     const buttonGetReview = page.getByRole('button', { name: REVIEW_AGAIN_BUTTON_NAME });
