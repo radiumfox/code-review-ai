@@ -28,7 +28,7 @@ export function ButtonBorder({ theme, isLoading, disabled, text, onClick, icon, 
     case 'error':
       return 'border-destructive text-destructive bg-destructive/10';
     default:
-      return 'border-[#6c6cff] text-[#6c6cff] hover:bg-[#6c6cff] hover:text-[#0a0a23]';
+      return 'border-accent text-accent hover:bg-accent hover:text-[#0a0a23]';
     }
   }, [theme]);
 

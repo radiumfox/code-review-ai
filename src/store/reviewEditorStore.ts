@@ -13,6 +13,8 @@ interface ReviewEditorState {
   currentReview: Review | null;
   createReviewLoading: boolean;
   createReviewError: ApiError | null;
+  deleteReviewsLoading: boolean;
+  deleteReviewsError: ApiError | null;
   language: CodingLanguage | null;
   model: string | null;
   codeSnippet: string;
@@ -23,6 +25,8 @@ export const initialState: ReviewEditorState = {
   currentReview: null,
   createReviewError: null,
   createReviewLoading: false,
+  deleteReviewsError: null,
+  deleteReviewsLoading: false,
   language: DEFAULT_LANGUAGE,
   model: null,
   codeSnippet: DEFAULT_EDITOR_VALUE,
@@ -62,6 +66,74 @@ export const createReview = createAsyncThunk<ApiSuccess<Review>, ReviewGenerateR
       const state = getState() as RootState;
 
       if (state.reviewEditor.createReviewLoading) {
+        return false;
+      }
+    },
+  },
+);
+
+export const deleteReview = createAsyncThunk<ApiSuccess<{ id: string }>, string, { rejectValue: ApiError }>(
+  'reviews/deleteReview',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_ROUTES.reviews}/${id}`, {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const responseData: unknown = await response.json().catch(() => null);
+
+      if (isApiFailure(responseData)) {
+        return rejectWithValue(responseData);
+      }
+
+      if (isApiSuccess<{ id: string }>(responseData)) {
+        return responseData;
+      }
+
+      return rejectWithValue(toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      }));
+    } catch (error) {
+      return rejectWithValue(toApiError(error));
+    }
+  },
+);
+
+export const deleteReviews = createAsyncThunk<ApiSuccess<{ deletedCount: number; deletedIds: string[] }>, string[], { rejectValue: ApiError }>(
+  'reviews/deleteReviews',
+  async (ids, { rejectWithValue }) => {
+    try {
+      const response = await fetch(API_ROUTES.reviews, {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ids })
+      });
+
+      const responseData: unknown = await response.json().catch(() => null);
+
+      if (isApiFailure(responseData)) {
+        return rejectWithValue(responseData);
+      }
+
+      if (isApiSuccess<{ deletedCount: number; deletedIds: string[] }>(responseData)) {
+        return responseData;
+      }
+
+      return rejectWithValue(toApiError({
+        ...(typeof responseData === 'object' && responseData !== null ? responseData : {}),
+        statusCode: response.status,
+      }));
+    } catch (error) {
+      return rejectWithValue(toApiError(error));
+    }
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+
+      if (state.reviewEditor.deleteReviewsLoading) {
         return false;
       }
     },
@@ -117,6 +189,25 @@ export const reviewEditorSlice = createSlice({
       .addCase(createReview.rejected, (state, action) => {
         state.createReviewLoading = false;
         state.createReviewError = action.payload ?? null;
+      })
+      .addCase(deleteReviews.pending, (state) => {
+        state.deleteReviewsLoading = true;
+        state.deleteReviewsError = null;
+      })
+      .addCase(deleteReviews.fulfilled, (state, action) => {
+        state.deleteReviewsLoading = false;
+
+        if (state.currentReview && action.payload.data.deletedIds.includes(state.currentReview.id)) {
+          state.currentReview = null;
+          state.language = null;
+          state.model = null;
+          state.codeSnippet = '';
+          state.summary = '';
+        }
+      })
+      .addCase(deleteReviews.rejected, (state, action) => {
+        state.deleteReviewsLoading = false;
+        state.deleteReviewsError = action.payload ?? null;
       });
   },
 });
@@ -126,6 +217,9 @@ export const { setCurrentReview, setLanguage, setModel, setCodeSnippet, setSumma
 export const selectCurrentReview = (state: RootState) => state.reviewEditor.currentReview;
 export const selectCreateReviewLoading = (state: RootState) => state.reviewEditor.createReviewLoading;
 export const selectCreateReviewError = (state: RootState) => state.reviewEditor.createReviewError;
+
+export const selectDeleteReviewsLoading = (state: RootState) => state.reviewEditor.deleteReviewsLoading;
+export const selectDeleteReviewsError = (state: RootState) => state.reviewEditor.deleteReviewsError;
 
 export const selectLang = (state: RootState) => state.reviewEditor.language;
 export const selectModel = (state: RootState) => state.reviewEditor.model;

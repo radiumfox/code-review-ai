@@ -35,12 +35,12 @@ const SlideOutDrawerComponent = function({ children, onClose, isOpen, buttonClos
       >
         <div className="flex items-center justify-between px-4 py-3 bg-[#151540] border-b border-[#1e1e4a]">
           <div className="flex items-center gap-2">
-            <StarIcon className="text-[#6c6cff] w-4 h-4" />
-            <span className="uppercase text-body font-medium text-[#6c6cff]">{ title }</span>
+            <StarIcon className="text-accent w-4 h-4" />
+            <span className="uppercase text-body font-medium text-accent">{ title }</span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[#6c6cff] hover:bg-[#1a1a3e] transition-colors cursor-pointer"
+            className="p-1 rounded text-accent hover:bg-[#1a1a3e] transition-colors cursor-pointer"
             aria-label={buttonCloseAreaLabel}
           >
             <ArrowRightIcon className="w-4 h-4 rotate-180" />

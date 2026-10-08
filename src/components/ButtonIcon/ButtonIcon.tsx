@@ -22,7 +22,7 @@ export function ButtonIcon({ icon, onClick, ariaLabel, className, size = 'sm', d
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-center rounded border border-[#2a2a5a] text-[#6c6cff] hover:bg-[#1a1a3e] transition-colors cursor-pointer ${BUTTON_ICON_SIZE_CLASSES[size]} ${className} ${disabled && 'pointer-events-none'}`}
+      className={`flex items-center justify-center rounded border border-[#2a2a5a] text-accent hover:bg-[#1a1a3e] transition-colors cursor-pointer ${BUTTON_ICON_SIZE_CLASSES[size]} ${className} ${disabled && 'pointer-events-none'}`}
       aria-label={ariaLabel}
       disabled={disabled}
     >

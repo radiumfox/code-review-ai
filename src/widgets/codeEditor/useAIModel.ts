@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { useFetch } from '@/lib/hooks';
 import { API_ROUTES, MODEL_TO_DESCRIPTION_MAP } from '@/lib/config';
 import { selectModel, setModel } from '@/store/reviewEditorStore';
-import { NotificationType, useNotification } from '@/lib/notifications';
+import { NotificationType, useNotification } from '@/lib/providers/notifications';
 import { FetchModelReturn } from '@/lib/genAI/openai/types';
 import { type User } from '@/lib/types';
 

@@ -14,6 +14,7 @@ import {
 import {
   reviewEditorSlice,
   createReview,
+  deleteReviews,
 } from '@/store/reviewEditorStore';
 import type { RootState } from '@/store';
 import { DEFAULT_LANGUAGE, REVIEWS_LIST_LIMIT } from '@/lib/config';
@@ -194,6 +195,28 @@ describe('extraReducers - createReview cross-slice', () => {
     });
 
     expect(selectIsInitialReviewsFetching(asRootState(state))).toBe(true);
+  });
+});
+
+describe('extraReducers - deleteReviews cross-slice', () => {
+  test('fulfilled removes deleted reviews from the list', () => {
+    const reviews = [
+      createMockReview({ id: '1' }),
+      createMockReview({ id: '2' }),
+      createMockReview({ id: '3' }),
+    ];
+
+    let state = reviewsListSlice.reducer(initialState, {
+      type: fetchReviews.fulfilled.type,
+      payload: { reviews, fetchId: 0, page: 0 },
+    });
+
+    state = reviewsListSlice.reducer(state, {
+      type: deleteReviews.fulfilled.type,
+      payload: { ok: true, data: { deletedCount: 2, deletedIds: ['1', '3'] } },
+    });
+
+    expect(selectReviews(asRootState(state))).toEqual([createMockReview({ id: '2' })]);
   });
 });
 

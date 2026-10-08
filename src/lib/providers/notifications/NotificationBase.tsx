@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { NotificationType } from './types';
-import { NOTIFICATION_TEST_IDS } from '@/lib/notifications/config';
+import { NOTIFICATION_TEST_IDS } from '@/lib/providers/notifications/config';
 
 interface NotificationBaseProps {
   type: NotificationType;
@@ -15,7 +15,7 @@ interface NotificationBaseProps {
 const typeStyles: Record<NotificationType, string> = {
   [NotificationType.Error]: 'border-l-4 border-destructive',
   [NotificationType.Warning]: 'border-l-4 border-[#ffb86c]',
-  [NotificationType.Neutral]: 'border-l-4 border-[#6c6cff]',
+  [NotificationType.Neutral]: 'border-l-4 border-accent',
 };
 
 const typeBackgrounds: Record<NotificationType, string> = {

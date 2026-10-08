@@ -15,9 +15,9 @@ export function RadioButton({ id, isActive, disabled, label, onChange, helpText 
       className={`
                 flex items-center gap-4 px-5 py-4 rounded-lg border transition-all cursor-pointer
                 ${isActive
-      ? 'border-[#6c6cff] bg-[#6c6cff]/10'
+      ? 'border-accent bg-accent/10'
       : !disabled
-        ? 'border-[#2a2a5a] hover:border-[#6c6cff]/50'
+        ? 'border-[#2a2a5a] hover:border-accent/50'
         : 'border-[#2a2a5a] opacity-50 cursor-not-allowed'
     }
                 ${disabled ? 'pointer-events-none' : ''}
@@ -31,7 +31,7 @@ export function RadioButton({ id, isActive, disabled, label, onChange, helpText 
         onChange={onChange}
         disabled={disabled}
         className="appearance-none w-4 h-4 rounded-full border-2 border-[#2a2a5a]
-                  checked:border-[#6c6cff] checked:bg-[#6c6cff]
+                  checked:border-accent checked:bg-accent
                   checked:shadow-[inset_0_0_0_3px_#0a0a23]
                   transition-all shrink-0"
       />

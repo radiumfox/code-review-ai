@@ -11,23 +11,20 @@ import { ResetIcon } from '@/components/icons/ResetIcon';
 import { CopyIcon } from '@/components/icons/CopyIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
 import { useCodeEditor } from './useCodeEditor';
-import { useGetReview } from './useGetReview';
+import { useGetReview } from '@/features/getReview';
 import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { ReviewsList } from './ReviewsList';
-import { SpinnerBase } from '@/components/SpinnerBase';
 import { CommentsList } from './CommentsList';
 import { AIModelSelect } from './AIModelSelect';
 import { TooltipBase } from '@/components/TooltipBase';
-import { ButtonSecondary } from '@/components/ButtonSecondary';
-import { ButtonBorder } from '@/components/ButtonBorder';
+import { ButtonPrimary } from '@/components/ButtonPrimary';
 
 export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [isResetTooltipOpen, setIsResetTooltipOpen] = useState(false);
   const {
     codeSnippet,
     viewRef,
@@ -122,9 +119,9 @@ export function CodeEditor() {
           bg-[#151540] border-b border-[#1e1e4a]`
         }>
           <div className="flex flex-col gap-2 flex-1 justify-between xs:flex-row xs:items-center xs:gap-2">
-            <div className="flex items-center gap-2 hidden xs:flex">
-              <StarIcon className="text-[#6c6cff] w-5 h-5" />
-              <span className="uppercase text-body transition-all duration-300 font-mono font-medium text-[#6c6cff]">Code Editor</span>
+            <div className="items-center gap-2 hidden xs:flex">
+              <StarIcon className="text-accent w-5 h-5" />
+              <span className="uppercase text-body transition-all duration-300 font-mono font-medium text-accent">Code Editor</span>
             </div>
 
             <div className="flex items-start gap-2">
@@ -162,19 +159,14 @@ export function CodeEditor() {
                 ariaLabel="Redo"
                 size="md"
               />
-              <div
-                onMouseEnter={() => setIsResetTooltipOpen(true)}
-                onMouseLeave={() => setIsResetTooltipOpen(false)}
-              >
-                <TooltipBase text="Restore the original code and highlights" position="top" hasArrow={false} isOpen={isResetTooltipOpen}>
-                  <ButtonIcon
-                    onClick={handleUndoAll}
-                    icon={<ResetIcon className="w-5 h-5" />}
-                    ariaLabel="Reset changes"
-                    size="md"
-                  />
-                </TooltipBase>
-              </div>
+              <TooltipBase text="Restore the original code and highlights" position="top" hasArrow={false}>
+                <ButtonIcon
+                  onClick={handleUndoAll}
+                  icon={<ResetIcon className="w-5 h-5" />}
+                  ariaLabel="Reset changes"
+                  size="md"
+                />
+              </TooltipBase>
               <TooltipBase text="Copied!" position="top" hasArrow={false} isOpen={isCopied}>
                 <ButtonIcon
                   onClick={handleCopy}
@@ -248,15 +240,13 @@ export function CodeEditor() {
         <div className="px-3 sm:px-4 md:px-5 py-2 transition-all duration-300 bg-[#151540] border-t border-[#1e1e4a]  md:w-[60%]">
           <div className="flex flex-col gap-2 xs:flex-row-reverse xs:items-center">
             <div className="flex w-full justify-end gap-x-4">
-              <button
-                type="button"
+              <ButtonPrimary
                 onClick={getReview}
                 disabled={reviewLoading}
-                className="max-w-100 w-full flex items-center justify-center gap-2 rounded-lg uppercase tracking-widest text-body font-medium py-2 bg-[#6c6cff] text-[#0a0a23] hover:bg-[#8282ff] transition-colors cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-default"
-              >
-                {reviewLoading ? <SpinnerBase className="border-[#0a0a23]" /> : <StarIcon className="w-4 h-4" />}
-                {reviewLoading ? 'Reviewing...' : (currentReview ? 'Review again' : 'Review Code')}
-              </button>
+                isLoading={reviewLoading}
+                icon={<StarIcon className="w-4 h-4" />}
+                text={reviewLoading ? 'Reviewing...' : (currentReview ? 'Review again' : 'Review Code')}
+              />
             </div>
             <p className="flex w-full text-body text-gray-500" data-testid={EDITOR_TEST_IDS.languageName}>
               {`${languageName} • ${linesCount}`}
