@@ -8,7 +8,7 @@ import {
   selectDeleteReviewsError,
   selectDeleteReviewsLoading
 } from '@/store/reviewEditorStore';
-import { NotificationType, useNotification } from '@/lib/notifications';
+import { NotificationType, useNotification } from '@/lib/providers/notifications';
 
 export function useDeleteReviews() {
   const deleteLoading = useSelector(selectDeleteReviewsLoading);

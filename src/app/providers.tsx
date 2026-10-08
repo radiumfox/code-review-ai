@@ -2,7 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react';
 import { type ReactNode } from 'react';
-import { NotificationProvider } from '@/lib/notifications';
+import { NotificationProvider } from '@/lib/providers/notifications';
 import { ModalProvider } from '@/lib/providers/modal';
 import { store } from '@/store';
 import { Provider } from 'react-redux';

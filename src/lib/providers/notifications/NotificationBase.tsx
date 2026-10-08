@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { NotificationType } from './types';
-import { NOTIFICATION_TEST_IDS } from '@/lib/notifications/config';
+import { NOTIFICATION_TEST_IDS } from '@/lib/providers/notifications/config';
 
 interface NotificationBaseProps {
   type: NotificationType;

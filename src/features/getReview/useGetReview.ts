@@ -12,7 +12,7 @@ import {
   selectModel
 } from '@/store/reviewEditorStore';
 import { fetchReviews } from '@/store/reviewsListStore';
-import { NotificationType, useNotification } from '@/lib/notifications';
+import { NotificationType, useNotification } from '@/lib/providers/notifications';
 
 export function useGetReview() {
   const language = useSelector(selectLang);
