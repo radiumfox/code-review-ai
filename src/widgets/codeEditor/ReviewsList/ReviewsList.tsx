@@ -73,6 +73,10 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
     });
   }, [reviews]);
 
+  const checkedIds = useMemo(() => {
+    return checkedReviewIds.filter(id => reviews.some(review => review.id === id));
+  }, [checkedReviewIds, reviews]);
+
   const createNewReview = useCallback(() => {
     dispatch(resetCurrentReview(session?.user?.aiModel ?? null));
   }, [dispatch, session?.user?.aiModel]);
@@ -155,10 +159,10 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
             />
             {isSelectMode && (
               <SelectModeActions
-                selectedCount={checkedReviewIds.length}
+                selectedCount={checkedIds.length}
                 onSelectAll={onSelectAll}
                 onDeselectAll={onDeselectAll}
-                onDeleteSelected={() => showDeleteReviewsModal(checkedReviewIds)}
+                onDeleteSelected={() => showDeleteReviewsModal(checkedIds)}
               />
             )}
             {reviewsList.map((review) => (
@@ -172,7 +176,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
                 {isSelectMode && (
                   <CheckboxBase
                     id={`review-check-${review.id}`}
-                    isChecked={checkedReviewIds.includes(review.id)}
+                    isChecked={checkedIds.includes(review.id)}
                     onChange={() => onCheckboxChange(review.id)}
                   />
                 )}
