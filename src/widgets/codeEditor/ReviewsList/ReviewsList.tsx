@@ -30,17 +30,24 @@ import { ButtonIcon } from '@/components/ButtonIcon';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon';
 import { LANGUAGES_NAMES_MAP } from '@/lib/config';
 import { Review } from '@/lib/types';
+import { useDeleteReviewsModal } from '@/features/deleteReviews';
 
 interface ReviewsListProps {
   className?: string;
   showTitle?: boolean;
   onReviewClick?: () => void;
+  mode?: 'sidebar' | 'list';
 }
 
-export function ReviewsList({ className = '', showTitle = true, onReviewClick = () => {} }: ReviewsListProps) {
-  const [isOpen, setIsOpen] = useState(true);
+export function ReviewsList({ className = '', showTitle = true, onReviewClick = () => {}, mode = 'list' }: ReviewsListProps) {
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [checkedReviewIds, setCheckedReviewIds] = useState<string[]>([]);
+
+  const isSidebarMode = mode === 'sidebar';
+  const isListOpen = isSidebarMode ? isPanelOpen : true;
+
+  const showDeleteReviewsModal = useDeleteReviewsModal();
 
   const { data: session } = useSession();
 
@@ -111,22 +118,24 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
   useInfiniteScroll(sentinelRef, loadMore, hasMore);
 
   return (
-    <div className={`flex flex-col min-w-0 border-r border-[#1e1e4a] overflow-hidden transition-[width] ${isOpen ? 'w-50' : 'w-[60px]'} ${className}`}>
-      <div className={`px-3 py-3 border-b border-[#1e1e4a] bg-[#0a0a23] flex items-center gap-2 ${isOpen && showTitle ? 'justify-between sticky top-0 left-0' : 'justify-center'}`}>
-        {isOpen && showTitle && (
+    <div className={`flex flex-col min-w-0 border-r border-[#1e1e4a] overflow-hidden transition-[width] ${isListOpen ? 'w-50' : 'w-[60px]'} ${className}`}>
+      <div className={`px-3 py-3 border-b border-[#1e1e4a] bg-[#0a0a23] flex items-center gap-2 ${(isListOpen && showTitle) || !isSidebarMode ? 'justify-between sticky top-0 left-0' : 'justify-center'}`}>
+        {isListOpen && showTitle && (
           <span className="uppercase text-md font-semibold tracking-wide text-accent">Reviews history</span>
         )}
         <div className="flex gap-x-4">
-          <SelectModeButton isActive={isSelectMode} onToggle={toggleSelectMode} />
-          <ButtonIcon
-            icon={<ArrowRightIcon className={`w-4 h-4 ${isOpen ? 'rotate-180' : ''}`} />}
-            onClick={() => setIsOpen(prevIsOpen => !prevIsOpen)}
-            ariaLabel={isOpen ? 'Collapse reviews list' : 'Expand reviews list'}
-          />
+          {isListOpen && <SelectModeButton isActive={isSelectMode} onToggle={toggleSelectMode} /> }
+          {isSidebarMode && (
+            <ButtonIcon
+              icon={<ArrowRightIcon className={`w-4 h-4 ${isListOpen ? 'rotate-180' : ''}`} />}
+              onClick={() => setIsPanelOpen(prevIsOpen => !prevIsOpen)}
+              ariaLabel={isListOpen ? 'Collapse reviews list' : 'Expand reviews list'}
+            />
+          )}
         </div>
       </div>
 
-      {isOpen && (
+      {isListOpen && (
         error ? (
           <div className="flex-1 flex items-center justify-center px-3 py-6">
             <p className="text-body text-destructive text-center">{error.message}</p>
@@ -149,7 +158,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
                 selectedCount={checkedReviewIds.length}
                 onSelectAll={onSelectAll}
                 onDeselectAll={onDeselectAll}
-                onDeleteSelected={() => {}}
+                onDeleteSelected={() => showDeleteReviewsModal(checkedReviewIds)}
               />
             )}
             {reviewsList.map((review) => (
@@ -189,7 +198,7 @@ export function ReviewsList({ className = '', showTitle = true, onReviewClick = 
         )
       )}
 
-      {isOpen && (
+      {isListOpen && (
         <div className="mt-auto h-[60px] border-t border-[#1e1e4a]"></div>
       )}
     </div>

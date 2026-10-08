@@ -1,1 +1,1 @@
-export { DeleteReviewsModal } from './DeleteReviewsModal';
+export { useDeleteReviewsModal } from './useDeleteReviewsModal';
