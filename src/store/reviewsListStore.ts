@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Review } from '@/lib/types';
 import { REVIEWS_LIST_LIMIT, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
-import { createReview } from './reviewEditorStore';
+import { createReview, deleteReviews } from './reviewEditorStore';
 import { toApiError } from '@/lib/api/errors';
 import { isApiFailure, isApiSuccess } from '@/lib/api/result';
 import type { ApiError } from '@/lib/api/errors';
@@ -112,6 +112,11 @@ export const reviewsListSlice = createSlice({
       })
       .addCase(createReview.fulfilled, (state) => {
         state.isInitialReviewsFetching = true;
+      })
+      .addCase(deleteReviews.fulfilled, (state, action) => {
+        const deletedIds = action.payload.data.deletedIds;
+
+        state.reviews = state.reviews.filter(review => !deletedIds.includes(review.id));
       });
   },
 });

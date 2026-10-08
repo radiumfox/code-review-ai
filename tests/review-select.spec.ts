@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { DEFAULT_EDITOR_VALUE, API_ROUTES, ROUTES } from '@/lib/config';
-import { EDITOR_TEST_IDS } from '@/features/codeEditor/config';
+import { EDITOR_TEST_IDS } from '@/widgets/codeEditor/config';
 import { mockReview } from './helpers';
 
 async function mockReviewsList(page: import('@playwright/test').Page, reviews: ReturnType<typeof mockReview>[]): Promise<void> {

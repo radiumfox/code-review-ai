@@ -218,6 +218,9 @@ export const selectCurrentReview = (state: RootState) => state.reviewEditor.curr
 export const selectCreateReviewLoading = (state: RootState) => state.reviewEditor.createReviewLoading;
 export const selectCreateReviewError = (state: RootState) => state.reviewEditor.createReviewError;
 
+export const selectDeleteReviewsLoading = (state: RootState) => state.reviewEditor.deleteReviewsLoading;
+export const selectDeleteReviewsError = (state: RootState) => state.reviewEditor.deleteReviewsError;
+
 export const selectLang = (state: RootState) => state.reviewEditor.language;
 export const selectModel = (state: RootState) => state.reviewEditor.model;
 export const selectCodeSnippet = (state: RootState) => state.reviewEditor.codeSnippet;

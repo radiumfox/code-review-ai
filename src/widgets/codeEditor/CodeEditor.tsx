@@ -11,7 +11,7 @@ import { ResetIcon } from '@/components/icons/ResetIcon';
 import { CopyIcon } from '@/components/icons/CopyIcon';
 import { EDITOR_BASIC_SETUP, EDITOR_TEST_IDS } from './config';
 import { useCodeEditor } from './useCodeEditor';
-import { useGetReview } from './useGetReview';
+import { useGetReview } from '@/features/getReview';
 import { ReviewSummary } from './ReviewSummary';
 import { SlideOutDrawer } from '@/components/SlideOutDrawer';
 import { ButtonIcon } from '@/components/ButtonIcon';
@@ -20,8 +20,6 @@ import { CommentsList } from './CommentsList';
 import { AIModelSelect } from './AIModelSelect';
 import { TooltipBase } from '@/components/TooltipBase';
 import { ButtonPrimary } from '@/components/ButtonPrimary';
-import { ButtonSecondary } from '@/components/ButtonSecondary';
-import { ButtonBorder } from '@/components/ButtonBorder';
 
 export function CodeEditor() {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);

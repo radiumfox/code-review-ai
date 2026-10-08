@@ -1,0 +1,1 @@
+export { DeleteReviewsModal } from './DeleteReviewsModal';
