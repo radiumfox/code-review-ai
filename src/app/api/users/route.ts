@@ -30,7 +30,7 @@ export async function PATCH(request: NextRequest) {
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       session.user.id,
-      input.data,
+      { $set: { aiModel: input.data.aiModel } },
       { new: true, runValidators: true }
     );
 

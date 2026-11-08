@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { buildPrompt } from './buildPrompt';
 import promptTemplate from '@/prompts/code-review-default.json';
 import type { ReviewGenerateRequest } from '@/lib/types';
+import { FREE_AI_MODELS } from '@/lib/config';
 
 const codeSnippet = 'const a = 1;\nconst b = 2;';
 
@@ -9,7 +10,7 @@ function createRequest(overrides: Partial<ReviewGenerateRequest> = {}): ReviewGe
   return {
     language: 'js',
     codeSnippet,
-    model: 'llama-3.3-70b-versatile',
+    model: FREE_AI_MODELS[0],
     ...overrides,
   };
 }
