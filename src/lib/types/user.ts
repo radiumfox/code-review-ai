@@ -21,3 +21,15 @@ export interface User {
     createdAt: string;
     updatedAt: string;
 }
+
+export const USER_IMMUTABLE_FIELDS = [
+  'email',
+  'provider',
+  'githubId',
+  'githubUsername',
+  'googleId',
+  'role',
+  'name'
+] as const;
+
+export type UserImmutableField = typeof USER_IMMUTABLE_FIELDS[number];
