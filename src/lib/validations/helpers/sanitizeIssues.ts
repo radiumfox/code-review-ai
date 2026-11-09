@@ -18,7 +18,7 @@ interface SanitizeIssuesResult {
 }
 
 const countSnippetLines = function (codeSnippet: string): number {
-  return sanitizeCodeSnippet(codeSnippet).length;
+  return sanitizeCodeSnippet(codeSnippet).split('\n').length;
 };
 
 export const sanitizeIssues = function (rawIssues: unknown, codeSnippet: string): SanitizeIssuesResult {

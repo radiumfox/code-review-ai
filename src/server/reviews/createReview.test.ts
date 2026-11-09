@@ -23,7 +23,7 @@ describe('createReview', () => {
     const aiPayload = {
       summary: 'Clean code with minor issues',
       issues: [{
-        line: 3,
+        line: 1,
         severity: 'warning',
         category: 'style',
         message: 'Missing semicolon',
@@ -55,6 +55,53 @@ describe('createReview', () => {
       summary: 'Clean code with minor issues',
       issues: aiPayload.issues,
     }));
+    expect(result).toEqual(created);
+  });
+
+  test('Clamps an out-of-range AI issue line to the snippet length and persists the review', async () => {
+    const codeSnippet = 'const a = 1;\nconst b = 2;\nconst c = 3;';
+    const aiPayload = {
+      summary: 'Review with a hallucinated line number',
+      issues: [{
+        line: 9999,
+        severity: 'warning',
+        category: 'style',
+        message: 'Out-of-range line',
+        suggestion: 'Clamp the line to the last line',
+      }],
+    };
+
+    mockGenerateContent.mockResolvedValue([{
+      message: { content: JSON.stringify(aiPayload) },
+    }]);
+
+    const clampedIssues = [{ ...aiPayload.issues[0], line: 3 }];
+
+    const created = {
+      _id: 'rev-2',
+      userId: 'user-1',
+      ...aiPayload,
+      issues: clampedIssues,
+      language: DEFAULT_LANGUAGE,
+      codeSnippet,
+      model: AI_MODEL,
+    };
+
+    mockReviewCreate.mockResolvedValue(created);
+
+    const { createReview } = await import('@/server/reviews/createReview');
+    const result = await createReview('user-1', {
+      language: DEFAULT_LANGUAGE,
+      codeSnippet,
+      model: AI_MODEL,
+    });
+
+    expect(mockReviewCreate).toHaveBeenCalledWith(expect.objectContaining({
+      userId: 'user-1',
+      codeSnippet,
+      issues: clampedIssues,
+    }));
+
     expect(result).toEqual(created);
   });
 
@@ -108,6 +155,7 @@ describe('createReview', () => {
         codeSnippet: 'let x = 1',
         model: AI_MODEL,
       });
+
       expect.unreachable('Should have thrown');
     } catch (error) {
       if (isApiError(error)) {
