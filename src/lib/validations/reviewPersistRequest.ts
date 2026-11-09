@@ -20,7 +20,7 @@ export const reviewPersistRequestSchema = z.object({
   summary: z.string().min(SUMMARY_MIN_VALUE),
   issues: z.array(
     z.object({
-      line: z.number().min(ISSUE_LINE_MIN_VALUE),
+      line: z.number().int().min(ISSUE_LINE_MIN_VALUE),
       severity: z.enum(IssueSeverity),
       category: z.enum(IssueCategory),
       message: z.string().min(ISSUE_MESSAGE_MIN_VALUE),

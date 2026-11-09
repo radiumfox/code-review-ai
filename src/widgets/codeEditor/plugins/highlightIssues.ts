@@ -8,8 +8,37 @@ import {
 } from '@uiw/react-codemirror';
 import { Issue } from '@/lib/types/review';
 import { ISSUE_SEVERITY_COLOR_MAP } from '@/lib/config';
+import { clampLineNumber } from '@/lib/validations/helpers/clampLineNumber';
 
 export const setIssuesEffect = StateEffect.define<Issue[]>();
+
+const getChangedLineNumbers = function (transaction: Transaction): Set<number> {
+  const changedLines = new Set<number>();
+  transaction.changes.iterChangedRanges((_fromA, _toA, fromB, toB) => {
+    const doc = transaction.state.doc;
+    const startLine = doc.lineAt(fromB).number;
+    const endLine = doc.lineAt(toB).number;
+    for (let i = startLine; i <= endLine; i++) {
+      changedLines.add(i);
+    }
+  });
+  return changedLines;
+};
+
+const buildIssueDecorations = function (issues: Issue[], state: EditorState): DecorationSet {
+  const decorations = issues.map(issue => {
+    const color = ISSUE_SEVERITY_COLOR_MAP[issue.severity];
+    const line = state.doc.line(clampLineNumber(issue.line, state.doc.lines));
+
+    return Decoration.line({
+      attributes: {
+        style: `background-color: ${color}15; border-left: 3px solid ${color};`
+      }
+    }).range(line.from);
+  });
+
+  return Decoration.set(decorations, true);
+};
 
 export const issueDecorationsField = StateField.define<DecorationSet>({
   create() {
@@ -37,34 +66,6 @@ export const issueDecorationsField = StateField.define<DecorationSet>({
   },
   provide: field => EditorView.decorations.from(field)
 });
-
-function getChangedLineNumbers(transaction: Transaction): Set<number> {
-  const changedLines = new Set<number>();
-  transaction.changes.iterChangedRanges((_fromA, _toA, fromB, toB) => {
-    const doc = transaction.state.doc;
-    const startLine = doc.lineAt(fromB).number;
-    const endLine = doc.lineAt(toB).number;
-    for (let i = startLine; i <= endLine; i++) {
-      changedLines.add(i);
-    }
-  });
-  return changedLines;
-}
-
-function buildIssueDecorations(issues: Issue[], state: EditorState): DecorationSet {
-  const decorations = issues.map(issue => {
-    const color = ISSUE_SEVERITY_COLOR_MAP[issue.severity];
-    const line = state.doc.line(issue.line);
-
-    return Decoration.line({
-      attributes: {
-        style: `background-color: ${color}15; border-left: 3px solid ${color};`
-      }
-    }).range(line.from);
-  });
-
-  return Decoration.set(decorations, true);
-}
 
 export const issuesField = StateField.define<Issue[]>({
   create: () => [],
