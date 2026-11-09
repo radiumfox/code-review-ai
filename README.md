@@ -9,7 +9,7 @@ An AI-powered code review application that analyzes source code and provides str
 * 📍 Line-by-line review comments
 * 🚦 Severity levels (Error, Warning, Suggestion)
 * 📂 Review history
-* 🔐 GitHub authentication
+* 🔐 GitHub and Google authentication
 
 ## Tech Stack
 

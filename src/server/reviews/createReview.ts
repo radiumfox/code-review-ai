@@ -6,6 +6,8 @@ import { ERROR_CODES, STATUS_CODE_BY_CODE, apiError } from '@/lib/api/errors';
 import { buildPrompt } from './helpers/buildPrompt';
 
 import { AIChoice } from '@/lib/genAI/openai/types';
+import { sanitizeIssues } from '@/lib/validations/helpers/sanitizeIssues';
+import { prettifyError } from 'zod';
 
 
 async function callAI(prompt: string, model?: string) {
@@ -39,7 +41,11 @@ function validateReviewData(data: unknown) {
   const reviewData = reviewPersistRequestSchema.safeParse(data);
 
   if(!reviewData.success) {
-    throw reviewData.error;
+    throw apiError(
+      prettifyError(reviewData.error),
+      ERROR_CODES.VALIDATION,
+      STATUS_CODE_BY_CODE[ERROR_CODES.VALIDATION],
+    );
   }
 
   return reviewData.data;
@@ -59,6 +65,17 @@ export async function createReview(userId: string, params: ReviewGenerateRequest
   }
 
   const reviewData = parseAIResponse(aiResponse);
-  const validated = validateReviewData({ ...reviewData, ...params });
+  const { issues, droppedCount, clampedCount } = sanitizeIssues(
+    reviewData.issues,
+    params.codeSnippet,
+  );
+
+  if (droppedCount > 0 || clampedCount > 0) {
+    console.warn(
+      `Sanitized AI issues: ${droppedCount} dropped, ${clampedCount} clamped`,
+    );
+  }
+
+  const validated = validateReviewData({ ...reviewData, ...params, issues });
   return persistReview(userId, { ...params, ...validated });
 }

@@ -1,9 +1,10 @@
 import { fillTemplate } from './fillTemplate';
 import promptTemplate from '@/prompts/code-review-default.json';
 import { ReviewGenerateRequest } from '@/lib/types';
+import { sanitizeCodeSnippet } from '@/lib/validations/helpers/sanitizeCodeSnippet';
 
 export function buildPrompt(input: ReviewGenerateRequest) {
-  const normalizedCode = input.codeSnippet.replace(/\r\n?/g, '\n').replace(/\s+$/g, '');
+  const normalizedCode = sanitizeCodeSnippet(input.codeSnippet);
   const numberedCode = normalizedCode
     .split('\n')
     .map((line, index) => `${index + 1}: ${line}`)
