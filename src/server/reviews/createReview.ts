@@ -2,44 +2,62 @@ import { generateContent } from '@/lib/genAI/openai';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
 import { ReviewGenerateRequest, ReviewPersistRequest, type AllowedAIModel } from '@/lib/types';
-import { ERROR_CODES, STATUS_CODE_BY_CODE, apiError } from '@/lib/api/errors';
+import { ERROR_CODES, STATUS_CODE_BY_CODE, apiError, isApiError } from '@/lib/api/errors';
 import { buildPrompt } from './helpers/buildPrompt';
+import { aiReviewResponseSchema } from './aiReviewResponse';
+import type { AIReviewResponse } from './types';
 
-import { AIChoice } from '@/lib/genAI/openai/types';
+function aiError(message: string) {
+  return apiError(message, ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
+}
 
+function parseAIResponse(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw aiError('AI returned invalid JSON');
+  }
+}
 
-async function callAI(prompt: string, model?: AllowedAIModel) {
-  if(!model) {
+function validateAIResponse(data: unknown): AIReviewResponse {
+  const aiReview = aiReviewResponseSchema.safeParse(data);
+
+  if (!aiReview.success) {
+    throw aiError('AI returned invalid review structure');
+  }
+
+  return aiReview.data;
+}
+
+async function callAI(prompt: string, model: AllowedAIModel | undefined): Promise<AIReviewResponse> {
+  if (!model) {
     throw new Error('Model is missing');
   }
 
   try {
-    return await generateContent({ contents: prompt, model: model });
+    const choices = await generateContent({ contents: prompt, model });
+
+    if (!choices) {
+      throw aiError('AI returned no candidates');
+    }
+
+    const text = choices[0]?.message?.content ?? '';
+    return validateAIResponse(parseAIResponse(text));
   } catch (error) {
+    if (isApiError(error)) {
+      throw error;
+    }
+
     const message = error instanceof Error ? error.message : 'AI generation failed';
-    throw apiError(message, ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
+    throw aiError(message);
   }
 }
 
-function extractText(choices: AIChoice[] | undefined): string | null {
-  return choices?.[0]?.message?.content ?? null;
-}
-
-function parseAIResponse(aiResponse: AIChoice[]) {
-  const text = extractText(aiResponse) ?? '';
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw apiError('AI returned invalid JSON', ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
-  }
-}
-
-function validateReviewData(data: unknown) {
+function validateReviewData(data: unknown): ReviewPersistRequest {
   const reviewData = reviewPersistRequestSchema.safeParse(data);
 
-  if(!reviewData.success) {
-    throw reviewData.error;
+  if (!reviewData.success) {
+    throw aiError('AI returned invalid review structure');
   }
 
   return reviewData.data;
@@ -51,14 +69,8 @@ async function persistReview(userId: string, params: ReviewPersistRequest) {
 
 export async function createReview(userId: string, params: ReviewGenerateRequest) {
   const prompt = buildPrompt(params);
+  const aiReview = await callAI(prompt, params.model);
+  const validated = validateReviewData({ ...params, ...aiReview });
 
-  const aiResponse = await callAI(prompt, params.model);
-
-  if(!aiResponse) {
-    throw apiError('AI returned no candidates', ERROR_CODES.AI, STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
-  }
-
-  const reviewData = parseAIResponse(aiResponse);
-  const validated = validateReviewData({ ...reviewData, ...params });
-  return persistReview(userId, { ...params, ...validated });
+  return persistReview(userId, validated);
 }

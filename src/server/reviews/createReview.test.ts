@@ -96,6 +96,34 @@ describe('createReview', () => {
     })).rejects.toThrow('AI returned invalid JSON');
   });
 
+  test('Throws aiError and does not persist when AI returns invalid review structure', async () => {
+    mockGenerateContent.mockResolvedValue([{
+      message: { content: JSON.stringify({ summary: '', issues: [] }) },
+    }]);
+
+    const { createReview } = await import('@/server/reviews/createReview');
+    const { isApiError, ERROR_CODES, STATUS_CODE_BY_CODE } = await import('@/lib/api/errors');
+
+    try {
+      await createReview('user-1', {
+        language: DEFAULT_LANGUAGE,
+        codeSnippet: 'let x = 1',
+        model: AI_MODEL,
+      });
+      expect.unreachable('Should have thrown');
+    } catch (error) {
+      if (isApiError(error)) {
+        expect(error.message).toBe('AI returned invalid review structure');
+        expect(error.code).toBe(ERROR_CODES.AI);
+        expect(error.statusCode).toBe(STATUS_CODE_BY_CODE[ERROR_CODES.AI]);
+      } else {
+        expect.unreachable('Expected an ApiError');
+      }
+    }
+
+    expect(mockReviewCreate).not.toHaveBeenCalled();
+  });
+
   test('Wraps generateContent errors as aiError matching ApiError contract', async () => {
     mockGenerateContent.mockRejectedValue(new Error('Network timeout'));
 
