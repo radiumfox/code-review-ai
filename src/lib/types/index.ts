@@ -5,3 +5,5 @@ export { AuthProvider, UserRole, USER_IMMUTABLE_FIELDS } from './user';
 export type { User, UserImmutableField } from './user';
 
 export type { CodingLanguage } from './languages';
+
+export type { AllowedAIModel } from './model';

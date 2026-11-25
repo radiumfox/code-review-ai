@@ -3,7 +3,7 @@ import GithubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import { type CallbacksOptions } from 'next-auth';
 import { UserModel } from '@/models/User';
-import { AuthProvider, UserRole } from '@/lib/types';
+import { AuthProvider, UserRole, type AllowedAIModel } from '@/lib/types';
 import { connectToDatabase } from '@/lib/api';
 import { ROUTES, DEFAULT_AI_MODEL } from '@/lib/config';
 
@@ -18,14 +18,14 @@ declare module 'next-auth' {
         login?: string, id?: number, sub?: string
     }
     interface Session {
-      user: { id: string; aiModel: string | null } & DefaultSession['user'];
+      user: { id: string; aiModel: AllowedAIModel | null } & DefaultSession['user'];
     }
 }
 
 declare module 'next-auth/jwt' {
     interface JWT {
         id: string;
-        aiModel: string | null;
+        aiModel: AllowedAIModel | null;
     }
 }
 

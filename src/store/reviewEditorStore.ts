@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { Review, ReviewGenerateRequest } from '@/lib/types';
+import { Review, ReviewGenerateRequest, type AllowedAIModel } from '@/lib/types';
 import { DEFAULT_EDITOR_VALUE, DEFAULT_LANGUAGE, API_ROUTES } from '@/lib/config';
 import type { RootState } from './index';
 import type { CodingLanguage } from '@/lib/types/languages';
@@ -16,7 +16,7 @@ interface ReviewEditorState {
   deleteReviewsLoading: boolean;
   deleteReviewsError: ApiError | null;
   language: CodingLanguage | null;
-  model: string | null;
+  model: AllowedAIModel | null;
   codeSnippet: string;
   summary: string;
 }
@@ -154,7 +154,7 @@ export const reviewEditorSlice = createSlice({
     setLanguage: (state, action: PayloadAction<CodingLanguage>) => {
       state.language = action.payload;
     },
-    setModel: (state, action: PayloadAction<string>) => {
+    setModel: (state, action: PayloadAction<AllowedAIModel>) => {
       state.model = action.payload;
     },
     setCodeSnippet: (state, action: PayloadAction<string>) => {
@@ -163,7 +163,7 @@ export const reviewEditorSlice = createSlice({
     setSummary: (state, action: PayloadAction<string>) => {
       state.summary = action.payload;
     },
-    resetCurrentReview: (state, action: PayloadAction<string | null>) => {
+    resetCurrentReview: (state, action: PayloadAction<AllowedAIModel | null>) => {
       state.currentReview = null;
       state.language = DEFAULT_LANGUAGE;
       state.model = action.payload;

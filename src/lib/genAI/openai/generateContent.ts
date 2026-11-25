@@ -1,8 +1,9 @@
 import { getAIClient } from '@/lib/genAI/openai/genAI';
+import { type AllowedAIModel } from '@/lib/types';
 
 
 
-export async function generateContent({ contents, model, userApiKey }: { contents: string, model: string, userApiKey?: string }) {
+export async function generateContent({ contents, model, userApiKey }: { contents: string, model: AllowedAIModel, userApiKey?: string }) {
   const client = getAIClient(userApiKey);
   const response = await client.chat.completions.create({
     model,

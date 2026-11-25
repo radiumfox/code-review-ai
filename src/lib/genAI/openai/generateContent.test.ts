@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import { AI_MODEL } from './config';
+import { DEFAULT_AI_MODEL } from '@/lib/config';
 
 const mockCreate = vi.fn();
 const mockGetAIClient = vi.fn();
@@ -20,11 +20,11 @@ describe('generateContent', () => {
     mockGetAIClient.mockReturnValue({ chat: { completions: { create: mockCreate } } });
 
     const { generateContent } = await import('@/lib/genAI/openai/generateContent');
-    const result = await generateContent({ contents: 'test prompt', model: AI_MODEL });
+    const result = await generateContent({ contents: 'test prompt', model: DEFAULT_AI_MODEL });
 
     expect(mockGetAIClient).toHaveBeenCalled();
     expect(mockCreate).toHaveBeenCalledWith({
-      model: AI_MODEL,
+      model: DEFAULT_AI_MODEL,
       messages: [{ role: 'user', content: 'test prompt' }],
       response_format: { type: 'json_object' },
     });

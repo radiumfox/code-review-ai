@@ -20,7 +20,7 @@ import {
 } from '@/store/reviewEditorStore';
 import { reviewsListSlice } from '@/store/reviewsListStore';
 import type { RootState } from '@/store';
-import { DEFAULT_LANGUAGE, DEFAULT_EDITOR_VALUE } from '@/lib/config';
+import { DEFAULT_LANGUAGE, DEFAULT_EDITOR_VALUE, FREE_AI_MODELS } from '@/lib/config';
 import { AI_MODEL } from '@/lib/genAI/openai/config';
 import type { Review, ReviewGenerateRequest } from '@/lib/types';
 import { ERROR_CODES, FALLBACK_STATUS_CODE, STATUS_CODE_BY_CODE } from '@/lib/api/errors';
@@ -79,13 +79,13 @@ describe('Synchronous reducers', () => {
 
   describe('setCurrentReview', () => {
     test('Sets review and updates all fields', () => {
-      const review = createMockReview({ language: 'py', model: 'other-model', codeSnippet: 'print(1)', summary: 'Looks good' });
+      const review = createMockReview({ language: 'py', model: FREE_AI_MODELS[0], codeSnippet: 'print(1)', summary: 'Looks good' });
       state = reviewEditorSlice.reducer(state, setCurrentReview(review));
       const root = asRootState(state);
 
       expect(selectCurrentReview(root)).toEqual(review);
       expect(selectLang(root)).toBe('py');
-      expect(selectModel(root)).toBe('other-model');
+      expect(selectModel(root)).toBe(FREE_AI_MODELS[0]);
       expect(selectCodeSnippet(root)).toBe('print(1)');
       expect(selectSummary(root)).toBe('Looks good');
     });
@@ -109,8 +109,8 @@ describe('Synchronous reducers', () => {
   });
 
   test('setModel updates model', () => {
-    state = reviewEditorSlice.reducer(state, setModel('other-model'));
-    expect(selectModel(asRootState(state))).toBe('other-model');
+    state = reviewEditorSlice.reducer(state, setModel(FREE_AI_MODELS[0]));
+    expect(selectModel(asRootState(state))).toBe(FREE_AI_MODELS[0]);
   });
 
   test('setCodeSnippet updates codeSnippet', () => {
@@ -127,7 +127,7 @@ describe('Synchronous reducers', () => {
     test('Reverts fields to defaults and sets the passed model', () => {
       state = reviewEditorSlice.reducer(state, setCurrentReview(createMockReview({
         language: 'py',
-        model: 'other',
+        model: FREE_AI_MODELS[0],
         codeSnippet: 'x = 1',
         summary: 'Changed',
       })));
@@ -209,13 +209,13 @@ describe('extraReducers - createReview', () => {
 
 describe('selector-reducer contract', () => {
   test('Selectors reflect state after setCurrentReview', () => {
-    const review = createMockReview({ language: 'py', model: 'gpt-4', codeSnippet: 'x=1', summary: 'ok' });
+    const review = createMockReview({ language: 'py', model: FREE_AI_MODELS[0], codeSnippet: 'x=1', summary: 'ok' });
     const state = reviewEditorSlice.reducer(initialState, setCurrentReview(review));
     const root = asRootState(state);
 
     expect(selectCurrentReview(root)).toEqual(review);
     expect(selectLang(root)).toBe('py');
-    expect(selectModel(root)).toBe('gpt-4');
+    expect(selectModel(root)).toBe(FREE_AI_MODELS[0]);
     expect(selectCodeSnippet(root)).toBe('x=1');
     expect(selectSummary(root)).toBe('ok');
   });

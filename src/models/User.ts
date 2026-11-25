@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { AuthProvider, UserRole } from '@/lib/types';
+import { FREE_AI_MODELS } from '@/lib/config';
 
 const { Schema } = mongoose;
 
@@ -28,6 +29,7 @@ const UserSchema = new Schema({
   },
   aiModel: {
     type: String,
+    enum: FREE_AI_MODELS,
     default: null
   },
   role: {
