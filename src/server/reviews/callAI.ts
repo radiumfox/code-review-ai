@@ -7,6 +7,7 @@ import type { AIReviewResponse } from './types';
 const AI_OUTPUT_ERRORS = {
   invalidJson: 'AI returned invalid JSON',
   invalidStructure: 'AI returned invalid review structure',
+  invalidIssueLine: 'AI returned issue line outside snippet',
   noCandidates: 'AI returned no candidates',
 };
 
@@ -24,17 +25,25 @@ function parseAIResponse(text: string): unknown {
   }
 }
 
-function validateAIResponse(data: unknown): AIReviewResponse {
+function validateAIResponse(data: unknown, lineCount: number): AIReviewResponse {
   const aiReview = aiReviewResponseSchema.safeParse(data);
 
   if (!aiReview.success) {
     throw aiError(AI_OUTPUT_ERRORS.invalidStructure);
   }
 
+  if (aiReview.data.issues.some(issue => issue.line > lineCount)) {
+    throw aiError(AI_OUTPUT_ERRORS.invalidIssueLine);
+  }
+
   return aiReview.data;
 }
 
-async function callAI(prompt: string, model: AllowedAIModel): Promise<AIReviewResponse> {
+async function callAI(
+  prompt: string,
+  model: AllowedAIModel,
+  lineCount: number
+): Promise<AIReviewResponse> {
   try {
     const choices = await generateContent({ contents: prompt, model });
 
@@ -43,7 +52,7 @@ async function callAI(prompt: string, model: AllowedAIModel): Promise<AIReviewRe
     }
 
     const text = choices[0]?.message?.content ?? '';
-    return validateAIResponse(parseAIResponse(text));
+    return validateAIResponse(parseAIResponse(text), lineCount);
   } catch (error) {
     if (isApiError(error)) {
       throw error;
@@ -62,15 +71,16 @@ function isRetryableAiOutputError(error: unknown): boolean {
 
 export async function callAIWithRetry(
   prompt: string,
-  model: AllowedAIModel
+  model: AllowedAIModel,
+  lineCount: number
 ): Promise<AIReviewResponse> {
   try {
-    return await callAI(prompt, model);
+    return await callAI(prompt, model, lineCount);
   } catch (error) {
     if (!isRetryableAiOutputError(error)) {
       throw error;
     }
 
-    return await callAI(prompt, model);
+    return await callAI(prompt, model, lineCount);
   }
 }
