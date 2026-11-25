@@ -1,14 +1,14 @@
 import { generateContent } from '@/lib/genAI/openai';
 import { reviewPersistRequestSchema } from '@/lib/validations/reviewPersistRequest';
 import { ReviewModel } from '@/models/Review';
-import { ReviewGenerateRequest, ReviewPersistRequest } from '@/lib/types';
+import { ReviewGenerateRequest, ReviewPersistRequest, type AllowedAIModel } from '@/lib/types';
 import { ERROR_CODES, STATUS_CODE_BY_CODE, apiError } from '@/lib/api/errors';
 import { buildPrompt } from './helpers/buildPrompt';
 
 import { AIChoice } from '@/lib/genAI/openai/types';
 
 
-async function callAI(prompt: string, model?: string) {
+async function callAI(prompt: string, model?: AllowedAIModel) {
   if(!model) {
     throw new Error('Model is missing');
   }

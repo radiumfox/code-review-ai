@@ -1,3 +1,5 @@
+import { type AllowedAIModel } from '@/lib/types';
+
 export enum UserRole {
     Admin = 'admin',
     User = 'user'
@@ -16,7 +18,7 @@ export interface User {
     githubId?: string;
     githubUsername?: string;
     googleId?: string;
-    aiModel: string | null;
+    aiModel: AllowedAIModel | null;
     role: UserRole;
     createdAt: string;
     updatedAt: string;

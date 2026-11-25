@@ -1,15 +1,15 @@
 import { describe, expect, test } from 'vitest';
 import { type Issue, IssueCategory, IssueSeverity, type ReviewPersistRequest } from '@/lib/types';
-import promptTemplate from '@/prompts/code-review-default.json';
 import { reviewPersistRequestSchema } from './reviewPersistRequest';
-import { CODE_SNIPPET_MAX_VALUE, LANGUAGE_MAX_VALUE, MODEL_MAX_VALUE } from '@/lib/validations/config';
+import { CODE_SNIPPET_MAX_VALUE, LANGUAGE_MAX_VALUE } from '@/lib/validations/config';
+import { FREE_AI_MODELS } from '@/lib/config';
 
 const mockDataTemplate: ReviewPersistRequest = Object.freeze({
   summary: 'Summary',
   issues: undefined,
   language: 'js',
   codeSnippet: 'console.log(\'hello world!\');',
-  model: promptTemplate.model,
+  model: FREE_AI_MODELS[0],
 });
 
 const issueMockDataTemplate: Issue = Object.freeze({
@@ -115,16 +115,13 @@ describe('reviewPersistRequestSchema', () => {
     expect(validation2.error).toBeTruthy();
   });
 
-  test('Parse with error if model name length doesn\'t satisfy constraints', () => {
-    const data1 = createMockData({ model: '' });
-    const data2 = createMockData({ model: 'x'.repeat(MODEL_MAX_VALUE + 1) });
-    const validation1 = reviewPersistRequestSchema.safeParse(data1);
-    const validation2 = reviewPersistRequestSchema.safeParse(data2);
+  test('Parse with error if model is outside the allowed list', () => {
+    // @ts-expect-error Need to test a wrong model name
+    const data = createMockData({ model: 'gpt-4' });
+    const validation = reviewPersistRequestSchema.safeParse(data);
 
-    expect(validation1.success).toBe(false);
-    expect(validation1.error).toBeTruthy();
-    expect(validation2.success).toBe(false);
-    expect(validation2.error).toBeTruthy();
+    expect(validation.success).toBe(false);
+    expect(validation.error).toBeTruthy();
   });
 });
 

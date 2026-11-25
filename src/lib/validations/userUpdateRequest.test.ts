@@ -24,8 +24,10 @@ describe('userUpdateRequest', () => {
     expect(userUpdateRequest.safeParse({ aiModel: null }).success).toBe(true);
   });
 
-  test('Rejects a model outside the allowlist', () => {
-    expect(userUpdateRequest.safeParse({ aiModel: 'gpt-4' }).success).toBe(false);
+  test('Rejects a model outside the allowed list', () => {
+    const validation = userUpdateRequest.safeParse({ aiModel: 'gpt-4' });
+    expect(validation.success).toBe(false);
+    expect(validation.error).toBeTruthy();
   });
 
   test.each(USER_IMMUTABLE_FIELDS)(

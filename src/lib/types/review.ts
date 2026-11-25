@@ -1,4 +1,5 @@
 import type { CodingLanguage } from '@/lib/types/languages';
+import { type AllowedAIModel } from '@/lib/types';
 
 export enum IssueSeverity {
     Error = 'error',
@@ -24,7 +25,7 @@ export interface Issue {
 export interface ReviewGenerateRequest {
     language: string;
     codeSnippet: string;
-    model: string;
+    model: AllowedAIModel;
 }
 
 export interface ReviewPersistRequest {
@@ -32,7 +33,7 @@ export interface ReviewPersistRequest {
     issues?: Issue[];
     language: string;
     codeSnippet: string;
-    model: string;
+    model: AllowedAIModel;
 }
 
 export interface Review {
@@ -42,5 +43,5 @@ export interface Review {
     createdAt: string;
     language: CodingLanguage;
     codeSnippet: string;
-    model: string;
+    model: AllowedAIModel;
 }

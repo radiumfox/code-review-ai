@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { IssueSeverity, IssueCategory } from '@/lib/types';
+import { FREE_AI_MODELS } from '@/lib/config';
 
 const { Schema } = mongoose;
 
@@ -21,7 +22,8 @@ const ReviewSchema = new Schema({
     required: true
   },
   model: {
-    type: String
+    type: String,
+    enum: FREE_AI_MODELS
   },
   issues: {
     type: [{

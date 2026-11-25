@@ -8,10 +8,10 @@ import { API_ROUTES, MODEL_TO_DESCRIPTION_MAP } from '@/lib/config';
 import { selectModel, setModel } from '@/store/reviewEditorStore';
 import { NotificationType, useNotification } from '@/lib/providers/notifications';
 import { FetchModelReturn } from '@/lib/genAI/openai/types';
-import { type User } from '@/lib/types';
+import { type User, type AllowedAIModel } from '@/lib/types';
 
 interface UseAIModelReturn {
-  model: string | null;
+  model: AllowedAIModel | null;
   models: { value: string; label: string; description: string }[];
   onModelChange(modelId: string): void;
   fetchingModels: boolean;
@@ -38,7 +38,7 @@ export function useAIModel(): UseAIModelReturn {
     executeFetch: executeSaveModel,
     data: saveModelData,
     error: saveModelError,
-  } = useFetch<{ aiModel: string }, User>(API_ROUTES.users, 'PATCH');
+  } = useFetch<{ aiModel: AllowedAIModel }, User>(API_ROUTES.users, 'PATCH');
 
   const models = useMemo(() => {
     return modelsData?.models.map((model) => ({
@@ -93,7 +93,7 @@ export function useAIModel(): UseAIModelReturn {
     };
   }, [saveModelData, dispatch, updateSession, showNotification]);
 
-  const onModelChange = useCallback((modelId: string) => {
+  const onModelChange = useCallback((modelId: AllowedAIModel) => {
     executeSaveModel({ aiModel: modelId });
   }, [executeSaveModel]);
 
