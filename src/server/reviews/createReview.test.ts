@@ -58,7 +58,31 @@ describe('createReview', () => {
     expect(result).toEqual(created);
   });
 
-  test('Throws when AI returns no candidates', async () => {
+  test('Retries malformed AI output once with the same prompt', async () => {
+    const aiPayload = {
+      summary: 'Clean code',
+      issues: [],
+    };
+
+    mockGenerateContent
+      .mockResolvedValueOnce([{ message: { content: 'not valid json' } }])
+      .mockResolvedValueOnce([{ message: { content: JSON.stringify(aiPayload) } }]);
+
+    mockReviewCreate.mockResolvedValue({ _id: 'rev-1' });
+
+    const { createReview } = await import('@/server/reviews/createReview');
+    await createReview('user-1', {
+      language: DEFAULT_LANGUAGE,
+      codeSnippet: 'let x = 1',
+      model: AI_MODEL,
+    });
+
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2);
+    expect(mockGenerateContent.mock.calls[0]).toEqual(mockGenerateContent.mock.calls[1]);
+    expect(mockReviewCreate).toHaveBeenCalledTimes(1);
+  });
+
+  test('Throws when AI returns no candidates after one retry', async () => {
     mockGenerateContent.mockResolvedValue(undefined);
 
     const { createReview } = await import('@/server/reviews/createReview');
@@ -68,9 +92,10 @@ describe('createReview', () => {
       codeSnippet: 'let x = 1',
       model: AI_MODEL,
     })).rejects.toThrow('AI returned no candidates');
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2);
   });
 
-  test('Throws when AI returns empty candidates array', async () => {
+  test('Throws when AI returns empty candidates array after one retry', async () => {
     mockGenerateContent.mockResolvedValue([]);
 
     const { createReview } = await import('@/server/reviews/createReview');
@@ -79,10 +104,11 @@ describe('createReview', () => {
       language: DEFAULT_LANGUAGE,
       codeSnippet: 'let x = 1',
       model: AI_MODEL,
-    })).rejects.toThrow();
+    })).rejects.toThrow('AI returned no candidates');
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2);
   });
 
-  test('Throws when AI returns invalid JSON', async () => {
+  test('Throws when AI returns invalid JSON after one retry', async () => {
     mockGenerateContent.mockResolvedValue([{
       message: { content: 'not valid json' },
     }]);
@@ -94,9 +120,10 @@ describe('createReview', () => {
       codeSnippet: 'let x = 1',
       model: AI_MODEL,
     })).rejects.toThrow('AI returned invalid JSON');
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2);
   });
 
-  test('Throws aiError and does not persist when AI returns invalid review structure', async () => {
+  test('Throws aiError and does not persist when AI returns invalid review structure twice', async () => {
     mockGenerateContent.mockResolvedValue([{
       message: { content: JSON.stringify({ summary: '', issues: [] }) },
     }]);
@@ -121,10 +148,11 @@ describe('createReview', () => {
       }
     }
 
+    expect(mockGenerateContent).toHaveBeenCalledTimes(2);
     expect(mockReviewCreate).not.toHaveBeenCalled();
   });
 
-  test('Wraps generateContent errors as aiError matching ApiError contract', async () => {
+  test('Wraps generateContent errors as aiError and does not retry', async () => {
     mockGenerateContent.mockRejectedValue(new Error('Network timeout'));
 
     const { createReview } = await import('@/server/reviews/createReview');
@@ -146,5 +174,7 @@ describe('createReview', () => {
         expect.unreachable('Expected an ApiError');
       }
     }
+
+    expect(mockGenerateContent).toHaveBeenCalledTimes(1);
   });
 });
